@@ -55,7 +55,7 @@ E_DA  = 1192.25e3           # characteristic adsorption energy     [J/kg]
 n_DA  = 1.55                # DA heterogeneity parameter           [-]
 
 # --------------- Operating conditions ----------------------------------------
-T_LIST = [280, 300, 320]                                  # inlet temperatures [°C]
+T_LIST = [260, 280, 300, 320]                                  # inlet temperatures [°C]
 P_bar = 1.0                 # total pressure                       [bar]
 P_Pa  = P_bar * 1e5         # total pressure                       [Pa]
 
@@ -96,12 +96,10 @@ Cp_CH4 = 46.9
 Cp_H2O = 34.2
 Cp_N2  = 29.5
 
-# Wall heat-transfer coefficient × specific area [W/(m³·K)]
-# U_a = h_wall × (4/d_b).  Keeping h_wall = 500 W/(m²·K):
-#   Wei  (d=10 mm): 500 × 400 = 200 000
-#   Here (d=50 mm): 500 ×  80 =  40 000  — larger tube is less well cooled
-U_a = 8000              # [W / (m³ · K)]
-
+# Wall heat-transfer coefficient and specific area [W/(m³·K)]
+# h_wall ≈ 100 W/(m²·K)  — realistic for gas-phase packed bed, d = 50 mm
+# U_a = h_wall × (4/d_b) = 100 × 80 = 8000 W/(m³·K)
+U_a = 0 # adiabatic case
 # --------------- Spatial discretisation --------------------------------------
 N  = 100
 dz = L_b / (N - 1)
@@ -535,13 +533,14 @@ plt.show()
 
 # region 7c. PLOT — Bareschino Fig. 7 style: species mole fractions vs time
 # =============================================================================
-# 7c. PLOT — outlet mole fractions over time for T = 280, 300, 320 °C (SE on)
+# 7c. PLOT — outlet mole fractions over time for T = 280, 300, 320 °C
 # =============================================================================
 T_PLOT3 = [280, 300, 320]
 
 fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex='col')
 fig.suptitle(
-    f'Full-scale SEM (SE on)  —  d = {d_b*100:.0f} cm, L = {L_b:.0f} m\n'
+    f'Full-scale SEM  —  SE on (solid) vs SE off (dashed)  —  '
+    f'd = {d_b*100:.0f} cm, L = {L_b:.0f} m\n'
     f'Feed: {y_CO2_in:.1%} CO₂ / {y_H2_in:.0%} H₂ / {y_CH4_in:.1%} CH₄  —  '
     f'GHSV = {GHSV:.1f} m³/(kg·h)',
     fontsize=11
@@ -549,79 +548,200 @@ fig.suptitle(
 
 for col, T_C in enumerate(T_PLOT3):
     data         = all_results[T_C]
-    sol_on       = data['results'][True]
     C_in_CO2_row = data['C_in_CO2']
-
-    t_arr = sol_on.t
-    y_arr = sol_on.sol(t_arr)
-
-    C_CO2_out = np.maximum(y_arr[  N - 1, :], 0.0)
-    C_H2_out  = np.maximum(y_arr[2*N - 1, :], 0.0)
-    C_CH4_out = np.maximum(y_arr[3*N - 1, :], 0.0)
-    C_H2O_out = np.maximum(y_arr[4*N - 1, :], 0.0)
-    T_out     = np.maximum(y_arr[6*N - 1, :], 200.0)
-
-    C_tot = np.maximum(C_CO2_out + C_H2_out + C_CH4_out + C_H2O_out, 1e-15)
-    y_CO2 = C_CO2_out / C_tot
-    y_H2  = C_H2_out  / C_tot
-    y_CH4 = C_CH4_out / C_tot
-    y_H2O = C_H2O_out / C_tot
-    X_CO2 = np.clip((C_in_CO2_row - C_CO2_out) / C_in_CO2_row, 0.0, 1.0)
-    t_min = t_arr / 60
-
     ax_top = axes[0, col]
     ax_bot = axes[1, col]
 
-    ax_top.plot(t_min, y_CH4, 'k-',  lw=2, label='$y_{CH_4}$')
-    ax_top.plot(t_min, X_CO2, 'k--', lw=2, label='$X_{CO_2}$')
+    for sol, ls, suffix in [(data['results'][True], '-', 'SE on'),
+                             (data['results'][False], '--', 'SE off')]:
+        t_arr = sol.t
+        y_arr = sol.sol(t_arr)
+
+        C_CO2_out = np.maximum(y_arr[  N - 1, :], 0.0)
+        C_H2_out  = np.maximum(y_arr[2*N - 1, :], 0.0)
+        C_CH4_out = np.maximum(y_arr[3*N - 1, :], 0.0)
+        C_H2O_out = np.maximum(y_arr[4*N - 1, :], 0.0)
+
+        C_tot = np.maximum(C_CO2_out + C_H2_out + C_CH4_out + C_H2O_out, 1e-15)
+        y_CO2 = C_CO2_out / C_tot
+        y_H2  = C_H2_out  / C_tot
+        y_CH4 = C_CH4_out / C_tot
+        y_H2O = C_H2O_out / C_tot
+        X_CO2 = np.clip((C_in_CO2_row - C_CO2_out) / C_in_CO2_row, 0.0, 1.0)
+        t_min = t_arr / 60
+
+        ax_top.plot(t_min, y_CH4, color='k',       ls=ls, lw=2, label=f'$y_{{CH_4}}$ ({suffix})')
+        ax_top.plot(t_min, X_CO2, color='tab:red', ls=ls, lw=2, label=f'$X_{{CO_2}}$ ({suffix})')
+
+        ax_bot.plot(t_min, y_CO2, color='red',   ls=ls, lw=2, label=f'$y_{{CO_2}}$ ({suffix})')
+        ax_bot.plot(t_min, y_H2,  color='green', ls=ls, lw=2, label=f'$y_{{H_2}}$ ({suffix})')
+        ax_bot.plot(t_min, y_H2O, color='blue',  ls=ls, lw=2, label=f'$y_{{H_2O}}$ ({suffix})')
+
     ax_top.set_ylim(0, 1.1)
     ax_top.set_title(f'T = {T_C} °C', fontsize=11)
     ax_top.text(0.05, 0.08, chr(ord('a') + col), transform=ax_top.transAxes,
                 fontsize=13, fontweight='bold')
     if col == 0:
         ax_top.set_ylabel('$y_{CH_4}$,  $X_{CO_2}$  [–]', fontsize=10)
-    ax_top.legend(fontsize=9, loc='lower left')
+    ax_top.legend(fontsize=8, loc='lower left')
     ax_top.grid(True, alpha=0.3)
 
-    ax_bot.plot(t_min, y_CO2, color='red',   lw=2, label='$y_{CO_2}$')
-    ax_bot.plot(t_min, y_H2,  color='green', lw=2, label='$y_{H_2}$')
-    ax_bot.plot(t_min, y_H2O, color='blue',  lw=2, label='$y_{H_2O}$')
     ax_bot.set_ylim(0, 0.12)
     ax_bot.set_xlabel('time [min]', fontsize=10)
     if col == 0:
         ax_bot.set_ylabel('$y_{CO_2}$, $y_{H_2}$, $y_{H_2O}$  [–]', fontsize=10)
-    ax_bot.legend(fontsize=9)
+    ax_bot.legend(fontsize=8)
     ax_bot.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
 # endregion
 
-# region 7d. PLOT — Axial temperature profile at T_in = 300 °C (SE on)
+# region 7d. PLOT — Axial temperature profile at T_in = 300 °C (SE on vs SE off)
 # =============================================================================
-# 7d. PLOT — T(z) snapshots for SE on at T_in = 300 °C
+# 7d. PLOT — T(z) snapshots for SE on and SE off at T_in = 300 °C
 # =============================================================================
 T_C_prof     = 300
-sol_prof     = all_results[T_C_prof]['results'][True]
-t_max_avail  = sol_prof.t[-1]
+sol_prof_on  = all_results[T_C_prof]['results'][True]
+sol_prof_off = all_results[T_C_prof]['results'][False]
+t_max_avail  = sol_prof_on.t[-1]
 t_snaps_min  = [5, 15, 30, 50, 90, 120]
 snap_colors  = plt.cm.plasma(np.linspace(0.1, 0.9, len(t_snaps_min)))
 
 fig, ax = plt.subplots(figsize=(9, 5))
-for i, t_min in enumerate(t_snaps_min):
-    t_s = t_min * 60.0
+for i, t_snap in enumerate(t_snaps_min):
+    t_s = t_snap * 60.0
     if t_s > t_max_avail:
-        print(f"  t = {t_min} min exceeds solver range ({t_max_avail/60:.0f} min) — skipped")
+        print(f"  t = {t_snap} min exceeds solver range ({t_max_avail/60:.0f} min) — skipped")
         continue
-    T_prof = sol_prof.sol(t_s)[5*N : 6*N]
-    ax.plot(z_m, T_prof - 273.15, color=snap_colors[i], lw=2.0, label=f't = {t_min} min')
+    T_prof_on  = sol_prof_on.sol(t_s)[5*N : 6*N]
+    T_prof_off = sol_prof_off.sol(t_s)[5*N : 6*N]
+    ax.plot(z_m, T_prof_on  - 273.15, color=snap_colors[i], lw=2.0, label=f't = {t_snap} min')
+    ax.plot(z_m, T_prof_off - 273.15, color=snap_colors[i], lw=2.0, ls='--')
 
 ax.axhline(T_C_prof, color='grey', lw=1.0, ls=':', label=f'T_in = {T_C_prof} °C')
+ax.plot([], [], 'k-',  lw=2, label='SE on  (solid)')
+ax.plot([], [], 'k--', lw=2, label='SE off (dashed)')
 ax.set_xlabel('Bed position  z  [m]', fontsize=12)
 ax.set_ylabel('Temperature  [°C]', fontsize=12)
-ax.set_title(f'Axial temperature profile — T_in = {T_C_prof} °C, SE on', fontsize=11)
-ax.legend(fontsize=10)
+ax.set_title(f'Axial temperature profile — T_in = {T_C_prof} °C', fontsize=11)
+ax.legend(fontsize=9)
 ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+# endregion
+
+# region 7e. PLOT — Axial reaction rate profile at T_in = 300 °C
+# =============================================================================
+# 7e. PLOT — r(z) snapshots for SE on and SE off at T_in = 300 °C
+# =============================================================================
+T_C_rate     = 300
+sol_rate_on  = all_results[T_C_rate]['results'][True]
+sol_rate_off = all_results[T_C_rate]['results'][False]
+t_max_rate   = sol_rate_on.t[-1]
+t_snaps_rate = [5, 15, 30, 50, 90, 120]
+snap_cols_r  = plt.cm.plasma(np.linspace(0.1, 0.9, len(t_snaps_rate)))
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for i, t_snap in enumerate(t_snaps_rate):
+    t_s = t_snap * 60.0
+    if t_s > t_max_rate:
+        print(f"  t = {t_snap} min exceeds solver range ({t_max_rate/60:.0f} min) — skipped")
+        continue
+    for sol, ls in [(sol_rate_on, '-'), (sol_rate_off, '--')]:
+        y_s   = sol.sol(t_s)
+        C_CO2 = np.maximum(y_s[0*N : 1*N], 0.0)
+        C_H2  = np.maximum(y_s[1*N : 2*N], 0.0)
+        C_CH4 = np.maximum(y_s[2*N : 3*N], 0.0)
+        C_H2O = np.maximum(y_s[3*N : 4*N], 0.0)
+        T_loc = np.maximum(y_s[5*N : 6*N], 200.0)
+        p_CO2 = C_CO2 * R_gas * T_loc / 1e5
+        p_H2  = C_H2  * R_gas * T_loc / 1e5
+        p_CH4 = C_CH4 * R_gas * T_loc / 1e5
+        p_H2O = C_H2O * R_gas * T_loc / 1e5
+        r_prof = reaction_rate_SI(T_loc, p_CO2, p_H2, p_CH4, p_H2O)
+        label = f't = {t_snap} min' if ls == '-' else None
+        ax.plot(z_m, r_prof * 1e3, color=snap_cols_r[i], lw=2.0, ls=ls, label=label)
+
+ax.plot([], [], 'k-',  lw=2, label='SE on  (solid)')
+ax.plot([], [], 'k--', lw=2, label='SE off (dashed)')
+ax.set_xlabel('Bed position  z  [m]', fontsize=12)
+ax.set_ylabel('Reaction rate  [mmol / (kg_cat · s)]', fontsize=12)
+ax.set_title(f'Axial reaction rate profile — T_in = {T_C_rate} °C', fontsize=11)
+ax.legend(fontsize=9)
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+# endregion
+
+# region 7f. PLOT — Reaction rate over time (outlet + spatially averaged)
+# =============================================================================
+# 7f. PLOT — r(t) at outlet and bed-average for SE on vs SE off
+# =============================================================================
+fig, axes = plt.subplots(len(T_LIST), 2, figsize=(14, 5 * len(T_LIST)), squeeze=False)
+fig.suptitle(
+    f'Reaction rate vs time  —  Full-scale SEM  (d = {d_b*100:.0f} cm, L = {L_b:.0f} m)\n'
+    f'Feed: {y_CO2_in:.1%} CO₂ / {y_H2_in:.0%} H₂ / {y_CH4_in:.1%} CH₄  —  '
+    f'GHSV = {GHSV:.1f} m³/(kg·h),  U_a = {U_a:.0f} W/(m³·K)',
+    fontsize=11
+)
+
+for row, T_C in enumerate(T_LIST):
+    data    = all_results[T_C]
+    ax_out  = axes[row, 0]
+    ax_avg  = axes[row, 1]
+
+    for se_on, color, ls, label in [
+        (True,  'tab:blue',   '-',  'SE on'),
+        (False, 'tab:orange', '--', 'SE off'),
+    ]:
+        sol   = data['results'][se_on]
+        t_arr = sol.t
+        y_arr = sol.sol(t_arr)
+
+        # --- outlet reaction rate ---
+        C_CO2_o = np.maximum(y_arr[  N - 1, :], 0.0)
+        C_H2_o  = np.maximum(y_arr[2*N - 1, :], 0.0)
+        C_CH4_o = np.maximum(y_arr[3*N - 1, :], 0.0)
+        C_H2O_o = np.maximum(y_arr[4*N - 1, :], 0.0)
+        T_o     = np.maximum(y_arr[6*N - 1, :], 200.0)
+        r_out = reaction_rate_SI(
+            T_o,
+            C_CO2_o * R_gas * T_o / 1e5,
+            C_H2_o  * R_gas * T_o / 1e5,
+            C_CH4_o * R_gas * T_o / 1e5,
+            C_H2O_o * R_gas * T_o / 1e5,
+        )
+
+        # --- spatially-averaged reaction rate ---
+        C_CO2_all = np.maximum(y_arr[0*N : 1*N, :], 0.0)
+        C_H2_all  = np.maximum(y_arr[1*N : 2*N, :], 0.0)
+        C_CH4_all = np.maximum(y_arr[2*N : 3*N, :], 0.0)
+        C_H2O_all = np.maximum(y_arr[3*N : 4*N, :], 0.0)
+        T_all     = np.maximum(y_arr[5*N : 6*N, :], 200.0)
+        r_all = reaction_rate_SI(
+            T_all,
+            C_CO2_all * R_gas * T_all / 1e5,
+            C_H2_all  * R_gas * T_all / 1e5,
+            C_CH4_all * R_gas * T_all / 1e5,
+            C_H2O_all * R_gas * T_all / 1e5,
+        )
+        r_avg = r_all.mean(axis=0)
+
+        t_min = t_arr / 60
+        ax_out.plot(t_min, r_out * 1e3, color=color, ls=ls, lw=2.0, label=label)
+        ax_avg.plot(t_min, r_avg * 1e3, color=color, ls=ls, lw=2.0, label=label)
+
+    ax_out.set_xlabel('Time [min]')
+    ax_out.set_ylabel('r  [mmol / (kg_cat · s)]')
+    ax_out.set_title(f'Outlet reaction rate — T_in = {T_C} °C')
+    ax_out.legend(fontsize=9); ax_out.grid(True, alpha=0.3)
+
+    ax_avg.set_xlabel('Time [min]')
+    ax_avg.set_ylabel('r̄  [mmol / (kg_cat · s)]')
+    ax_avg.set_title(f'Bed-average reaction rate — T_in = {T_C} °C')
+    ax_avg.legend(fontsize=9); ax_avg.grid(True, alpha=0.3)
+
 plt.tight_layout()
 plt.show()
 # endregion

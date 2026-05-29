@@ -104,7 +104,7 @@ dz = L_b / (N - 1)       # node spacing                          [m]
 PARAM_SETS = {
     'Mette (2014)': {'W0': 341.00e-6, 'E': 1192.25e3, 'n': 1.55},
     'Kiefer (2022)':  {'W0':  90.17e-6, 'E': 1030.90e3, 'n': 1.55},
-    'Ligtenberg (2026)': {'W0':  190e-6, 'E':  1190.00e3, 'n': 1.55},  # hypothetical set for testing
+    'Ligtenberg (2026)': {'W0':  180e-6, 'E':  1190.00e3, 'n': 1.4},  # hypothetical set for testing
 }
 
 # --- Experimental reference data ---

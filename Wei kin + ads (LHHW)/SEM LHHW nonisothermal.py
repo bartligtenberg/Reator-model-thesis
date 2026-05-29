@@ -62,8 +62,8 @@ tau_p = 3.0                 # tortuosity factor                    [-]
 rho_ads = 998.2             # liquid water density                 [kg/m³]
 
 # --------------- DA isotherm parameters: Mette (2014) ------------------------
-W0_DA = 190.00e-6           # micropore volume                     [m³/kg_sorbent]
-E_DA  = 1190e3           # characteristic adsorption energy     [J/kg]
+W0_DA = 341.00e-6           # micropore volume                     [m³/kg_sorbent]
+E_DA  = 1192.25e3           # characteristic adsorption energy     [J/kg]
 n_DA  = 1.55                # DA heterogeneity parameter           [-]
 
 # --------------- Operating conditions ----------------------------------------
@@ -197,7 +197,7 @@ def reaction_rate_SI(T_K, p_CO2, p_H2, p_CH4, p_H2O):
            + K_mix * p_CO2_s)
 
     r_g_s = k * (p_CO2_s * p_H2_s)**0.5 * f_eq / DEN**2
-    return r_g_s * 1000.0 # mol/(g·s) → mol/(kg·s) with effectiveness factor
+    return r_g_s * 1000.0   # mol/(g·s) → mol/(kg·s)
 
 
 # endregion
@@ -409,9 +409,9 @@ def extract_outlet(sol, C_in_CO2_loc):
 # =============================================================================
 # 7. PLOT  (time-series, disabled — kept for reference)
 # =============================================================================
-if True:
+if False:
     n_rows = len(T_LIST)
-    fig, axes = plt.subplots(n_rows, 4, figsize=(22, 5 * n_rows), squeeze=False)
+    fig, axes = plt.subplots(n_rows, 3, figsize=(16, 5 * n_rows), squeeze=False)
     fig.suptitle(
         f'Non-isothermal SEM Column  —  P = {P_bar} bar,  U_a = {U_a:.0f} W/(m³·K)\n'
         f'Feed: {y_CO2_in:.1%} CO₂ / {y_H2_in:.0%} H₂ / {y_CH4_in:.1%} CH₄ / '
@@ -429,11 +429,10 @@ if True:
         t_off, X_off, pH2O_off, Tmax_off = extract_outlet(results[False], C_in_CO2_row)
 
         sol_on   = results[True]
-        sol_off  = results[False]
         t_snaps  = np.linspace(sol_on.t[1], sol_on.t[-1], 5)
         snap_col = plt.cm.plasma(np.linspace(0.15, 0.85, len(t_snaps)))
 
-        ax1, ax2, ax3, ax4 = axes[row]
+        ax1, ax2, ax3 = axes[row]
 
         ax1.plot(t_on  / 60, X_on  * 100, color='tab:blue',   lw=2.5, label='SE on')
         ax1.plot(t_off / 60, X_off * 100, color='tab:orange', lw=2.5, ls='--', label='SE off')
@@ -455,27 +454,6 @@ if True:
         ax3.set_xlabel('Bed position z [cm]'); ax3.set_ylabel('q  [mol/kg]')
         ax3.set_title(f'Solid-phase H₂O loading (SE on) — {T_C} °C')
         ax3.legend(fontsize=8, loc='upper left'); ax3.grid(True, alpha=0.3)
-
-        # --- Outlet species concentrations ---
-        y_on_arr  = sol_on.sol(sol_on.t)
-        y_off_arr = sol_off.sol(sol_off.t)
-        T_out_on  = y_on_arr[6*N - 1, :]
-        T_out_off = y_off_arr[6*N - 1, :]
-        to_mbar = lambda C, T_loc: np.maximum(C, 0.0) * R_gas * T_loc / 1e5 * 1000
-
-        for blk, label, col in [(0,'CO₂','tab:blue'), (1,'H₂','tab:green'),
-                                 (3,'H₂O','tab:purple')]:
-            C_on  = y_on_arr[ (blk+1)*N - 1, :]
-            C_off = y_off_arr[(blk+1)*N - 1, :]
-            ax4.plot(sol_on.t  / 60, to_mbar(C_on,  T_out_on),  color=col, lw=2.0,
-                     label=f'{label} (SE on)')
-            ax4.plot(sol_off.t / 60, to_mbar(C_off, T_out_off), color=col, lw=2.0,
-                     ls='--', label=f'{label} (SE off)')
-        ax4.set_xlabel('Time [min]')
-        ax4.set_ylabel('Outlet partial pressure [mbar]')
-        ax4.set_title(f'Outlet species — T_in = {T_C} °C')
-        ax4.legend(fontsize=7, ncol=2)
-        ax4.grid(True, alpha=0.3)
 
     plt.tight_layout(rect=[0, 0.0, 1, 0.96])
     plt.show()
@@ -561,80 +539,6 @@ ax_bot.legend(fontsize=10)
 ax_bot.grid(True, alpha=0.3)
 
 ax_bot.set_xlim(170, 370)
-plt.tight_layout()
-plt.show()
-# endregion
-
-# region 8. ADSORPTION CAPACITY AND BREAKTHROUGH TIMES
-# =============================================================================
-# 8. ADSORPTION CAPACITY AND BREAKTHROUGH TIMES PER TEMPERATURE
-# =============================================================================
-
-print("\n" + "=" * 70)
-print("  Adsorption Capacity and Breakthrough Times — Non-Isothermal SEM")
-print("=" * 70)
-print(f"{'T_in':>6} {'q_max':>10} {'Cap':>12} {'t_bt_est':>11} {'t_bt_sim':>11}")
-print(f"{'[°C]':>6} {'[mmol/g]':>10} {'[mol H2O]':>12} {'[min]':>11} {'[min]':>11}")
-print("-" * 70)
-
-cap_mol_kg    = []
-cap_mol_tot   = []
-t_bt_est_list = []
-t_bt_sim_list = []
-
-for T_C in T_LIST:
-    data         = all_results[T_C]
-    sol_on       = data['results'][True]
-    C_in_CO2_row = data['C_in_CO2']
-    q_max_row    = data['q_at_max']
-    t_sat_row    = data['t_sat_est']
-
-    t_pts  = sol_on.t
-    y_arr  = sol_on.sol(t_pts)                   # shape (6N, n_t)
-    q_out  = np.maximum(y_arr[5*N - 1, :], 0.0) # outlet solid loading [mol/kg]
-
-    # Simulated breakthrough: first time outlet q reaches 5 % of equilibrium capacity
-    idx_bt   = np.where(q_out >= 0.05 * q_max_row)[0]
-    t_bt_val = float(t_pts[idx_bt[0]]) / 60 if len(idx_bt) > 0 else float(t_pts[-1]) / 60
-
-    cap_mol_kg.append(q_max_row)
-    cap_mol_tot.append(q_max_row * m_cat)
-    t_bt_est_list.append(t_sat_row / 60)
-    t_bt_sim_list.append(t_bt_val)
-
-    print(f"{T_C:>6} {q_max_row:>10.3f} {q_max_row*m_cat:>12.4f} "
-          f"{t_sat_row/60:>11.1f} {t_bt_val:>11.1f}")
-
-print("=" * 70)
-print("  q_max    : DA equilibrium loading at max H₂O partial pressure  [mmol H₂O / g_cat]")
-print("  Cap      : total sorbent capacity  (q_max × m_cat)")
-print("  t_bt_est : mass-balance estimate   (Cap / (2 × F_CO2_in))")
-print("  t_bt_sim : simulated breakthrough  (outlet q ≥ 5 % of q_max)")
-
-# ---- Figure: capacity and breakthrough times vs temperature -----------------
-fig_bt, (ax_cap, ax_bt) = plt.subplots(1, 2, figsize=(12, 5))
-fig_bt.suptitle(
-    'Adsorption capacity and breakthrough times — Non-isothermal SEM\n'
-    f'DA isotherm:  W₀ = {W0_DA*1e6:.0f} cm³/kg,  E = {E_DA/1e3:.0f} kJ/kg,  n = {n_DA}',
-    fontsize=10
-)
-
-ax_cap.plot(T_arr, cap_mol_kg, 'b^-', lw=2.0, ms=8)
-ax_cap.set_xlabel('Inlet temperature [°C]', fontsize=12)
-ax_cap.set_ylabel('Adsorption capacity  q* [mmol H₂O / g sorbent]', fontsize=11)
-ax_cap.set_title('Equilibrium H₂O loading at max p_H₂O')
-ax_cap.set_xlim(240, 320)
-ax_cap.grid(True, alpha=0.3)
-
-ax_bt.plot(T_arr, t_bt_est_list, 'ko--', lw=2.0, ms=7, label='Theoretical (mass balance)')
-ax_bt.plot(T_arr, t_bt_sim_list, 'r^-',  lw=2.0, ms=7, label='Simulated (q_out ≥ 5 % q_max)')
-ax_bt.set_xlabel('Inlet temperature [°C]', fontsize=12)
-ax_bt.set_ylabel('Breakthrough time [min]', fontsize=12)
-ax_bt.set_title('Time until adsorption front exits bed')
-ax_bt.legend(fontsize=10)
-ax_bt.set_xlim(240, 320)
-ax_bt.grid(True, alpha=0.3)
-
 plt.tight_layout()
 plt.show()
 # endregion

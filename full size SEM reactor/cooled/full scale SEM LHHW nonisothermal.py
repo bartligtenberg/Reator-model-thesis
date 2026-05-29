@@ -1,15 +1,12 @@
 """
-Coupled SEM Column Model  —  1D Non-Isothermal Transient
-=========================================================
+Full-Scale SEM Column Model  —  1D Non-Isothermal Transient
+============================================================
 
-Non-isothermal extension of SEM LHHW.py.  Temperature T(z,t) is added as a
-6th block of N state variables and evolves via a 1D energy balance.
+Scaled up from Wei's lab tube to Bareschino's pilot geometry:
+    d = 50 mm,  L = 2 m,  d_p = 2.5 mm
 
-The exothermic Sabatier reaction (ΔH_r ≈ −165 kJ/mol) heats the bed above the
-inlet setpoint.  This hot spot raises the local K_eq denominator, shifts the
-approach-to-equilibrium factor β towards 1, and reduces conversion — most
-visible at low inlet temperatures (180–240 °C) where the kinetics are fast
-relative to the contact time.
+Flow is set via GHSV = 0.5 m³_STP / (kg_cat · h), matching Bareschino.
+All kinetics, isotherm, and feed composition are identical to the Wei model.
 
 State vector  (6 × N values — one value per axial node)
 ---------------------------------------------------------
@@ -19,19 +16,6 @@ State vector  (6 × N values — one value per axial node)
     y[3N : 4N]   C_H2O  [mol/m³]   gas-phase H2O concentration
     y[4N : 5N]   q      [mol/kg]   solid-phase H2O loading
     y[5N : 6N]   T      [K]        local bed temperature
-
-Energy balance (per unit bed volume):
-    (ρ_b·Cp_cat + ε_b·ρ_g·Cp_g) · dT/dt =
-        − u · ρ_g · Cp_g · (T − T_up) / Δz   ← convective heat transport
-        + (−ΔH_r) · ρ_b · r                   ← reaction heat release
-        + (−ΔH_ads) · ρ_b · dq/dt             ← adsorption heat release (SE on only)
-        − U_a · (T − T_wall)                   ← wall heat exchange
-
-Simplification: superficial velocity u is computed at the inlet temperature
-and held constant along the bed (same as the isothermal version).  Local gas
-expansion from heating is neglected — a standard first-model approximation.
-
-The isothermal file (SEM LHHW.py) is unchanged.
 """
 
 import numpy as np
@@ -44,43 +28,48 @@ from scipy.integrate import solve_ivp
 # 1. PARAMETERS
 # =============================================================================
 
-# --------------- Bed geometry  (identical to SEM LHHW.py) --------------------
-d_b     = 0.010             # bed diameter                        [m]
-L_b     = 0.100             # bed length                          [m]
-A_b     = np.pi / 4 * d_b**2   # cross-sectional area            [m²]
-V_bed   = A_b * L_b             # total bed volume                [m³]
-m_cat   = 6.5e-3            # catalyst / sorbent mass             [kg]  (Wei Fig. 5.3)
-rho_bed = m_cat / V_bed     # bulk density                        [kg_cat / m³_bed]
-eps_b   = 0.40              # void fraction between particles      [-]
+# --------------- Bed geometry (Bareschino pilot scale) -----------------------
+d_b   = 0.050               # bed diameter                        [m]
+L_b   = 2.000               # bed length                          [m]
+A_b   = np.pi / 4 * d_b**2  # cross-sectional area                [m²]
+V_bed = A_b * L_b            # total bed volume                    [m³]
+eps_b = 0.4                # void fraction between particles      [-]
 
-# --------------- Particle properties -----------------------------------------
-d_p   = 0.75e-3             # particle diameter                   [m]
-eps_p = 0.6                 # intraparticle void fraction          [-]
+# Separate catalyst and adsorbent masses (Bareschino Table 3)
+M_cat = 0.064               # catalyst mass (Ni/Ce component)     [kg]
+M_ads = 1.22                # adsorbent mass (zeolite 13X)        [kg]
+rho_bed_cat = M_cat / V_bed # catalyst bulk density               [kg_cat / m³_bed]
+rho_bed_ads = M_ads / V_bed # adsorbent bulk density              [kg_ads / m³_bed]
+rho_bed_tot = (M_cat + M_ads) / V_bed  # total (for energy balance solid Cp)
+
+# --------------- Particle properties (Bareschino 2.5 mm pellets) -------------
+d_p   = 0.75e-3              # particle diameter                   [m]
+eps_p = 0.615               # intraparticle void fraction          [-]  (Bareschino Table S1)
 tau_p = 3.0                 # tortuosity factor                    [-]
 
-# --------------- Adsorbed-phase density (liquid water) -----------------------
-rho_ads = 998.2             # liquid water density                 [kg/m³]
+# rho_ads is now temperature-dependent — see rho_water(T_K) in region 2
 
-# --------------- DA isotherm parameters: Mette (2014) ------------------------
+# --------------- DA isotherm parameters: Ligtenberg (2026) --------------------
 W0_DA = 190.00e-6           # micropore volume                     [m³/kg_sorbent]
 E_DA  = 1190e3           # characteristic adsorption energy     [J/kg]
 n_DA  = 1.55                # DA heterogeneity parameter           [-]
 
 # --------------- Operating conditions ----------------------------------------
-T_LIST = [180, 210, 240, 270, 300, 330, 360]   # inlet temperatures [°C]
+T_LIST = [260, 280, 300, 320]                                  # inlet temperatures [°C]
 P_bar = 1.0                 # total pressure                       [bar]
 P_Pa  = P_bar * 1e5         # total pressure                       [Pa]
 
-# --------------- Feed composition (Wei 2022, Fig. 5.3 experiment) -------------
-y_CO2_in = 0.025
-y_H2_in  = 0.10
-y_CH4_in = 0.815
-y_N2_in  = 0.06
+# --------------- Feed composition (Bareschino 2022: CO2=4%, H2=16%, CH4=80%) --
+y_CO2_in = 0.04
+y_H2_in  = 0.16
+y_CH4_in = 0.80
+y_N2_in  = 0.00
 
-# --------------- Gas flow (Wei Fig. 5.3: 100 mL/min, 6.5 g → GHSV = 923) ----
-Q_STP = 100e-6 / 60         # volumetric flow at STP               [m³/s]
-T_STP = 273.15              # STP temperature                      [K]
-u_STP = Q_STP / A_b         # superficial velocity at STP          [m/s]
+# --------------- Gas flow: GHSV = 0.5 m³_STP/(kg_ads·h)  (Bareschino) -------
+GHSV  = 0.5                  # m³_STP / (kg_ads · h)              [m³/(kg·h)]
+T_STP = 273.15               # STP temperature                     [K]
+Q_STP = GHSV * M_ads / 3600  # volumetric flow at STP             [m³/s]
+u_STP = Q_STP / A_b          # superficial velocity at STP         [m/s]
 
 # --------------- Physical constants ------------------------------------------
 R_gas  = 8.314
@@ -96,33 +85,32 @@ A_mix   = 0.88;  dH_mix = -10.0e3
 P_FLOOR = 1e-4
 
 # --------------- Thermal parameters ------------------------------------------
-# Heat of Sabatier reaction: CO2 + 4H2 → CH4 + 2H2O(g), ΔH ≈ −165 kJ/mol_CO2
-dH_r   = -165.0e3           # [J / mol_CO2]
+dH_r   = -165.0e3           # heat of Sabatier reaction            [J / mol_CO2]
+dH_ads = -45.0e3            # isosteric heat of H2O adsorption     [J / mol_H2O]  (Bareschino Table 3)
+Cp_cat = 1100.0             # solid heat capacity                  [J / (kg · K)]  (Bareschino Table 3)
 
-# Isosteric heat of H2O adsorption on 13X zeolite (approximate literature value)
-dH_ads = -50.0e3            # [J / mol_H2O]
-
-# Heat capacity of the solid catalyst/sorbent (zeolite-dominated)
-Cp_cat = 900.0              # [J / (kg · K)]
-
-# Molar heat capacities of gas species at ~300 °C  [J / (mol · K)]
-Cp_CO2 = 37.1
+# Molar heat capacities at 573 K (300 °C) — NIST Shomate equations  [J / (mol · K)]
+Cp_CO2 = 45.4
 Cp_H2  = 29.3
-Cp_CH4 = 38.7
-Cp_H2O = 33.6
-Cp_N2  = 29.1
+Cp_CH4 = 46.9
+Cp_H2O = 34.2
+Cp_N2  = 29.5
 
-# Wall heat-transfer coefficient × bed interfacial area per bed volume [W/(m³·K)]
-# U_a = 0  →  adiabatic (maximum hot-spot effect, lower bound on conversion)
-# Large U_a → nearly isothermal (converges to SEM LHHW.py result)
-# For a 10-mm tube in a furnace: h_w ~ 100–500 W/(m²·K), 4/d_b ~ 400 m²/m³
-# → U_a up to ~200 000.  Start with 0 to see the full hot-spot.
-U_a = 200000                  # [W / (m³ · K)]
-
+# Wall heat-transfer coefficient and specific area [W/(m³·K)]
+# h_wall ≈ 100 W/(m²·K)  — realistic for gas-phase packed bed, d = 50 mm
+# U_a = h_wall × (4/d_b) = 100 × 80 = 8000 W/(m³·K)
+U_a = 8000
 # --------------- Spatial discretisation --------------------------------------
-N  = 50
+N  = 100
 dz = L_b / (N - 1)
-z_cm = np.linspace(0, L_b, N) * 100   # [cm] for plots
+z_m = np.linspace(0, L_b, N)   # [m] for plots
+
+print(f"Bed: d = {d_b*100:.0f} cm,  L = {L_b:.1f} m,  V_bed = {V_bed*1e3:.2f} L")
+print(f"M_cat = {M_cat:.3f} kg,  M_ads = {M_ads:.3f} kg,  total = {M_cat+M_ads:.3f} kg")
+print(f"rho_bed_cat = {rho_bed_cat:.1f}  rho_bed_ads = {rho_bed_ads:.1f}  rho_bed_tot = {rho_bed_tot:.1f} kg/m³")
+print(f"GHSV  = {GHSV:.1f} m³/(kg_ads·h)  (Q = {Q_STP*3600*1e3:.1f} L/h)")
+print(f"Q_STP = {Q_STP*1e3:.3f} L/s  =  {Q_STP*60*1e3:.2f} L/min")
+print(f"u_STP = {u_STP:.4f} m/s")
 
 
 # endregion
@@ -130,13 +118,20 @@ z_cm = np.linspace(0, L_b, N) * 100   # [cm] for plots
 # region 2. THERMODYNAMIC AND KINETIC FUNCTIONS
 # =============================================================================
 # 2. THERMODYNAMIC AND KINETIC FUNCTIONS
-#    Identical to SEM LHHW.py — all functions vectorise naturally when T_K is
-#    passed as an array of length N instead of a scalar.
 # =============================================================================
 
 def P_sat_bar(T_K):
-    """Saturation vapour pressure of water [bar] — Antoine equation."""
-    return 10.0 ** (5.40221 - 1838.675 / (T_K - 31.737))
+    """Saturation vapour pressure of water [bar] — Kowalska & Ambrozek (2017), Bareschino Eq. S.17."""
+    log10_p_mmHg = (29.8605 - 3.1522e3 / T_K
+                    - 7.3037 * np.log10(T_K)
+                    + 2.4247e-9 * T_K
+                    + 1.8090e-6 * T_K**2)
+    return 10.0**log10_p_mmHg * 133.322e-5   # mmHg → bar
+
+
+def rho_water(T_K):
+    """Temperature-dependent liquid water density [kg/m³] — Schaefer & Thess (2018), Bareschino Eq. S.16."""
+    return 996.0 / (1.0 + 2.0e-3 * (T_K - 298.15))
 
 
 def q_star_vec(T_K, p_arr, W0, E, n):
@@ -147,7 +142,7 @@ def q_star_vec(T_K, p_arr, W0, E, n):
     A_raw  = (R_gas / MW_H2O) * T_K * np.log(Psat / p_safe)
     A  = np.where((p <= 0.0) | (p >= Psat), 0.0, A_raw)
     W  = W0 * np.exp(-np.minimum((A / E) ** n, 500.0))
-    qs = rho_ads / MW_H2O * W
+    qs = rho_water(T_K) / MW_H2O * W
     return np.where(p <= 0.0, 0.0, qs)
 
 
@@ -162,7 +157,7 @@ def K_LDF_vec(T_K, p_arr, W0, E, n):
                  - q_star_vec(T_K, p_lo, W0, E, n)) / 2.0
     dqstar_dp = np.maximum(dqstar_dp, 1e-30)
     return (15.0 * D_M * MW_H2O * eps_p
-            / (0.5 * d_p**2 * tau_p * rho_ads * R_gas * T_K * dqstar_dp))
+            / (0.5 * d_p**2 * tau_p * rho_water(T_K) * R_gas * T_K * dqstar_dp))
 
 
 def K_eq_sabatier(T_K):
@@ -197,7 +192,7 @@ def reaction_rate_SI(T_K, p_CO2, p_H2, p_CH4, p_H2O):
            + K_mix * p_CO2_s)
 
     r_g_s = k * (p_CO2_s * p_H2_s)**0.5 * f_eq / DEN**2
-    return r_g_s * 1000.0 # mol/(g·s) → mol/(kg·s) with effectiveness factor
+    return r_g_s * 1000.0   # mol/(g·s) → mol/(kg·s)
 
 
 # endregion
@@ -215,75 +210,59 @@ def rhs_sem_noniso(t, y, se_on, u, C_in_CO2, C_in_H2, C_in_CH4, C_in_H2O,
     Parameters
     ----------
     se_on    : bool   — True = SE mode (adsorption active)
-    u        : float  — superficial gas velocity at inlet T [m/s]  (constant along bed)
+    u        : float  — superficial gas velocity at inlet T [m/s]
     C_in_*   : float  — inlet concentrations [mol/m³] at inlet T
-    T_in     : float  — inlet / feed temperature [K]  (boundary condition for T)
-    T_wall   : float  — wall / furnace temperature [K]  (used for U_a term)
-
-    Mass balances: same first-order upwind as SEM LHHW.py, but partial pressures
-    are computed with the LOCAL temperature T(z,t) from the state vector.
-
-    Energy balance (per unit bed volume):
-        Cp_eff · dT/dt = −u·ρ_g·Cp_g·(T−T_up)/Δz  +  Q_rxn  +  Q_ads  +  Q_wall
+    T_in     : float  — inlet / feed temperature [K]
+    T_wall   : float  — wall / furnace temperature [K]
     """
     # --- Unpack and clip state vector ---
-    C_CO2 = np.maximum(y[0*N : 1*N], 0.0) # so this is CO2 concentraion  at all 50 nodes in z direction
+    C_CO2 = np.maximum(y[0*N : 1*N], 0.0)
     C_H2  = np.maximum(y[1*N : 2*N], 0.0)
     C_CH4 = np.maximum(y[2*N : 3*N], 0.0)
     C_H2O = np.maximum(y[3*N : 4*N], 0.0)
     q     = np.maximum(y[4*N : 5*N], 0.0)
-    T     = np.maximum(y[5*N : 6*N], 200.0)   # floor at 200 K prevents divide-by-zero
+    T     = np.maximum(y[5*N : 6*N], 200.0)
 
-    # --- Partial pressures using LOCAL temperature and ideal gas law at each node ---
+    # --- Partial pressures using LOCAL temperature ---
     p_CO2 = C_CO2 * R_gas * T / 1e5
     p_H2  = C_H2  * R_gas * T / 1e5
     p_CH4 = C_CH4 * R_gas * T / 1e5
     p_H2O = C_H2O * R_gas * T / 1e5
 
-    # --- Rates with LOCAL T (all rate functions accept T as an array) ---
+    # --- Rates with LOCAL T ---
     r    = reaction_rate_SI(T, p_CO2, p_H2, p_CH4, p_H2O)
     qs   = q_star_vec(T, p_H2O, W0_DA, E_DA, n_DA)
     Kl   = K_LDF_vec( T, p_H2O, W0_DA, E_DA, n_DA)
     dqdt = Kl * (qs - q) if se_on else np.zeros(N)
 
-    # --- Upwind mass balances (identical structure to SEM LHHW.py) ---
+    # --- Upwind mass balances ---
     C_CO2_up = np.concatenate([[C_in_CO2], C_CO2[:-1]])
     C_H2_up  = np.concatenate([[C_in_H2],  C_H2[:-1]])
     C_CH4_up = np.concatenate([[C_in_CH4], C_CH4[:-1]])
     C_H2O_up = np.concatenate([[C_in_H2O], C_H2O[:-1]])
 
-    dCdt_CO2 = (-u * (C_CO2 - C_CO2_up) / dz  +  rho_bed * (-1) * r) / eps_b
-    dCdt_H2  = (-u * (C_H2  - C_H2_up)  / dz  +  rho_bed * (-4) * r) / eps_b
-    dCdt_CH4 = (-u * (C_CH4 - C_CH4_up) / dz  +  rho_bed * (+1) * r) / eps_b
-    dCdt_H2O = (-u * (C_H2O - C_H2O_up) / dz  +  rho_bed * (+2) * r
-                                                 -  rho_bed * dqdt) / eps_b
+    dCdt_CO2 = (-u * (C_CO2 - C_CO2_up) / dz  +  rho_bed_cat * (-1) * r) / eps_b
+    dCdt_H2  = (-u * (C_H2  - C_H2_up)  / dz  +  rho_bed_cat * (-4) * r) / eps_b
+    dCdt_CH4 = (-u * (C_CH4 - C_CH4_up) / dz  +  rho_bed_cat * (+1) * r) / eps_b
+    dCdt_H2O = (-u * (C_H2O - C_H2O_up) / dz  +  rho_bed_cat * (+2) * r
+                                                 -  rho_bed_ads * dqdt) / eps_b
 
-    # --- Energy balance --- How fast is temperatrue changing at each node?
-    
-    # Local gas mole fractions (p_i / P_bar = y_i at total pressure P_bar)
+    # --- Energy balance ---
     y_CO2l = p_CO2 / P_bar
     y_H2l  = p_H2  / P_bar
     y_CH4l = p_CH4 / P_bar
     y_H2Ol = p_H2O / P_bar
     y_N2l  = np.maximum(1.0 - y_CO2l - y_H2l - y_CH4l - y_H2Ol, 0.0)
 
-    # Local mixture molar heat capacity [J/(mol·K)]
-    Cp_mix = (y_CO2l*Cp_CO2 + y_H2l*Cp_H2 + y_CH4l*Cp_CH4
-              + y_H2Ol*Cp_H2O + y_N2l*Cp_N2)
-
-    # Local gas molar density [mol/m³]  (ideal gas, varies with T)
+    Cp_mix    = (y_CO2l*Cp_CO2 + y_H2l*Cp_H2 + y_CH4l*Cp_CH4
+                 + y_H2Ol*Cp_H2O + y_N2l*Cp_N2)
     rho_g_mol = P_Pa / (R_gas * T)
+    Cp_eff    = rho_bed_tot * Cp_cat + eps_b * rho_g_mol * Cp_mix
 
-    # Effective volumetric heat capacity [J/(m³·K)]
-    Cp_eff = rho_bed * Cp_cat + eps_b * rho_g_mol * Cp_mix
-
-    # Upwind temperature (T_in as inlet BC)
-    T_up = np.concatenate([[T_in], T[:-1]])
-
-    # Heat source terms [W/m³]
-    Q_rxn  = (-dH_r)   * rho_bed * r           # exothermic reaction  (+)
-    Q_ads  = (-dH_ads) * rho_bed * dqdt         # exothermic adsorption (+, zero if SE off)
-    Q_wall = -U_a * (T - T_wall)                # wall cooling (negative when T > T_wall)
+    T_up   = np.concatenate([[T_in], T[:-1]])
+    Q_rxn  = (-dH_r)   * rho_bed_cat * r
+    Q_ads  = (-dH_ads) * rho_bed_ads * dqdt
+    Q_wall = -U_a * (T - T_wall)
 
     dTdt = (-u * rho_g_mol * Cp_mix * (T - T_up) / dz
             + Q_rxn + Q_ads + Q_wall) / Cp_eff
@@ -302,11 +281,10 @@ all_results = {}
 
 p_H2O_max = 2 * y_CO2_in * P_bar / (1 - 2 * y_CO2_in)
 
-# Absolute tolerances: tight for concentrations and loading, relaxed for T
 atol_vec = np.concatenate([
-    1e-8 * np.ones(4 * N),   # C blocks  [mol/m³]
-    1e-8 * np.ones(N),        # q block   [mol/kg]
-    1e-2 * np.ones(N),        # T block   [K]  — 0.01 K is more than sufficient
+    1e-8 * np.ones(4 * N),
+    1e-8 * np.ones(N),
+    1e-2 * np.ones(N),
 ])
 
 for T_C in T_LIST:
@@ -319,23 +297,21 @@ for T_C in T_LIST:
 
     q_at_max  = float(q_star_vec(T_K, np.array([p_H2O_max]), W0_DA, E_DA, n_DA)[0])
     F_CO2_in  = C_in_CO2 * u * A_b
-    t_sat_est = q_at_max * m_cat / (2.0 * F_CO2_in)
+    t_sat_est = q_at_max * M_ads / (2.0 * F_CO2_in)
     t_end     = min(2.5 * t_sat_est, 7200.0)
 
     print("=" * 60)
-    print(f"  Non-isothermal SEM — T_in = {T_C} °C,  P = {P_bar} bar,  U_a = {U_a:.0f} W/(m³·K)")
+    print(f"  Full-scale SEM — T_in = {T_C} °C,  P = {P_bar} bar,  U_a = {U_a:.0f} W/(m³·K)")
     print(f"  Feed:  CO2 = {y_CO2_in:.1%},  H2 = {y_H2_in:.0%},  "
           f"CH4 = {y_CH4_in:.1%},  N2 = {y_N2_in:.0%}")
-    print(f"  GHSV:  {Q_STP*3600*1e6 / (m_cat*1e3):.0f} mL/(g·h)")
+    print(f"  GHSV:  {Q_STP*3600/M_ads:.2f} m³/(kg_ads·h)  =  {Q_STP*3600*1e6/(M_ads*1e3):.0f} mL/(g_ads·h)")
     print(f"  t_sat_est ≈ {t_sat_est/60:.0f} min  →  t_end = {t_end/60:.0f} min")
 
-    # Initial condition: bed pre-filled with feed gas at T_in, sorbent clean.
     y0 = np.zeros(6 * N)
     y0[0*N : 1*N] = C_in_CO2
     y0[1*N : 2*N] = C_in_H2
     y0[2*N : 3*N] = C_in_CH4
-    # q block stays 0 (clean sorbent)
-    y0[5*N : 6*N] = T_K        # bed starts uniformly at setpoint temperature
+    y0[5*N : 6*N] = T_K
 
     results = {}
     for se_on in [True, False]:
@@ -343,7 +319,7 @@ for T_C in T_LIST:
         print(f"  Solving {tag} ...", end="", flush=True)
         y0_run = y0.copy()
         if not se_on:
-            y0_run[4*N : 5*N] = q_at_max   # sorbent pre-saturated (matches Wei non-SE experiment)
+            y0_run[4*N : 5*N] = q_at_max
         sol = solve_ivp(
             rhs_sem_noniso,
             t_span=[0.0, t_end],
@@ -379,23 +355,14 @@ print("=" * 60)
 # =============================================================================
 
 def extract_outlet(sol, C_in_CO2_loc):
-    """
-    Extract outlet CO2 conversion, H2O pressure, and peak bed temperature.
-
-    Returns
-    -------
-    t_arr      : (n_t,)  time points [s]
-    X_CO2      : (n_t,)  outlet CO2 conversion [-]
-    p_H2O_mbar : (n_t,)  outlet H2O partial pressure [mbar]
-    T_max      : (n_t,)  maximum T along the bed at each time [K]
-    """
+    """Extract outlet CO2 conversion, H2O pressure, and peak bed temperature."""
     t_arr     = sol.t
     y_arr     = sol.sol(t_arr)
-    C_CO2_out = np.maximum(y_arr[N - 1,     :], 0.0)   # last node of CO2 block
-    C_H2O_out = np.maximum(y_arr[4*N - 1,   :], 0.0)   # last node of H2O block
-    T_profile = y_arr[5*N : 6*N,            :]          # T at all nodes (N × n_t)
-    T_out     = T_profile[-1, :]                        # outlet temperature (n_t,)
-    T_max     = T_profile.max(axis=0)                   # peak temperature in bed (n_t,)
+    C_CO2_out = np.maximum(y_arr[N - 1,     :], 0.0)
+    C_H2O_out = np.maximum(y_arr[4*N - 1,   :], 0.0)
+    T_profile = y_arr[5*N : 6*N,            :]
+    T_out     = T_profile[-1, :]
+    T_max     = T_profile.max(axis=0)
 
     X_CO2      = np.clip((C_in_CO2_loc - C_CO2_out) / C_in_CO2_loc, 0.0, 1.0)
     p_H2O_mbar = C_H2O_out * R_gas * T_out / 1e5 * 1000
@@ -405,17 +372,18 @@ def extract_outlet(sol, C_in_CO2_loc):
 
 # endregion
 
-# region 7. PLOT (time-series, disabled — kept for reference)
+# region 7. PLOT — time-series (4 panels per temperature)
 # =============================================================================
-# 7. PLOT  (time-series, disabled — kept for reference)
+# 7. PLOT  — time-series
 # =============================================================================
 if True:
     n_rows = len(T_LIST)
     fig, axes = plt.subplots(n_rows, 4, figsize=(22, 5 * n_rows), squeeze=False)
     fig.suptitle(
-        f'Non-isothermal SEM Column  —  P = {P_bar} bar,  U_a = {U_a:.0f} W/(m³·K)\n'
+        f'Full-scale SEM  —  d = {d_b*100:.0f} cm, L = {L_b:.0f} m  |  '
+        f'P = {P_bar} bar,  U_a = {U_a:.0f} W/(m³·K)\n'
         f'Feed: {y_CO2_in:.1%} CO₂ / {y_H2_in:.0%} H₂ / {y_CH4_in:.1%} CH₄ / '
-        f'{y_N2_in:.0%} N₂  —  GHSV = 923 mL/(g·h)',
+        f'{y_N2_in:.0%} N₂  —  GHSV = {GHSV:.1f} m³/(kg·h)',
         fontsize=11
     )
 
@@ -450,13 +418,12 @@ if True:
         for i, t_s in enumerate(t_snaps):
             y_s = sol_on.sol(t_s)
             q_s = np.maximum(y_s[4*N : 5*N], 0.0)
-            ax3.plot(z_cm, q_s, color=snap_col[i], lw=2.0, label=f't = {t_s/60:.0f} min')
+            ax3.plot(z_m, q_s, color=snap_col[i], lw=2.0, label=f't = {t_s/60:.0f} min')
         ax3.axhline(q_max_row, color='grey', ls=':', lw=1.0, label=f'q* = {q_max_row:.2f} mol/kg')
-        ax3.set_xlabel('Bed position z [cm]'); ax3.set_ylabel('q  [mol/kg]')
+        ax3.set_xlabel('Bed position z [m]'); ax3.set_ylabel('q  [mol/kg]')
         ax3.set_title(f'Solid-phase H₂O loading (SE on) — {T_C} °C')
         ax3.legend(fontsize=8, loc='upper left'); ax3.grid(True, alpha=0.3)
 
-        # --- Outlet species concentrations ---
         y_on_arr  = sol_on.sol(sol_on.t)
         y_off_arr = sol_off.sol(sol_off.t)
         T_out_on  = y_on_arr[6*N - 1, :]
@@ -489,11 +456,15 @@ from scipy.optimize import brentq
 
 
 def equilibrium_conversion(T_K_val):
-    """Equilibrium CO2 conversion for Wei's feed at 1 bar (reference for isothermal limit)."""
+    """Equilibrium CO2 conversion for Bareschino's feed (4% CO2, 16% H2, 80% CH4) at 1 bar."""
     K = K_eq_sabatier(T_K_val)
     def f(X):
-        return ((0.815 + 0.025*X) * 0.0025 * X**2 * (1 - 0.05*X)**2
-                / (2.5e-6 * (1 - X)**5) - K)
+        d     = 1.0 - 0.08 * X
+        p_CO2 = 0.04 * (1 - X) / d
+        p_H2  = 0.16 * (1 - X) / d
+        p_CH4 = (0.80 + 0.04 * X) / d
+        p_H2O = 0.08 * X / d
+        return p_CH4 * p_H2O**2 / (p_CO2 * p_H2**4 + 1e-100) - K
     try:
         return brentq(f, 1e-9, 1 - 1e-9) * 100
     except Exception:
@@ -503,8 +474,8 @@ def equilibrium_conversion(T_K_val):
 T_arr    = np.array(T_LIST, dtype=float)
 X_off_ss = []
 X_on_ini = []
-dT_off   = []   # peak hot-spot ΔT for non-SE case
-dT_on    = []   # peak hot-spot ΔT for SE case
+dT_off   = []
+dT_on    = []
 
 for T_C in T_LIST:
     data         = all_results[T_C]
@@ -516,32 +487,28 @@ for T_C in T_LIST:
     t_off, X_off, _, Tmax_off = extract_outlet(results[False], C_in_CO2_row)
     t_on,  X_on,  _, Tmax_on  = extract_outlet(results[True],  C_in_CO2_row)
 
-    # Non-SE steady state: mean of second half
     mid = max(1, len(X_off) // 2)
     X_off_ss.append(float(np.mean(X_off[mid:])) * 100)
     dT_off.append(float(np.mean(Tmax_off[mid:])) - T_K_row)
 
-    # SE fresh-sorbent plateau: mean of 10%–40% of t_sat window
     mask = (t_on >= 0.10 * t_sat_row) & (t_on <= 0.40 * t_sat_row)
     if mask.sum() == 0:
         mask = np.ones(len(t_on), dtype=bool)
     X_on_ini.append(float(np.mean(X_on[mask])) * 100)
     dT_on.append(float(np.mean(Tmax_on[mask])) - T_K_row)
 
-# Equilibrium curve (isothermal reference)
 T_fine = np.linspace(170, 370, 120)
 X_eq   = [equilibrium_conversion(T + 273.15) for T in T_fine]
 
 fig, (ax_top, ax_bot) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
 fig.suptitle(
-    '5%Ni2.5%Ce13X  —  Non-isothermal SEM model\n'
-    f'GHSV = {Q_STP*3600*1e6/(m_cat*1e3):.0f} mL/(g·h),  P = {P_bar} bar,  '
+    f'5%Ni2.5%Ce13X  —  Full-scale SEM  (d = {d_b*100:.0f} cm, L = {L_b:.0f} m)\n'
+    f'GHSV = {GHSV:.1f} m³/(kg·h),  P = {P_bar} bar,  '
     f'U_a = {U_a:.0f} W/(m³·K)  ({"adiabatic" if U_a == 0 else "cooled"})\n'
     f'Feed: {y_CO2_in:.1%} CO₂ / {y_H2_in:.0%} H₂ / {y_CH4_in:.1%} CH₄',
     fontsize=10
 )
 
-# --- Top panel: CO2 conversion ---
 ax_top.plot(T_fine, X_eq,     'k--',  lw=1.5, label='Equilibrium (isothermal ref.)')
 ax_top.plot(T_arr,  X_off_ss, 'ko--', lw=2.0, ms=7, label='Non-SE (steady state)')
 ax_top.plot(T_arr,  X_on_ini, 'r^-',  lw=2.0, ms=7, label='SE (fresh sorbent)')
@@ -550,7 +517,6 @@ ax_top.set_ylim(0, 105)
 ax_top.legend(fontsize=10)
 ax_top.grid(True, alpha=0.3)
 
-# --- Bottom panel: peak hot-spot temperature rise ---
 ax_bot.plot(T_arr, dT_off, 'ko--', lw=2.0, ms=7, label='Non-SE')
 ax_bot.plot(T_arr, dT_on,  'r^-',  lw=2.0, ms=7, label='SE (fresh sorbent)')
 ax_bot.axhline(0, color='grey', lw=0.8, ls=':')
@@ -565,76 +531,179 @@ plt.tight_layout()
 plt.show()
 # endregion
 
-# region 8. ADSORPTION CAPACITY AND BREAKTHROUGH TIMES
+# region 7c. PLOT — Bareschino Fig. 7 style: species mole fractions vs time
 # =============================================================================
-# 8. ADSORPTION CAPACITY AND BREAKTHROUGH TIMES PER TEMPERATURE
+# 7c. PLOT — outlet mole fractions over time for T = 280, 300, 320 °C
 # =============================================================================
+T_PLOT3 = [280, 300, 320]
 
-print("\n" + "=" * 70)
-print("  Adsorption Capacity and Breakthrough Times — Non-Isothermal SEM")
-print("=" * 70)
-print(f"{'T_in':>6} {'q_max':>10} {'Cap':>12} {'t_bt_est':>11} {'t_bt_sim':>11}")
-print(f"{'[°C]':>6} {'[mmol/g]':>10} {'[mol H2O]':>12} {'[min]':>11} {'[min]':>11}")
-print("-" * 70)
-
-cap_mol_kg    = []
-cap_mol_tot   = []
-t_bt_est_list = []
-t_bt_sim_list = []
-
-for T_C in T_LIST:
-    data         = all_results[T_C]
-    sol_on       = data['results'][True]
-    C_in_CO2_row = data['C_in_CO2']
-    q_max_row    = data['q_at_max']
-    t_sat_row    = data['t_sat_est']
-
-    t_pts  = sol_on.t
-    y_arr  = sol_on.sol(t_pts)                   # shape (6N, n_t)
-    q_out  = np.maximum(y_arr[5*N - 1, :], 0.0) # outlet solid loading [mol/kg]
-
-    # Simulated breakthrough: first time outlet q reaches 5 % of equilibrium capacity
-    idx_bt   = np.where(q_out >= 0.05 * q_max_row)[0]
-    t_bt_val = float(t_pts[idx_bt[0]]) / 60 if len(idx_bt) > 0 else float(t_pts[-1]) / 60
-
-    cap_mol_kg.append(q_max_row)
-    cap_mol_tot.append(q_max_row * m_cat)
-    t_bt_est_list.append(t_sat_row / 60)
-    t_bt_sim_list.append(t_bt_val)
-
-    print(f"{T_C:>6} {q_max_row:>10.3f} {q_max_row*m_cat:>12.4f} "
-          f"{t_sat_row/60:>11.1f} {t_bt_val:>11.1f}")
-
-print("=" * 70)
-print("  q_max    : DA equilibrium loading at max H₂O partial pressure  [mmol H₂O / g_cat]")
-print("  Cap      : total sorbent capacity  (q_max × m_cat)")
-print("  t_bt_est : mass-balance estimate   (Cap / (2 × F_CO2_in))")
-print("  t_bt_sim : simulated breakthrough  (outlet q ≥ 5 % of q_max)")
-
-# ---- Figure: capacity and breakthrough times vs temperature -----------------
-fig_bt, (ax_cap, ax_bt) = plt.subplots(1, 2, figsize=(12, 5))
-fig_bt.suptitle(
-    'Adsorption capacity and breakthrough times — Non-isothermal SEM\n'
-    f'DA isotherm:  W₀ = {W0_DA*1e6:.0f} cm³/kg,  E = {E_DA/1e3:.0f} kJ/kg,  n = {n_DA}',
-    fontsize=10
+fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex='col')
+fig.suptitle(
+    f'Full-scale SEM  —  SE on (solid) vs SE off (dashed)  —  '
+    f'd = {d_b*100:.0f} cm, L = {L_b:.0f} m\n'
+    f'Feed: {y_CO2_in:.1%} CO₂ / {y_H2_in:.0%} H₂ / {y_CH4_in:.1%} CH₄  —  '
+    f'GHSV = {GHSV:.1f} m³/(kg·h)',
+    fontsize=11
 )
 
-ax_cap.plot(T_arr, cap_mol_kg, 'b^-', lw=2.0, ms=8)
-ax_cap.set_xlabel('Inlet temperature [°C]', fontsize=12)
-ax_cap.set_ylabel('Adsorption capacity  q* [mmol H₂O / g sorbent]', fontsize=11)
-ax_cap.set_title('Equilibrium H₂O loading at max p_H₂O')
-ax_cap.set_xlim(240, 320)
-ax_cap.grid(True, alpha=0.3)
+for col, T_C in enumerate(T_PLOT3):
+    data         = all_results[T_C]
+    C_in_CO2_row = data['C_in_CO2']
+    ax_top = axes[0, col]
+    ax_bot = axes[1, col]
 
-ax_bt.plot(T_arr, t_bt_est_list, 'ko--', lw=2.0, ms=7, label='Theoretical (mass balance)')
-ax_bt.plot(T_arr, t_bt_sim_list, 'r^-',  lw=2.0, ms=7, label='Simulated (q_out ≥ 5 % q_max)')
-ax_bt.set_xlabel('Inlet temperature [°C]', fontsize=12)
-ax_bt.set_ylabel('Breakthrough time [min]', fontsize=12)
-ax_bt.set_title('Time until adsorption front exits bed')
-ax_bt.legend(fontsize=10)
-ax_bt.set_xlim(240, 320)
-ax_bt.grid(True, alpha=0.3)
+    for sol, ls, suffix in [(data['results'][True], '-', 'SE on'),
+                             (data['results'][False], '--', 'SE off')]:
+        t_arr = sol.t
+        y_arr = sol.sol(t_arr)
+
+        C_CO2_out = np.maximum(y_arr[  N - 1, :], 0.0)
+        C_H2_out  = np.maximum(y_arr[2*N - 1, :], 0.0)
+        C_CH4_out = np.maximum(y_arr[3*N - 1, :], 0.0)
+        C_H2O_out = np.maximum(y_arr[4*N - 1, :], 0.0)
+
+        C_tot = np.maximum(C_CO2_out + C_H2_out + C_CH4_out + C_H2O_out, 1e-15)
+        y_CO2 = C_CO2_out / C_tot
+        y_H2  = C_H2_out  / C_tot
+        y_CH4 = C_CH4_out / C_tot
+        y_H2O = C_H2O_out / C_tot
+        X_CO2 = np.clip((C_in_CO2_row - C_CO2_out) / C_in_CO2_row, 0.0, 1.0)
+        t_min = t_arr / 60
+
+        ax_top.plot(t_min, y_CH4, color='k',       ls=ls, lw=2, label=f'$y_{{CH_4}}$ ({suffix})')
+        ax_top.plot(t_min, X_CO2, color='tab:red', ls=ls, lw=2, label=f'$X_{{CO_2}}$ ({suffix})')
+
+        ax_bot.plot(t_min, y_CO2, color='red',   ls=ls, lw=2, label=f'$y_{{CO_2}}$ ({suffix})')
+        ax_bot.plot(t_min, y_H2,  color='green', ls=ls, lw=2, label=f'$y_{{H_2}}$ ({suffix})')
+        ax_bot.plot(t_min, y_H2O, color='blue',  ls=ls, lw=2, label=f'$y_{{H_2O}}$ ({suffix})')
+
+    ax_top.set_ylim(0, 1.1)
+    ax_top.set_title(f'T = {T_C} °C', fontsize=11)
+    ax_top.text(0.05, 0.08, chr(ord('a') + col), transform=ax_top.transAxes,
+                fontsize=13, fontweight='bold')
+    if col == 0:
+        ax_top.set_ylabel('$y_{CH_4}$,  $X_{CO_2}$  [–]', fontsize=10)
+    ax_top.legend(fontsize=8, loc='lower left')
+    ax_top.grid(True, alpha=0.3)
+
+    ax_bot.set_ylim(0, 0.12)
+    ax_bot.set_xlabel('time [min]', fontsize=10)
+    if col == 0:
+        ax_bot.set_ylabel('$y_{CO_2}$, $y_{H_2}$, $y_{H_2O}$  [–]', fontsize=10)
+    ax_bot.legend(fontsize=8)
+    ax_bot.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
+# endregion
+
+# region 7d. PLOT — Axial temperature profile at T_in = 300 °C (SE on vs SE off)
+# =============================================================================
+# 7d. PLOT — T(z) snapshots for SE on and SE off at T_in = 300 °C
+# =============================================================================
+T_C_prof     = 300
+sol_prof_on  = all_results[T_C_prof]['results'][True]
+sol_prof_off = all_results[T_C_prof]['results'][False]
+t_max_avail  = sol_prof_on.t[-1]
+t_snaps_min  = [5, 10, 15, 25, 50]
+snap_colors  = plt.cm.plasma(np.linspace(0.1, 0.9, len(t_snaps_min)))
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for i, t_snap in enumerate(t_snaps_min):
+    t_s = t_snap * 60.0
+    if t_s > t_max_avail:
+        print(f"  t = {t_snap} min exceeds solver range ({t_max_avail/60:.0f} min) — skipped")
+        continue
+    T_prof_on  = sol_prof_on.sol(t_s)[5*N : 6*N]
+    T_prof_off = sol_prof_off.sol(t_s)[5*N : 6*N]
+    ax.plot(z_m, T_prof_on  - 273.15, color=snap_colors[i], lw=2.0, label=f't = {t_snap} min')
+    ax.plot(z_m, T_prof_off - 273.15, color=snap_colors[i], lw=2.0, ls='--')
+
+ax.axhline(T_C_prof, color='grey', lw=1.0, ls=':', label=f'T_in = {T_C_prof} °C')
+ax.plot([], [], 'k-',  lw=2, label='SE on  (solid)')
+ax.plot([], [], 'k--', lw=2, label='SE off (dashed)')
+ax.set_xlabel('Bed position  z  [m]', fontsize=12)
+ax.set_ylabel('Temperature  [°C]', fontsize=12)
+ax.set_title(f'Axial temperature profile — T_in = {T_C_prof} °C', fontsize=11)
+ax.legend(fontsize=9)
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+# endregion
+
+# region 7e. PLOT — Axial reaction rate profile at T_in = 300 °C
+# =============================================================================
+# 7e. PLOT — r(z) snapshots for SE on and SE off at T_in = 300 °C
+# =============================================================================
+T_C_rate     = 300
+sol_rate_on  = all_results[T_C_rate]['results'][True]
+sol_rate_off = all_results[T_C_rate]['results'][False]
+t_max_rate   = sol_rate_on.t[-1]
+t_snaps_rate = [5, 15, 30, 50, 90, 120]
+snap_cols_r  = plt.cm.plasma(np.linspace(0.1, 0.9, len(t_snaps_rate)))
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for i, t_snap in enumerate(t_snaps_rate):
+    t_s = t_snap * 60.0
+    if t_s > t_max_rate:
+        print(f"  t = {t_snap} min exceeds solver range ({t_max_rate/60:.0f} min) — skipped")
+        continue
+    for sol, ls in [(sol_rate_on, '-'), (sol_rate_off, '--')]:
+        y_s   = sol.sol(t_s)
+        C_CO2 = np.maximum(y_s[0*N : 1*N], 0.0)
+        C_H2  = np.maximum(y_s[1*N : 2*N], 0.0)
+        C_CH4 = np.maximum(y_s[2*N : 3*N], 0.0)
+        C_H2O = np.maximum(y_s[3*N : 4*N], 0.0)
+        T_loc = np.maximum(y_s[5*N : 6*N], 200.0)
+        p_CO2 = C_CO2 * R_gas * T_loc / 1e5
+        p_H2  = C_H2  * R_gas * T_loc / 1e5
+        p_CH4 = C_CH4 * R_gas * T_loc / 1e5
+        p_H2O = C_H2O * R_gas * T_loc / 1e5
+        r_prof = reaction_rate_SI(T_loc, p_CO2, p_H2, p_CH4, p_H2O)
+        label = f't = {t_snap} min' if ls == '-' else None
+        ax.plot(z_m, r_prof * 1e3, color=snap_cols_r[i], lw=2.0, ls=ls, label=label)
+
+ax.plot([], [], 'k-',  lw=2, label='SE on  (solid)')
+ax.plot([], [], 'k--', lw=2, label='SE off (dashed)')
+ax.set_xlabel('Bed position  z  [m]', fontsize=12)
+ax.set_ylabel('Reaction rate  [mmol / (kg_cat · s)]', fontsize=12)
+ax.set_title(f'Axial reaction rate profile — T_in = {T_C_rate} °C', fontsize=11)
+ax.legend(fontsize=9)
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+# endregion
+
+# region 8. BREAKTHROUGH TIMES
+# =============================================================================
+# 8. H2O BREAKTHROUGH TIMES (SE on)
+#    Defined as first time outlet y_H2O exceeds 0.5 % of total gas flow.
+# =============================================================================
+# Threshold = 10 % of equilibrium y_H2O at each process temperature (Bareschino definition)
+print("\n" + "=" * 60)
+print("  H2O breakthrough times  (y_H2O_outlet ≥ 10% of y_H2O_eq)")
+print("=" * 60)
+for T_C in T_LIST:
+    T_K_bt    = T_C + 273.15
+    X_eq_bt   = equilibrium_conversion(T_K_bt) / 100.0          # 0–1
+    y_H2O_eq  = 0.08 * X_eq_bt / (1.0 - 0.08 * X_eq_bt)        # equilibrium y_H2O
+    threshold = 0.10 * y_H2O_eq
+
+    data      = all_results[T_C]
+    sol_on    = data['results'][True]
+    t_arr     = sol_on.t
+    y_arr     = sol_on.sol(t_arr)
+    C_H2O_out = np.maximum(y_arr[4*N - 1, :], 0.0)
+    T_out_bt  = np.maximum(y_arr[6*N - 1, :], 200.0)
+    y_H2O_out = C_H2O_out * R_gas * T_out_bt / P_Pa
+
+    idx = np.where(y_H2O_out >= threshold)[0]
+    if len(idx) > 0:
+        t_bt = t_arr[idx[0]] / 60
+        print(f"  T_in = {T_C:3d} °C  |  y_H2O_eq = {y_H2O_eq:.4f},  "
+              f"threshold = {threshold:.4f}  →  t_BT ≈ {t_bt:.1f} min")
+    else:
+        print(f"  T_in = {T_C:3d} °C  |  threshold = {threshold:.4f}  →  "
+              f"no breakthrough within {t_arr[-1]/60:.0f} min")
+print("=" * 60)
 # endregion

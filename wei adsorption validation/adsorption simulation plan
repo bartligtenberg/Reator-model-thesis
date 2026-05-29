@@ -1,0 +1,117 @@
+"""
+
+catalyst weigth = 8.4 g
+GHSV = 923 ml/gcat/h
+
+goal: remake figure 5.5 from Wei. Y-axis - H2O breakthrough capacity (mmol/g), X-axis - temperature (°C)
+
+
+"""
+
+# =============================================================================
+# SE METHANATION MODEL — IMPLEMENTATION PLAN
+# Validation target: Wei (2022) PhD thesis, Chapter 5
+# =============================================================================
+#
+# ── REACTOR GEOMETRY (Wei Ch.5, same quartz fixed-bed as Ch.6) ──────────────
+#   Inner diameter      d_b  = 0.010 m
+#   Bed length          L_b  = 0.100 m   (100 mm total, filled with catalyst
+#                                          + inert borosilicate beads 1 mm dia)
+#   Catalyst mass       m_cat = 6.5 g    (5%Ni2.5%Ce/13X, reduced 500°C/2h)
+#   Particle diameter   d_p  = 0.75e-3 m (0.5–1 mm range; use midpoint)
+#   Bed void fraction   eps  = ~0.4      (packed spheres, estimate)
+#   Pressure            P    = 1 bar
+#   Temperature         T    = isothermal, set per experiment (150–390°C)
+#
+# ── FEED CONDITIONS (Fig 5.3 and Fig 5.10) ──────────────────────────────────
+#   Total flow          Q_tot = 100 ml/min (NTP: 20°C, 1 bar)
+#   Composition (vol%): N2 = 6%, H2 = 10%, CO2 = 2.5%, CH4 = 81.5%
+#   GHSV                = 923 ml_gas / g_cat / h
+#   Initial sorbent state: q = 0 (fully regenerated, dry)
+#
+# ── MODEL TYPE ───────────────────────────────────────────────────────────────
+#   1D transient plug-flow reactor discretised along axial coordinate z.
+#   Independent variables: z (space), t (time).
+#   State variables per node: y_H2, y_CO2, y_CH4, y_H2O, y_N2, q [mol/kg].
+#   Integrate over time using scipy.integrate.solve_ivp (method='BDF').
+#   Spatial derivatives: finite differences on uniform grid (N~50 nodes).
+#
+# ── GOVERNING EQUATIONS ──────────────────────────────────────────────────────
+#
+#   Gas-phase mole balance for species i (H2, CO2, CH4, N2):
+#     eps * dC_i/dt = -u * dC_i/dz + nu_i * rho_bed * r_rxn
+#
+#   Gas-phase mole balance for H2O (extra adsorption sink):
+#     eps * dC_H2O/dt = -u * dC_H2O/dz + nu_H2O * rho_bed * r_rxn
+#                       - rho_ads_bulk * dq/dt
+#
+#   Solid loading (new state variable per node):
+#     dq/dt = K_LDF * (q_star - q)
+#
+#   where:
+#     u          = superficial gas velocity [m/s], from Q_tot and bed area
+#     rho_bed    = m_cat / V_bed   [kg_cat/m3_reactor]
+#     rho_ads_bulk = same as rho_bed (catalyst IS the sorbent, bifunctional)
+#     nu_i       = stoichiometric coefficients: CO2=-1, H2=-4, CH4=+1, H2O=+2
+#     C_i        = molar concentration [mol/m3], from ideal gas: C_i = y_i*P/RT
+#
+#   NOTE: isothermal model (T fixed per run). No energy balance needed for
+#   validation against Wei's furnace-controlled experiments.
+#
+# ── REACTION KINETICS (Wei Ch.6, fitted on same material) ───────────────────
+#   r = k0 * exp(-Ea/R * (1/T - 1/T_ref))
+#       * p_CO2^0.10 * p_H2^0.51 * p_CH4^0.016 * p_H2O^0.06
+#
+#   k0    = 3.4e2   [mol / kg_cat / s / bar^sum_n]
+#   Ea    = 65.2e3  [J/mol]
+#   T_ref = 548 K   (275°C, midpoint of Wei's kinetic fitting range)
+#   partial pressures p_i = y_i * P  [bar]
+#
+# ── ADSORPTION EQUILIBRIUM: Dubinin–Astakhov (Mette et al. 2014) ────────────
+#   Parameters (binderless zeolite 13X):
+#     W0    = 341.03e-6  [m3/kg_ads]
+#     E_ads = 1192.3e3   [J/kg_ads]
+#     n     = 1.55       [-]
+#
+#   Adsorbed-phase density:
+#     rho_20C  = 998.2   [kg/m3]
+#     beta_20C = 2.07e-4 [1/K]
+#     rho_ads(T) = rho_20C / (1 + beta_20C * (T - 293.15))
+#
+#   Saturation pressure (Antoine, T in K):
+#     log10(P_sat/bar) = 5.40221 - 1838.675 / (T - 31.737)
+#
+#   Adsorption potential:
+#     A = (R / MW_H2O) * T * ln(P_sat / P_H2O)
+#     R / MW_H2O = 8.314 / 0.018015 = 461.5  [J/kg/K]
+#     Guard: if P_H2O >= P_sat, set A = 0
+#
+#   Volumetric capacity:
+#     W = W0 * exp(-(A / E_ads)**n)
+#
+#   Molar equilibrium capacity:
+#     q_star = rho_ads(T) / MW_H2O * W     [mol_H2O / kg_ads]
+#
+# ── ADSORPTION KINETICS: Linear Driving Force ────────────────────────────────
+#   dq/dt = K_LDF * (q_star - q)
+#
+#   K_LDF = 15 * D_M * MW_H2O * eps_p
+#           / (0.5 * d_p**2 * tau * rho_ads * R * T * dqstar_dP)
+#
+#   Constants:
+#     eps_p = 0.6      [-]     particle porosity (Mette 2014)
+#     tau   = 3.0      [-]     tortuosity (Mette 2014)
+#     D_M   = 2.5e-5 * (T/300)**1.75   [m2/s]   water vapour diffusivity
+#     dqstar_dP = numerical derivative, central difference with dP = 1 Pa
+#
+#   Heat of adsorption (constant):
+#     dH_ads = 45e3   [J/mol_H2O]
+#     (not needed for isothermal model, include if energy balance added later)
+#
+# ── INITIAL AND BOUNDARY CONDITIONS ─────────────────────────────────────────
+#   t=0:  q(z) = 0 everywhere (dry sorbent)
+#         C_i(z) = feed composition (uniform, reactor pre-filled with feed gas)
+#   z=0:  C_i = feed concentrations (Dirichlet, constant inlet)
+#   z=L:  dC_i/dz = 0 (Neumann outflow)
+
+
