@@ -51,8 +51,8 @@ tau_p = 3.0            # [-]             — pore tortuosity, typical zeolite pe
 
 # --- Dubinin-Astakhov adsorption isotherm (H2O on 13X) ---
 # Fitted to Bareschino et al. (2020), Fig. 1 (see bareschino adsorption validation folder)
-W0_DA = 190.00e-6      # [m³_liq/kg_sorbent] — limiting micropore volume
-E_DA  = 1190e3         # [J/mol]         — characteristic adsorption energy
+W0_DA = 175.00e-6      # [m³_liq/kg_sorbent] — limiting micropore volume
+E_DA  = 1192.25e3      # [J/mol]         — characteristic adsorption energy
 n_DA  = 1.55           # [-]             — isotherm heterogeneity exponent
 
 # --- LHHW kinetics (CO2 methanation on 5%Ni/13X) ---
@@ -440,6 +440,9 @@ T_C_PROF = T_IN_LIST[0]
 i_plot   = np.arange(len(U_S_LIST))
 pal      = plt.cm.plasma(np.linspace(0.1, 0.85, len(i_plot)))
 
+T_K_prof = T_C_PROF + 273.15
+q_sat    = rho_water(T_K_prof) / MW_H2O * W0_DA   # DA limit: p_H2O -> P_sat, A -> 0
+
 fig, axes = plt.subplots(2, 2, figsize=(13, 9))
 fig.suptitle(f'MPB axial profiles  |  T_in = {T_C_PROF} C  |  isothermal, counter-current',
              fontsize=11)
@@ -452,10 +455,13 @@ for k, i_us in enumerate(i_plot):
     r   = e['res']
     lbl = f"u_s = {e['u_s']*1e3:.3f} mm/s"
     axes[0,0].plot(r['z'], r['C_CO2']*1e3, color=pal[k], lw=2, label=lbl)
-    axes[0,1].plot(r['z'], r['q'],          color=pal[k], lw=2, label=lbl)
+    axes[0,1].plot(r['z'], r['q'],         color=pal[k], lw=2, label=lbl)
     axes[1,0].plot(r['z'], r['X_CO2']*100,  color=pal[k], lw=2, label=lbl)
     axes[1,1].plot(r['z'], r['r']*1e3,      color=pal[k], lw=2, label=lbl)
     plotted += 1
+
+axes[0,1].axhline(q_sat, color='black', lw=1.5, ls='--',
+                  label=f'q_sat = {q_sat:.2f} mol/kg')
 
 labels_units = [('C_CO2 [mmol/m3]',    'CO2 concentration'),
                 ('q [mol/kg]',          'Solid H2O loading'),
@@ -534,6 +540,8 @@ for k, i_us in enumerate(i_plot):
     ax_q.plot(r['z'], r['q'],                              color=pal[k], lw=2, label=lbl)
     ax_h.plot(r['z'], r['C_H2O']*R_gas*T_C_PROF/1e2,    color=pal[k], lw=2, label=lbl)
 
+ax_q.axhline(q_sat, color='black', lw=1.5, ls='--',
+             label=f'q_sat = {q_sat:.2f} mol/kg')
 ax_q.set_xlabel('z [m]');  ax_q.set_ylabel('q [mol/kg]')
 ax_q.set_title('Solid H2O loading q(z)')
 ax_q.legend(fontsize=7);   ax_q.grid(True, alpha=0.3)

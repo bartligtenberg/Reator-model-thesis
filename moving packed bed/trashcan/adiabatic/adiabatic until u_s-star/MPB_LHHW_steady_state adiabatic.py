@@ -1,40 +1,49 @@
 """
-Moving Packed Bed (MPB) Reactor Model — Steady-State, Non-Isothermal, CO2 Methanation
-=======================================================================================
+Moving Packed Bed (MPB) Reactor Model — Steady-State, Adiabatic, CO2 Methanation
+==================================================================================
 
 Counter-current flow:
     gas  : z = 0 (inlet, bottom)  ->  z = L (outlet, top)    u_g > 0
     solid: z = L (inlet, top)     ->  z = 0 (outlet, bottom)  u_s > 0 (magnitude)
 
-Non-isothermal: T(z) is solved as a 5th state variable in the gas IVP via a
-gas-phase energy balance:
+Adiabatic: no wall heat exchange (U_a = 0).  Temperature is determined by the
+full counter-current pseudo-homogeneous energy balance:
 
-    u_g·ρ_g_mol·Cp_mix · dT/dz =
+    (u_g·ρ_g_mol·Cp_mix  −  u_s·ρ_bed·Cp_cat) · dT/dz  =
         (−ΔH_r)·ρ_bed_cat·r          ← reaction heat release
       + (−ΔH_ads)·ρ_bed_ads·ads       ← adsorption heat release
-      − U_a·(T − T_wall)              ← wall cooling  (h = 100 W/(m²·K))
 
-The solid is assumed to be at local thermal equilibrium with the gas
-(pseudo-homogeneous), but only the gas convective flux appears in the
-denominator. The full counter-current formulation is a BVP (BCs at both
-z = 0 and z = L) and becomes an unstable IVP when u_s·ρ_bed·Cp_cat exceeds
-u_g·ρ_g·Cp_mix. The gas-only denominator is always positive and always stable.
+For all practical solid velocities u_s·ρ_bed·Cp_cat >> u_g·ρ_g_mol·Cp_mix, so the
+solid dominates heat transport.  Re-expressed in ζ = L−z (solid travel direction):
 
-Wall temperature T_wall = T_in (furnace maintains set-point throughout).
-With U_a = 8000 W/(m³·K) the temperature excursion stays < 1 K, confirming
-the isothermal assumption, but the full profile is now tracked.
+    dT/dζ = (Q_rxn + Q_ads) / (u_s·ρ_bed·Cp_cat − u_g·ρ_g_mol·Cp_mix)
+                                         ↑ always > 0 when solid dominates
+
+This is a stable forward IVP in ζ-space with BC T(ζ=0) = T_s_in (solid inlet
+temperature, defaults to T_K — fresh sorbent at feed temperature).
+
+The solid acts as the built-in coolant: higher u_s → more cold mass flow →
+smaller temperature excursion.  For u_s → 0 (fixed bed), temperatures are
+unbounded without wall cooling.
+
+Key difference from non-isothermal file:
+  • T is removed from the gas IVP (gas uses frozen T(z) from the solid IVP)
+  • T is added as a 2nd state variable in the solid IVP alongside q
+  • All 4 concentration profiles are passed to the solid IVP (needed for Q_rxn)
+  • Convergence is checked on both q(z) and T(z)
 
 Solved by decoupled Gauss-Seidel iteration:
-  1. Gas IVP   (z = 0 -> L, solve_ivp BDF) with fixed q(z) → gives C(z), T(z)
-  2. Solid IVP (zeta = 0 -> L, zeta = L-z, solve_ivp BDF) with fixed C_H2O(z), T(z)
-  3. Repeat until max|delta_q| < tol
+  1. Gas IVP   (z = 0 -> L, solve_ivp BDF): fixed q(z), T(z)  → gives C(z)
+  2. Solid IVP (ζ = 0 -> L, solve_ivp BDF): fixed C(z)        → gives q(z), T(z)
+  3. Repeat until max|Δq|/q and max|ΔT|/ΔT_range both < tol
 
 State variables at steady state:
     C_CO2(z), C_H2(z), C_CH4(z), C_H2O(z)  [mol/m3]
     q(z)                                      [mol/kg]
-    T(z)                                      [K]
+    T(z)                                      [K]       ← from solid IVP
 """
 
+import os
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -72,7 +81,7 @@ E_DA  = 1190e3         # [J/mol]         — characteristic adsorption energy
 n_DA  = 1.55           # [-]             — isotherm heterogeneity exponent
 
 # --- LHHW kinetics (CO2 methanation on 5%Ni/13X) ---
-# Rate: r [mol/(kg_cat·s)] = k*(p_CO2*p_H2)^0.5 * f_eq / DEN² * 1000
+# Rate: r [mmol/(kg_cat·s)] = k*(p_CO2*p_H2)^0.5 * f_eq / DEN² * 1000
 # All kinetic parameters from Wei et al.
 T_ref_K = 555.0        # [K]             — reference temperature
 k_ref   = 3.46e-4      # [mol/(kg_cat·s·bar)] — rate constant at T_ref
@@ -86,8 +95,7 @@ P_FLOOR = 1e-4         # [bar]           — numerical floor to prevent log(0) s
 dH_r   = -165.0e3      # [J/mol_CO2]     — methanation reaction enthalpy, NIST
 dH_ads =  -45.0e3      # [J/mol_H2O]     — H2O adsorption enthalpy on 13X, literature
 Cp_cat = 1100.0        # [J/(kg·K)]      — catalyst/sorbent heat capacity, literature estimate
-Cp_CO2 = 45.4;  Cp_H2 = 29.3;  Cp_CH4 = 46.9;  Cp_H2O = 34.2;  Cp_N2 = 29.5  # [J/(mol·K)] — NIST at ~550 K
-U_a    = 000.0        # [W/(m³_bed·K)]  — volumetric wall heat transfer coeff., own estimate, h = 100 W/(M2*K) (justifies temporary isothermal assumption)
+Cp_CO2 = 45.4;  Cp_H2 = 29.3;  Cp_CH4 = 46.9;  Cp_H2O = 34.2  # [J/(mol·K)] — NIST at ~550 K
 
 # --- Physical constants ---
 R_gas  = 8.314         # [J/(mol·K)]     — universal gas constant
@@ -112,12 +120,12 @@ _us_fine  = np.array([6.5e-4, 7.0e-4, 7.5e-4, 8.0e-4, 8.5e-4, 9.5e-4]) # [m/s] e
 U_S_LIST  = np.unique(np.concatenate([_us_base, _us_fine]))               # [m/s] sorted, ~16 points
 T_IN_LIST = [280]                       # [°C]   — inlet temperatures to scan
 
-print(f"MPB: d={d_b*100:.0f} cm, L={L_b:.1f} m, "
+print(f"MPB adiabatic: d={d_b*100:.0f} cm, L={L_b:.1f} m, "
       f"rho_bed_tot={rho_bed_tot:.0f} kg/m3, u_g_STP={u_g_STP*1e3:.1f} mm/s")
 # endregion
 
 
-# region 2. INHERITED FUNCTIONS, validated by Wei's experiments
+# region 2. INHERITED FUNCTIONS
 # =============================================================================
 def P_sat_bar(T_K):
     """
@@ -197,22 +205,19 @@ def reaction_rate_SI(T_K, p_CO2, p_H2, p_CH4, p_H2O):
 
     k(T)         : Arrhenius rate constant relative to T_ref = 555 K.
     K_OH/H2/mix  : van 't Hoff surface adsorption equilibrium constants.
-    f_eq         : approach-to-equilibrium factor = max(1 - Q/K_eq, 0),
-                   where Q = p_CH4*p_H2O^2/(K_eq*p_CO2*p_H2^4).
-                   Shuts the rate off smoothly as the system nears equilibrium.
-    DEN^2        : bimolecular LHHW denominator — OH* (from H2O) and H2 compete
-                   for active sites; squared because two sites are involved.
+    f_eq         : approach-to-equilibrium factor = max(1 - Q/K_eq, 0).
+    DEN^2        : bimolecular LHHW denominator (OH* and H2 compete for active sites).
     *1000        : converts mol -> mmol to match k_ref units [mmol/(kg_cat·s·bar^0.5)].
     """
     vH    = lambda dH: np.exp(-dH/R_gas*(1.0/T_K - 1.0/T_ref_K))  # van 't Hoff factor
-    k     = k_ref*np.exp(-Ea_k/R_gas*(1.0/T_K - 1.0/T_ref_K))     # Arrhenius [mmol/(kg·s·bar^0.5)]
+    k     = k_ref*np.exp(-Ea_k/R_gas*(1.0/T_K - 1.0/T_ref_K))     # Arrhenius
     K_OH  = A_OH*vH(dH_OH);  K_H2 = A_H2*vH(dH_H2);  K_mix = A_mix*vH(dH_mix)
     K_eq  = K_eq_sabatier(T_K)
     p_CO2_s = np.maximum(p_CO2, P_FLOOR);  p_H2_s = np.maximum(p_H2, P_FLOOR)
     beta  = (p_CH4*p_H2O**2)/(K_eq*p_CO2_s*p_H2_s**4)             # reaction quotient / K_eq
-    f_eq  = np.maximum(1.0 - np.where(np.isfinite(beta), beta, 1e10), 0.0)  # approach-to-eq.
-    DEN   = (1.0 + K_OH*np.maximum(p_H2O,0)/p_H2_s**0.5           # OH* site blocking
-             + K_H2*p_H2_s**0.5 + K_mix*p_CO2_s)                  # H2 and CO2 adsorption
+    f_eq  = np.maximum(1.0 - np.where(np.isfinite(beta), beta, 1e10), 0.0)
+    DEN   = (1.0 + K_OH*np.maximum(p_H2O,0)/p_H2_s**0.5
+             + K_H2*p_H2_s**0.5 + K_mix*p_CO2_s)
     return k*(p_CO2_s*p_H2_s)**0.5*f_eq/DEN**2*1000.0
 
 def q_star(T_K, p_H2O):
@@ -227,10 +232,6 @@ def equilibrium_conversion(T_K_val):
     """
     Thermodynamic equilibrium CO2 conversion [%] at the given temperature.
     Solves Q(X) = K_eq via Brent's method (brentq).
-    Mole fractions from inlet (y_CO2=0.04, y_H2=0.16, y_CH4=0.80, P=1 bar):
-        d = 1 - 0.08*X  (net mole change: -2 mol per mol CO2 reacted)
-        p_CH4 = (0.80+0.04X)/d,  p_H2O = 0.08X/d,
-        p_CO2 = 0.04(1-X)/d,     p_H2  = 0.16(1-X)/d
     """
     K = K_eq_sabatier(T_K_val)
     def f(X):
@@ -246,25 +247,34 @@ def equilibrium_conversion(T_K_val):
 
 # region 3. DECOUPLED SOLVER
 # =============================================================================
+def _cp_mix(p_CO2, p_H2, p_CH4, p_H2O):
+    """Mole-fraction weighted heat capacity [J/(mol·K)] at local gas composition."""
+    y_CO2 = p_CO2/P_bar;  y_H2 = p_H2/P_bar
+    y_CH4 = p_CH4/P_bar;  y_H2O = p_H2O/P_bar
+    y_rest = max(1.0 - y_CO2 - y_H2 - y_CH4 - y_H2O, 0.0)
+    return y_CO2*Cp_CO2 + y_H2*Cp_H2 + y_CH4*Cp_CH4 + y_H2O*Cp_H2O + y_rest*Cp_CH4
+
+
 def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
-              max_iter=200, tol=1e-4, N=100, q_init=None, T_wall=None):
+              max_iter=200, tol=1e-4, N=100, q_init=None):
     """
-    Counter-current MPB at steady state, non-isothermal.
+    Counter-current MPB at steady state, adiabatic (no wall cooling).
 
-    Decoupled Gauss-Seidel iteration:
-      - Gas IVP  : z = 0 -> L (BDF), uses q(z) from previous iteration
-                   T(z) is the 5th state variable (pseudo-homogeneous energy balance)
-      - Solid IVP: zeta = L-z, zeta=0->L (BDF), uses C_H2O(z) and T(z) from gas step
+    T is the 5th state variable in the gas IVP (same structure as non-isothermal).
+    Energy denominator uses the full adiabatic formula when gas dominates (u_s < u_s*),
+    falling back to the gas-only term when solid dominates (u_s > u_s*) to keep the
+    IVP stable in the gas direction.
 
-    q_init: optional initial q(z) profile [mol/kg] on N points — warm-start from a
-            nearby case to reduce iterations needed.
-    T_wall: wall / furnace temperature [K]; defaults to T_K (furnace at set-point).
+    u_s* = u_g·ρ_g·Cp_mix / (ρ_bed·Cp_cat) ≈ 0.47 mm/s at 280 °C.
+
+      u_s < u_s*: denom = u_g·Cp_g − u_s·Cp_s > 0  →  exact adiabatic result
+      u_s > u_s*: denom = u_g·Cp_g              > 0  →  lower bound on ΔT (conservative)
+
+    BC: T(z=0) = T_K.  Decoupled Gauss-Seidel iteration on q(z).
     """
-    if T_wall is None:
-        T_wall = T_K
+    solid_cap = u_s * rho_bed_tot * Cp_cat   # [W/(m²·K)], constant
 
     z_grid = np.linspace(0.0, L_b, N)
-
     if q_init is not None:
         q_prof = np.interp(z_grid, np.linspace(0, L_b, len(q_init)), q_init)
     else:
@@ -272,46 +282,37 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
     T_prof = T_K * np.ones(N)
 
     converged = False
+    err = 1.0
     for it in range(max_iter):
         q_fn = interp1d(z_grid, q_prof, kind='linear',
                         bounds_error=False, fill_value=(q_prof[0], q_prof[-1]))
 
         # ── Step 1: gas IVP from z=0 to z=L ─────────────────────────────────
         def gas_rhs(z, y):
-            C_CO2_l = max(y[0], 0.0)
-            C_H2_l  = max(y[1], 0.0)
-            C_CH4_l = max(y[2], 0.0)
-            C_H2O_l = max(y[3], 0.0)
+            C_CO2_l = max(y[0], 0.0);  C_H2_l  = max(y[1], 0.0)
+            C_CH4_l = max(y[2], 0.0);  C_H2O_l = max(y[3], 0.0)
             T_l     = max(y[4], 200.0)
             q_l     = max(float(q_fn(z)), 0.0)
 
-            p_CO2 = C_CO2_l*R_gas*T_l/1e5
-            p_H2  = C_H2_l *R_gas*T_l/1e5
-            p_CH4 = C_CH4_l*R_gas*T_l/1e5
-            p_H2O = C_H2O_l*R_gas*T_l/1e5
+            p_CO2 = C_CO2_l*R_gas*T_l/1e5;  p_H2  = C_H2_l *R_gas*T_l/1e5
+            p_CH4 = C_CH4_l*R_gas*T_l/1e5;  p_H2O = C_H2O_l*R_gas*T_l/1e5
 
-            r   = float(reaction_rate_SI(T_l,
-                        np.array([p_CO2]), np.array([p_H2]),
-                        np.array([p_CH4]), np.array([p_H2O]))[0])
+            r   = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                          np.array([p_CH4]), np.array([p_H2O]))[0])
             qs  = float(q_star(T_l, np.array([p_H2O]))[0])
             Kl  = float(K_LDF(T_l,  np.array([p_H2O]))[0])
             ads = Kl*(qs - q_l)
 
-            # Gas-phase energy balance (stable IVP; solid at local thermal equilibrium)
-            # Full counter-current pseudo-homogeneous balance is a BVP (BCs at both ends)
-            # and becomes an unstable IVP when u_s*rho_bed*Cp_cat > u_g*rho_g*Cp_mix.
-            # Gas-only denominator keeps it always positive → always stable.
             rho_g_mol_l = P_Pa / (R_gas * T_l)
-            y_CO2l = p_CO2/P_bar; y_H2l = p_H2/P_bar
-            y_CH4l = p_CH4/P_bar; y_H2Ol = p_H2O/P_bar
-            Cp_mix_l = (y_CO2l*Cp_CO2 + y_H2l*Cp_H2 + y_CH4l*Cp_CH4
-                        + y_H2Ol*Cp_H2O
-                        + max(1.0 - y_CO2l - y_H2l - y_CH4l - y_H2Ol, 0.0)*Cp_CH4)
-            denom = u_g * rho_g_mol_l * Cp_mix_l   # gas-only, always > 0
-            Q_rxn   = (-dH_r)   * rho_bed_cat * r
-            Q_ads   = (-dH_ads) * rho_bed_ads * ads
-            Q_wall_ = U_a * (T_l - T_wall)
-            dTdz = (Q_rxn + Q_ads - Q_wall_) / denom
+            gas_cap     = u_g * rho_g_mol_l * _cp_mix(p_CO2, p_H2, p_CH4, p_H2O)
+            full_denom  = gas_cap - solid_cap
+            # Use full adiabatic denominator when gas dominates (stable, exact).
+            # Fall back to gas-only when solid dominates (prevents sign flip).
+            denom = full_denom if full_denom > 0 else gas_cap
+
+            Q_rxn = (-dH_r)   * rho_bed_cat * r
+            Q_ads = (-dH_ads) * rho_bed_ads * ads
+            dTdz  = (Q_rxn + Q_ads) / denom
 
             return [
                 -rho_bed_cat*r / (eps_b*u_g),
@@ -322,7 +323,8 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
             ]
 
         gs = solve_ivp(gas_rhs, [0.0, L_b], [C_in_CO2, C_in_H2, C_in_CH4, 0.0, T_K],
-                       method='BDF', rtol=1e-4, atol=np.array([1e-8, 1e-8, 1e-8, 1e-8, 1e-2]),
+                       method='BDF', rtol=1e-4,
+                       atol=np.array([1e-8, 1e-8, 1e-8, 1e-8, 1e-2]),
                        t_eval=z_grid, dense_output=False)
         if not gs.success:
             return None
@@ -336,11 +338,7 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
                                bounds_error=False,
                                fill_value=(T_prof_new[0], T_prof_new[-1]))
 
-        # ── Step 2: solid IVP in zeta = L-z from zeta=0 (z=L) to zeta=L (z=0)
-        # Chain rule: dq/dζ = (dq/dt) / (dζ/dt) = K_LDF*(q*-q) / u_s
-        #   dq/dt  [mol/(kg·s)] : adsorption rate (LDF)
-        #   1/u_s  [s/m]        : time spent per metre of bed  ← slow u_s = more time per step
-        #   dq/dζ  [mol/(kg·m)] : loading change per metre travelled by solid
+        # ── Step 2: solid IVP in ζ = L−z from ζ=0 (z=L) to ζ=L (z=0) ───────
         def solid_rhs(zeta, q_arr):
             z_pos   = L_b - float(zeta)
             T_local = float(T_fn_new(z_pos))
@@ -357,19 +355,14 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
         if not ss.success:
             return None
 
-        # Map zeta -> z:  z = L - zeta  (zeta=0 -> z=L, zeta=L -> z=0)
-        z_from_zeta = L_b - ss.t          # z values in DECREASING order
+        z_from_zeta = L_b - ss.t
         q_from_zeta = np.maximum(ss.y[0], 0.0)
-
-        # Interpolate onto z_grid (which is increasing)
-        sort_idx = np.argsort(z_from_zeta)
+        sort_idx    = np.argsort(z_from_zeta)
         q_new = np.interp(z_grid, z_from_zeta[sort_idx], q_from_zeta[sort_idx])
 
-        # Damped update (avoids oscillatory non-convergence at slow u_s)
         q_prof_new = 0.5 * q_prof + 0.5 * q_new
         T_prof     = 0.5 * T_prof + 0.5 * T_prof_new
 
-        # Check convergence
         scale = max(np.max(q_prof_new), 1e-8)
         err   = np.max(np.abs(q_prof_new - q_prof)) / scale
         q_prof = q_prof_new
@@ -377,18 +370,15 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
             converged = True
             break
 
-    if not converged:
-        pass   # return best estimate anyway
-
-    # ── Recompute final gas profiles with converged q ────────────────────────
-    q_fn_final = interp1d(z_grid, q_prof, kind='linear',
-                          bounds_error=False, fill_value=(q_prof[0], q_prof[-1]))
+    # ── Final recompute on fine grid ─────────────────────────────────────────
+    q_fn_f = interp1d(z_grid, q_prof, kind='linear',
+                      bounds_error=False, fill_value=(q_prof[0], q_prof[-1]))
 
     def gas_rhs_final(z, y):
         C_CO2_l = max(y[0], 0.0);  C_H2_l  = max(y[1], 0.0)
         C_CH4_l = max(y[2], 0.0);  C_H2O_l = max(y[3], 0.0)
         T_l     = max(y[4], 200.0)
-        q_l     = max(float(q_fn_final(z)), 0.0)
+        q_l     = max(float(q_fn_f(z)), 0.0)
         p_CO2 = C_CO2_l*R_gas*T_l/1e5;  p_H2  = C_H2_l *R_gas*T_l/1e5
         p_CH4 = C_CH4_l*R_gas*T_l/1e5;  p_H2O = C_H2O_l*R_gas*T_l/1e5
         r   = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
@@ -397,26 +387,22 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
         Kl  = float(K_LDF(T_l,  np.array([p_H2O]))[0])
         ads = Kl*(qs - q_l)
         rho_g_mol_l = P_Pa / (R_gas * T_l)
-        y_CO2l = p_CO2/P_bar; y_H2l = p_H2/P_bar
-        y_CH4l = p_CH4/P_bar; y_H2Ol = p_H2O/P_bar
-        Cp_mix_l = (y_CO2l*Cp_CO2 + y_H2l*Cp_H2 + y_CH4l*Cp_CH4
-                    + y_H2Ol*Cp_H2O
-                    + max(1.0 - y_CO2l - y_H2l - y_CH4l - y_H2Ol, 0.0)*Cp_CH4)
-        denom = u_g * rho_g_mol_l * Cp_mix_l   # gas-only, always > 0
-        Q_rxn   = (-dH_r)   * rho_bed_cat * r
-        Q_ads   = (-dH_ads) * rho_bed_ads * ads
-        Q_wall_ = U_a * (T_l - T_wall)
-        dTdz = (Q_rxn + Q_ads - Q_wall_) / denom
+        gas_cap     = u_g * rho_g_mol_l * _cp_mix(p_CO2, p_H2, p_CH4, p_H2O)
+        full_denom  = gas_cap - solid_cap
+        denom = full_denom if full_denom > 0 else gas_cap
+        Q_rxn = (-dH_r)   * rho_bed_cat * r
+        Q_ads = (-dH_ads) * rho_bed_ads * ads
         return [
             -rho_bed_cat*r/(eps_b*u_g),
             -4.0*rho_bed_cat*r/(eps_b*u_g),
             +rho_bed_cat*r/(eps_b*u_g),
             (2.0*rho_bed_cat*r - rho_bed_ads*ads)/(eps_b*u_g),
-            dTdz,
+            (Q_rxn + Q_ads) / denom,
         ]
 
     z_fine = np.linspace(0.0, L_b, 300)
-    gf = solve_ivp(gas_rhs_final, [0.0, L_b], [C_in_CO2, C_in_H2, C_in_CH4, 0.0, T_K],
+    gf = solve_ivp(gas_rhs_final, [0.0, L_b],
+                   [C_in_CO2, C_in_H2, C_in_CH4, 0.0, T_K],
                    method='BDF', rtol=1e-6,
                    atol=np.array([1e-10, 1e-10, 1e-10, 1e-10, 1e-3]),
                    t_eval=z_fine, dense_output=False)
@@ -426,7 +412,7 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
     q_fine = np.interp(z_fine, z_grid, q_prof)
     T_fine = np.maximum(gf.y[4], 200.0)
 
-    p_CO2f = C_CO2f*R_gas*T_fine/1e5;  p_H2f  = C_H2f *R_gas*T_fine/1e5
+    p_CO2f = C_CO2f*R_gas*T_fine/1e5;  p_H2f  = C_H2f*R_gas*T_fine/1e5
     p_CH4f = C_CH4f*R_gas*T_fine/1e5;  p_H2Of = C_H2Of*R_gas*T_fine/1e5
     r_fine = reaction_rate_SI(T_fine, p_CO2f, p_H2f, p_CH4f, p_H2Of)
     X_CO2  = np.clip(1.0 - C_CO2f/C_in_CO2, 0.0, 1.0)
@@ -439,18 +425,55 @@ def solve_mpb(u_s, u_g, T_K, C_in_CO2, C_in_H2, C_in_CH4,
 
 # region 4. SOLVE LOOP
 # =============================================================================
-def _q_physics_init(T_K, u_g, C_in_CO2, C_in_H2, C_in_CH4, N=150):
+def _compute_noSE_adiabatic(T_K, u_g, C_in_CO2, C_in_H2, C_in_CH4, N=300):
     """
-    Physics-based initial guess for q(z).
+    Fixed-bed (u_s = 0) adiabatic profile: no net adsorption, adiabatic energy balance.
+    At steady state in a fixed bed the sorbent is saturated (q = q* everywhere, ads = 0),
+    so only the reaction heats the gas.  denom = u_g·ρ_g·Cp_mix (gas-only, always > 0).
+    Returns X_CO2_noSE (scalar) and a profile dict for plotting.
+    """
+    def rhs(_z, y):
+        C_CO2_l = max(y[0], 0.0); C_H2_l  = max(y[1], 0.0)
+        C_CH4_l = max(y[2], 0.0); C_H2O_l = max(y[3], 0.0)
+        T_l     = max(y[4], 200.0)
+        p_CO2 = C_CO2_l*R_gas*T_l/1e5; p_H2  = C_H2_l*R_gas*T_l/1e5
+        p_CH4 = C_CH4_l*R_gas*T_l/1e5; p_H2O = C_H2O_l*R_gas*T_l/1e5
+        r = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                   np.array([p_CH4]), np.array([p_H2O]))[0])
+        denom = u_g * (P_Pa/(R_gas*T_l)) * _cp_mix(p_CO2, p_H2, p_CH4, p_H2O)
+        return [
+            -rho_bed_cat*r/(eps_b*u_g),
+            -4.0*rho_bed_cat*r/(eps_b*u_g),
+            +rho_bed_cat*r/(eps_b*u_g),
+             2.0*rho_bed_cat*r/(eps_b*u_g),   # no adsorption sink
+            (-dH_r)*rho_bed_cat*r / denom,     # adiabatic: reaction heat only
+        ]
+    z_grid = np.linspace(0, L_b, N)
+    sol = solve_ivp(rhs, [0, L_b], [C_in_CO2, C_in_H2, C_in_CH4, 0.0, T_K],
+                    method='BDF', rtol=1e-5,
+                    atol=np.array([1e-9, 1e-9, 1e-9, 1e-9, 1e-2]), t_eval=z_grid)
+    C_CO2_f = np.maximum(sol.y[0], 0.0);  C_H2O_f = np.maximum(sol.y[3], 0.0)
+    T_f     = np.maximum(sol.y[4], 200.0)
+    p_H2O_f = C_H2O_f * R_gas * T_f / 1e5
+    p_CO2_f = np.maximum(sol.y[0], 0.0) * R_gas * T_f / 1e5
+    p_H2_f  = np.maximum(sol.y[1], 0.0) * R_gas * T_f / 1e5
+    p_CH4_f = np.maximum(sol.y[2], 0.0) * R_gas * T_f / 1e5
+    r_f     = reaction_rate_SI(T_f, p_CO2_f, p_H2_f, p_CH4_f, p_H2O_f)
+    X_f     = np.clip(1.0 - C_CO2_f / C_in_CO2, 0.0, 1.0)
+    X_CO2_noSE = float(X_f[-1])
+    return dict(
+        X_CO2_noSE=X_CO2_noSE,
+        profile=dict(z=z_grid, C_CO2=C_CO2_f, C_H2O=C_H2O_f,
+                     q=q_star(T_f, p_H2O_f), r=r_f, X_CO2=X_f, T=T_f)
+    )
 
-    Solves the gas ODE with no adsorption (pure reaction, like a saturated fixed bed),
-    then returns q*(T, p_H2O(z)). This is the maximum possible solid loading given
-    the H2O profile from reaction alone — a much better start than q=0 for slow u_s.
-    """
+
+def _q_physics_init(T_K, u_g, C_in_CO2, C_in_H2, C_in_CH4, N=150):
+    """Physics-based initial guess for q(z): saturated fixed-bed q*(p_H2O(z))."""
     def rhs_noads(_z, y):
         C_CO2_l = max(y[0], 0.0); C_H2_l  = max(y[1], 0.0)
         C_CH4_l = max(y[2], 0.0); C_H2O_l = max(y[3], 0.0)
-        p_CO2 = C_CO2_l*R_gas*T_K/1e5; p_H2  = C_H2_l *R_gas*T_K/1e5
+        p_CO2 = C_CO2_l*R_gas*T_K/1e5; p_H2  = C_H2_l*R_gas*T_K/1e5
         p_CH4 = C_CH4_l*R_gas*T_K/1e5; p_H2O = C_H2O_l*R_gas*T_K/1e5
         r = float(reaction_rate_SI(T_K, np.array([p_CO2]), np.array([p_H2]),
                                    np.array([p_CH4]), np.array([p_H2O]))[0])
@@ -458,31 +481,21 @@ def _q_physics_init(T_K, u_g, C_in_CO2, C_in_H2, C_in_CH4, N=150):
             -rho_bed_cat*r/(eps_b*u_g),
             -4.0*rho_bed_cat*r/(eps_b*u_g),
             +rho_bed_cat*r/(eps_b*u_g),
-             2.0*rho_bed_cat*r/(eps_b*u_g),   # no adsorption sink
+             2.0*rho_bed_cat*r/(eps_b*u_g),
         ]
     z_grid = np.linspace(0, L_b, N)
     sol = solve_ivp(rhs_noads, [0, L_b], [C_in_CO2, C_in_H2, C_in_CH4, 0.0],
                     method='BDF', rtol=1e-4, atol=1e-8, t_eval=z_grid)
-    p_H2O_prof  = np.maximum(sol.y[3], 0.0) * R_gas * T_K / 1e5
-    X_CO2_noSE  = float(np.clip(1.0 - sol.y[0, -1] / C_in_CO2, 0.0, 1.0))
-    q_prof_f = q_star(T_K, p_H2O_prof)
-    p_CO2_f  = np.maximum(sol.y[0], 0.0) * R_gas * T_K / 1e5
-    p_H2_f   = np.maximum(sol.y[1], 0.0) * R_gas * T_K / 1e5
-    p_CH4_f  = np.maximum(sol.y[2], 0.0) * R_gas * T_K / 1e5
-    T_arr    = T_K * np.ones(N)
-    r_f      = reaction_rate_SI(T_arr, p_CO2_f, p_H2_f, p_CH4_f, p_H2O_prof)
-    X_f      = np.clip(1.0 - np.maximum(sol.y[0], 0.0) / C_in_CO2, 0.0, 1.0)
-    profile  = dict(z=z_grid, C_CO2=np.maximum(sol.y[0], 0.0),
-                    C_H2O=np.maximum(sol.y[3], 0.0), q=q_prof_f, r=r_f, X_CO2=X_f)
-    return dict(q=q_prof_f, X_CO2_noSE=X_CO2_noSE, profile=profile)
+    p_H2O_prof = np.maximum(sol.y[3], 0.0) * R_gas * T_K / 1e5
+    X_CO2_noSE = float(np.clip(1.0 - sol.y[0, -1] / C_in_CO2, 0.0, 1.0))
+    return dict(q=q_star(T_K, p_H2O_prof), X_CO2_noSE=X_CO2_noSE)
 
 def _fmt_seconds(s):
-    """Format seconds as e.g. '1m 23s' or '45s'."""
     s = int(s)
     return f"{s//60}m {s%60:02d}s" if s >= 60 else f"{s}s"
 
-all_results  = {}   # key: (T_C, i_us)
-noSE_results = {}   # key: T_C  →  non-SE fixed-bed CO2 conversion [-]
+all_results  = {}
+noSE_results = {}
 
 n_total     = len(T_IN_LIST) * len(U_S_LIST)
 n_done      = 0
@@ -494,30 +507,17 @@ for T_C in T_IN_LIST:
     C_in_CO2 = y_CO2_in*P_Pa/(R_gas*T_K)
     C_in_H2  = y_H2_in *P_Pa/(R_gas*T_K)
     C_in_CH4 = y_CH4_in*P_Pa/(R_gas*T_K)
-    Cp_mix_est = y_CH4_in*Cp_CH4 + y_CO2_in*Cp_CO2 + y_H2_in*Cp_H2
-    rho_g_mol  = P_Pa/(R_gas*T_K)
-    u_s_star   = u_g*rho_g_mol*Cp_mix_est/(rho_bed_tot*Cp_cat)
 
     print(f"\n{'='*60}")
-    print(f"  T_in = {T_C} C  |  u_g = {u_g*1e3:.1f} mm/s  "
-          f"|  u_s* = {u_s_star*1e3:.3f} mm/s")
+    print(f"  T_in = {T_C} C  |  u_g = {u_g*1e3:.1f} mm/s  (ADIABATIC)")
     print(f"{'='*60}")
 
     _phys      = _q_physics_init(T_K, u_g, C_in_CO2, C_in_H2, C_in_CH4)
     q_init_raw = _phys['q']
-    q_init     = q_init_raw[::-1]          # flip (z=L→0 shape); fully saturated = correct steady-state guess
-    noSE_results[T_C] = _phys
-    print(f"  non-SE fixed-bed conversion: {_phys['X_CO2_noSE']*100:.1f}%")
-    z_init     = np.linspace(0, L_b, len(q_init))
-
-    fig, ax = plt.subplots(figsize=(7, 3))
-    ax.plot(z_init, q_init_raw, lw=2, color='grey',      ls='--', label='raw q* (wrong direction)')
-    ax.plot(z_init, q_init,     lw=2, color='steelblue',           label='flipped, fully saturated (used as q_init)')
-    ax.axvline(L_b, color='tab:orange', lw=1, ls=':', alpha=0.7, label=f'z=L (solid inlet, q=0 BC)')
-    ax.set_xlabel('z [m]');  ax.set_ylabel('q [mol/kg]')
-    ax.set_title(f'Physics-based initial guess  |  T_in = {T_C} C')
-    ax.legend(fontsize=8);  ax.grid(True, alpha=0.3)
-    plt.tight_layout();  plt.show()
+    q_init     = q_init_raw[::-1]
+    _noSE      = _compute_noSE_adiabatic(T_K, u_g, C_in_CO2, C_in_H2, C_in_CH4)
+    noSE_results[T_C] = _noSE
+    print(f"  non-SE fixed-bed conversion: {_noSE['X_CO2_noSE']*100:.1f}%")
 
     for i_us, u_s in enumerate(U_S_LIST):
         t0  = time.perf_counter()
@@ -528,11 +528,13 @@ for T_C in T_IN_LIST:
         eta     = elapsed / n_done * (n_total - n_done)
 
         if res is not None:
-            X_out = float(res['X_CO2'][-1])*100
-            q_out = float(res['q'][0])
-            tag   = "ok" if res['converged'] else "not-conv"
+            X_out  = float(res['X_CO2'][-1])*100
+            q_out  = float(res['q'][0])
+            T_max  = float(np.max(res['T'])) - 273.15
+            tag    = "ok" if res['converged'] else "not-conv"
             print(f"  u_s={u_s*1e3:.4f} mm/s  X={X_out:.1f}%  "
-                  f"q(0)={q_out:.3f} mol/kg  [{tag}, {res['n_iter']} iter, err={res['conv_err']:.2e}]"
+                  f"q(0)={q_out:.3f} mol/kg  T_max={T_max:.1f} C  "
+                  f"[{tag}, {res['n_iter']} iter, err={res['conv_err']:.2e}]"
                   f"  ({dt:.1f}s, ETA {_fmt_seconds(eta)})")
             q_init = np.interp(np.linspace(0, L_b, 150), res['z'], res['q'])
         else:
@@ -552,36 +554,39 @@ def get_metrics(entry):
     if res is None:
         return None
     T_K = entry['T_K']
-    X_out   = float(res['X_CO2'][-1])
-    q_out   = float(res['q'][0])            # solid loading at z=0 (solid outlet)
-    r_max   = float(np.max(res['r']))*1e3   # mmol/(kg_cat.s)
-    p_H2O_max = float(np.max(res['C_H2O']))*R_gas*T_K/1e5*1000  # mbar
-    # sorbent utilisation: q at solid outlet vs q* at the peak H2O in the bed
-    # (NOT at z=L where fresh solid instantly adsorbs all H2O → p_H2O≈0 → q*≈0 → util→∞)
-    p_H2O_peak = float(np.max(res['C_H2O']))*R_gas*T_K/1e5
-    q_star_out = float(q_star(T_K, np.array([max(p_H2O_peak, 1e-8)]))[0])
-    return dict(X_CO2=X_out, q_out=q_out, r_max=r_max,
-                p_H2O_max=p_H2O_max, q_star_out=q_star_out,
-                sorbent_util=q_out/max(q_star_out,1e-10))
+    X_out      = float(res['X_CO2'][-1])
+    q_out      = float(res['q'][0])
+    T_max      = float(np.max(res['T']))
+    T_out_solid = float(res['T'][0])   # solid outlet temperature at z=0
+    p_H2O_peak  = float(np.max(res['C_H2O']))*R_gas*T_K/1e5
+    q_star_peak = float(q_star(T_K, np.array([max(p_H2O_peak, 1e-8)]))[0])
+    return dict(X_CO2=X_out, q_out=q_out, T_max=T_max, T_out_solid=T_out_solid,
+                sorbent_util=q_out/max(q_star_peak, 1e-10))
 # endregion
 
 
 # region 6. PLOTS
 # =============================================================================
+SAVE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def _savefig(filename):
+    plt.savefig(os.path.join(SAVE_DIR, filename), dpi=150, bbox_inches='tight')
+
 markers = ['o', 's', '^', 'D']
 cmap    = plt.cm.viridis
 
-# ── Plot 1: Axial profiles at T_in = 300 C for 5 u_s values ─────────────────
 T_C_PROF = T_IN_LIST[0]
 i_plot   = np.arange(len(U_S_LIST))
 pal      = plt.cm.plasma(np.linspace(0.1, 0.85, len(i_plot)))
+pal2     = cmap(np.linspace(0.1, 0.85, len(T_IN_LIST)))
 
+# Convenience: fixed-bed (u_s=0) adiabatic profile for T_C_PROF
+_p0 = noSE_results.get(T_C_PROF, {}).get('profile')
 
+# ── Plot 1: Axial profiles ────────────────────────────────────────────────────
 fig, axes = plt.subplots(2, 2, figsize=(13, 9))
-fig.suptitle(f'MPB axial profiles  |  T_in = {T_C_PROF} C  |  isothermal, counter-current',
+fig.suptitle(f'MPB axial profiles  |  T_in = {T_C_PROF} C  |  adiabatic, counter-current',
              fontsize=11)
-
-plotted = 0
 for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
     if e is None or e['res'] is None:
@@ -592,32 +597,24 @@ for k, i_us in enumerate(i_plot):
     axes[0,1].plot(r['z'], r['q'],          color=pal[k], lw=2, label=lbl)
     axes[1,0].plot(r['z'], r['X_CO2']*100,  color=pal[k], lw=2, label=lbl)
     axes[1,1].plot(r['z'], r['r']*1e3,      color=pal[k], lw=2, label=lbl)
-    plotted += 1
-
-if T_C_PROF in noSE_results:
-    p0 = noSE_results[T_C_PROF]['profile']
-    axes[0,0].plot(p0['z'], p0['C_CO2']*1e3, color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
-    axes[0,1].plot(p0['z'], p0['q'],          color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
-    axes[1,0].plot(p0['z'], p0['X_CO2']*100,  color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
-    axes[1,1].plot(p0['z'], p0['r']*1e3,      color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
-
+if _p0 is not None:
+    axes[0,0].plot(_p0['z'], _p0['C_CO2']*1e3, color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
+    axes[0,1].plot(_p0['z'], _p0['q'],           color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
+    axes[1,0].plot(_p0['z'], _p0['X_CO2']*100,   color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
+    axes[1,1].plot(_p0['z'], _p0['r']*1e3,       color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
 labels_units = [('C_CO2 [mmol/m3]',    'CO2 concentration'),
                 ('q [mol/kg]',          'Solid H2O loading'),
                 ('CO2 conversion [%]',  'CO2 conversion along bed'),
                 ('r [mmol/(kg_cat.s)]', 'Reaction rate')]
 for ax, (ylabel, title) in zip(axes.flat, labels_units):
-    ax.set_xlabel('z [m]', fontsize=10)
-    ax.set_ylabel(ylabel,  fontsize=10)
-    ax.set_title(title,    fontsize=10)
-    ax.legend(fontsize=7);  ax.grid(True, alpha=0.3)
+    ax.set_xlabel('z [m]', fontsize=10);  ax.set_ylabel(ylabel, fontsize=10)
+    ax.set_title(title, fontsize=10);     ax.legend(fontsize=7);  ax.grid(True, alpha=0.3)
     ax.axvline(0,   color='tab:blue',   lw=1, ls=':', alpha=0.5)
     ax.axvline(L_b, color='tab:orange', lw=1, ls=':', alpha=0.5)
-
 plt.tight_layout()
-plt.show()
+_savefig(f'plot1_axial_profiles_T{T_C_PROF}C.png');  plt.show()
 
-# ── Plot 2: CO2 conversion at z=L vs u_s for each T_in ─────────────────────
-pal2 = cmap(np.linspace(0.1, 0.85, len(T_IN_LIST)))
+# ── Plot 2: CO2 conversion vs u_s ────────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
     us_ok, X_ok = [], []
@@ -626,25 +623,22 @@ for j, T_C in enumerate(T_IN_LIST):
         if e and e['res']:
             m = get_metrics(e)
             if m:
-                us_ok.append(e['u_s']*1e3)
-                X_ok.append(m['X_CO2']*100)
+                us_ok.append(e['u_s']*1e3);  X_ok.append(m['X_CO2']*100)
     if us_ok:
         ax.semilogx(us_ok, X_ok, marker=markers[j], color=pal2[j],
-                    lw=2, ms=6, label=f'{T_C} C (MPB)')
+                    lw=2, ms=6, label=f'{T_C} C (MPB adiabatic)')
         ax.axhline(equilibrium_conversion(T_C+273.15), color=pal2[j],
                    lw=1, ls=':', alpha=0.5, label=f'{T_C} C thermo. eq.')
         if T_C in noSE_results:
             ax.axhline(noSE_results[T_C]['X_CO2_noSE']*100, color=pal2[j],
-                       lw=1.5, ls='--', alpha=0.8, label=f'{T_C} C non-SE (fixed bed)')
-
-ax.set_xlabel('u_s [mm/s]', fontsize=11)
-ax.set_ylabel('CO2 conversion at z=L [%]', fontsize=11)
-ax.set_title('MPB  --  CO2 conversion vs solid velocity\n'
-             '(dotted = thermo. eq., dashed = non-SE fixed bed)', fontsize=10)
+                       lw=1.5, ls='--', alpha=0.8, label=f'{T_C} C u_s=0 (fixed bed)')
+ax.set_xlabel('u_s [mm/s]', fontsize=11);  ax.set_ylabel('CO2 conversion [%]', fontsize=11)
+ax.set_title('MPB adiabatic — CO2 conversion vs solid velocity', fontsize=10)
 ax.legend(fontsize=9);  ax.grid(True, alpha=0.3);  ax.set_ylim(0, 105)
-plt.tight_layout();  plt.show()
+plt.tight_layout()
+_savefig('plot2_conversion_vs_us.png');  plt.show()
 
-# ── Plot 3: Sorbent utilisation vs u_s ──────────────────────────────────────
+# ── Plot 3: Sorbent utilisation vs u_s ───────────────────────────────────────
 fig, ax = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
     us_ok, util_ok = [], []
@@ -653,48 +647,44 @@ for j, T_C in enumerate(T_IN_LIST):
         if e and e['res']:
             m = get_metrics(e)
             if m:
-                us_ok.append(e['u_s']*1e3)
-                util_ok.append(m['sorbent_util'] * 100)
+                us_ok.append(e['u_s']*1e3);  util_ok.append(m['sorbent_util']*100)
     if us_ok:
         ax.semilogx(us_ok, util_ok, marker=markers[j], color=pal2[j],
                     lw=2, ms=6, label=f'{T_C} C')
-
 ax.axhline(100, color='grey', lw=1.5, ls='--', label='q = q* (fully saturated)')
 ax.set_xlabel('u_s [mm/s]', fontsize=11)
 ax.set_ylabel('Sorbent utilisation  q(z=0) / q*(p_H2O_max)  [%]', fontsize=11)
-ax.set_title('MPB  --  Sorbent utilisation vs solid velocity', fontsize=10)
+ax.set_title('MPB adiabatic — Sorbent utilisation vs solid velocity', fontsize=10)
 ax.legend(fontsize=9);  ax.grid(True, alpha=0.3)
-plt.tight_layout();  plt.show()
+plt.tight_layout()
+_savefig('plot3_sorbent_utilisation.png');  plt.show()
 
-# ── Plot 4: q profile and C_H2O profile for several u_s at T=300 C ─────────
+# ── Plot 4: H2O profiles ─────────────────────────────────────────────────────
+T_K_prof = T_C_PROF + 273.15
 fig, (ax_q, ax_h) = plt.subplots(1, 2, figsize=(13, 5))
-fig.suptitle(f'H2O profiles along bed  |  T_in = {T_C_PROF} C', fontsize=11)
+fig.suptitle(f'H2O profiles along bed  |  T_in = {T_C_PROF} C  |  adiabatic', fontsize=11)
 for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
     if e is None or e['res'] is None:
         continue
     r   = e['res']
     lbl = f"u_s = {e['u_s']*1e3:.3f} mm/s"
-    ax_q.plot(r['z'], r['q'],                              color=pal[k], lw=2, label=lbl)
-    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_C_PROF/1e2,    color=pal[k], lw=2, label=lbl)
-
-if T_C_PROF in noSE_results:
-    p0 = noSE_results[T_C_PROF]['profile']
-    ax_q.plot(p0['z'], p0['q'],                           color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
-    ax_h.plot(p0['z'], p0['C_H2O']*R_gas*T_C_PROF/1e2,  color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
+    ax_q.plot(r['z'], r['q'],                          color=pal[k], lw=2, label=lbl)
+    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_K_prof/1e2,  color=pal[k], lw=2, label=lbl)
+if _p0 is not None:
+    ax_q.plot(_p0['z'], _p0['q'],                            color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
+    ax_h.plot(_p0['z'], _p0['C_H2O']*R_gas*T_K_prof/1e2,   color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
 ax_q.set_xlabel('z [m]');  ax_q.set_ylabel('q [mol/kg]')
-ax_q.set_title('Solid H2O loading q(z)')
-ax_q.legend(fontsize=7);   ax_q.grid(True, alpha=0.3)
+ax_q.set_title('Solid H2O loading q(z)');  ax_q.legend(fontsize=7);  ax_q.grid(True, alpha=0.3)
 ax_h.set_xlabel('z [m]');  ax_h.set_ylabel('p_H2O [mbar]')
-ax_h.set_title('Gas-phase H2O partial pressure')
-ax_h.legend(fontsize=7);   ax_h.grid(True, alpha=0.3)
-plt.tight_layout();  plt.show()
+ax_h.set_title('Gas-phase H2O partial pressure');  ax_h.legend(fontsize=7);  ax_h.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig(f'plot4_H2O_profiles_T{T_C_PROF}C.png');  plt.show()
 
-# ── Plot 5: Temperature profiles along bed for several u_s ───────────────────
+# ── Plot 5: Temperature profiles ─────────────────────────────────────────────
 fig, ax_T = plt.subplots(figsize=(9, 5))
-fig.suptitle(f'Temperature profile along bed  |  T_in = {T_C_PROF} C  |  non-isothermal',
+fig.suptitle(f'Temperature profile along bed  |  T_in = {T_C_PROF} C  |  adiabatic',
              fontsize=11)
-T_wall_C = T_C_PROF
 for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
     if e is None or e['res'] is None:
@@ -702,36 +692,38 @@ for k, i_us in enumerate(i_plot):
     r   = e['res']
     lbl = f"u_s = {e['u_s']*1e3:.3f} mm/s"
     ax_T.plot(r['z'], r['T'] - 273.15, color=pal[k], lw=2, label=lbl)
-
-ax_T.axhline(T_wall_C, color='grey', lw=1.5, ls='--', alpha=0.8, label='T_wall (furnace)')
-ax_T.set_xlabel('z [m]', fontsize=10)
-ax_T.set_ylabel('T [°C]', fontsize=10)
-ax_T.set_title('Axial temperature profile  (pseudo-homogeneous counter-current energy balance)',
-               fontsize=9)
+if _p0 is not None:
+    ax_T.plot(_p0['z'], _p0['T'] - 273.15, color='k', lw=2, ls='--', label='u_s = 0 (fixed bed)')
+ax_T.axhline(T_C_PROF, color='grey', lw=1.5, ls='--', alpha=0.8, label='T_in')
+ax_T.set_xlabel('z [m]', fontsize=10);  ax_T.set_ylabel('T [°C]', fontsize=10)
+ax_T.set_title('Axial temperature profile  (adiabatic energy balance)', fontsize=9)
 ax_T.legend(fontsize=7);  ax_T.grid(True, alpha=0.3)
-plt.tight_layout();  plt.show()
+plt.tight_layout()
+_savefig(f'plot5_temperature_T{T_C_PROF}C.png');  plt.show()
 
-# ── Plot 6: CO2 mole fraction along bed [mol%] ───────────────────────────────
-T_K_prof = T_C_PROF + 273.15
+# ── Plot 6: Maximum temperature rise vs u_s ───────────────────────────────────
 fig, ax6 = plt.subplots(figsize=(9, 5))
-fig.suptitle(f'CO2 mole fraction along bed  |  T_in = {T_C_PROF} C  '
-             f'(inlet: {y_CO2_in*100:.0f} mol%)', fontsize=11)
-for k, i_us in enumerate(i_plot):
-    e = all_results.get((T_C_PROF, i_us))
-    if e is None or e['res'] is None:
-        continue
-    r   = e['res']
-    lbl = f"u_s = {e['u_s']*1e3:.3f} mm/s"
-    y_CO2 = r['C_CO2'] * R_gas * r['T'] / P_Pa * 100   # mol%
-    ax6.plot(r['z'], y_CO2, color=pal[k], lw=2, label=lbl)
-if T_C_PROF in noSE_results:
-    p0 = noSE_results[T_C_PROF]['profile']
-    y_CO2_noSE = p0['C_CO2'] * R_gas * T_K_prof / P_Pa * 100
-    ax6.plot(p0['z'], y_CO2_noSE, color='grey', lw=2, ls='--', label='u_s = 0 (fixed bed)')
-ax6.set_xlabel('z [m]', fontsize=10)
-ax6.set_ylabel('y_CO2 [mol%]', fontsize=10)
-ax6.legend(fontsize=7);  ax6.grid(True, alpha=0.3)
-ax6.axvline(0,   color='tab:blue',   lw=1, ls=':', alpha=0.5)
-ax6.axvline(L_b, color='tab:orange', lw=1, ls=':', alpha=0.5)
-plt.tight_layout();  plt.show()
+for j, T_C in enumerate(T_IN_LIST):
+    us_ok, dT_ok = [], []
+    for i_us in range(len(U_S_LIST)):
+        e = all_results.get((T_C, i_us))
+        if e and e['res']:
+            m = get_metrics(e)
+            if m:
+                us_ok.append(e['u_s']*1e3)
+                dT_ok.append(m['T_max'] - (T_C + 273.15))
+    if us_ok:
+        ax6.semilogx(us_ok, dT_ok, marker=markers[j], color=pal2[j],
+                     lw=2, ms=6, label=f'{T_C} C (MPB)')
+    if T_C in noSE_results and noSE_results[T_C].get('profile') is not None:
+        dT_noSE = float(np.max(noSE_results[T_C]['profile']['T'])) - (T_C + 273.15)
+        ax6.axhline(dT_noSE, color=pal2[j], lw=1.5, ls='--', alpha=0.8,
+                    label=f'{T_C} C u_s=0 (fixed bed)')
+ax6.set_xlabel('u_s [mm/s]', fontsize=11)
+ax6.set_ylabel('ΔT_max = T_peak − T_in  [K]', fontsize=11)
+ax6.set_title('MPB adiabatic — peak temperature rise vs solid velocity\n'
+              '(higher u_s = more cold solid = better cooling)', fontsize=10)
+ax6.legend(fontsize=9);  ax6.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig('plot6_Tmax_vs_us.png');  plt.show()
 # endregion
