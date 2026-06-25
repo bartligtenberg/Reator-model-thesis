@@ -1,0 +1,47 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\Energy balance check\energy_balance_check.py" 
+=================================================================
+Energy balance check
+  u_s = 4.00 mm/s  |  T_in = 280 °C  |  U_a = 2000 W/(m³·K)
+  u_s* = 0.465 mm/s  (regime switch)
+  Solving with tol=1e-5, max_iter=1000, N=400
+  Output: converged iterate grid — no fine-grid recompute
+=================================================================
+  Regime: solid-dominated  |  converged  |  103 iterations
+  Final errors:  err_q=9.86e-06  err_T=1.87e-07  h2o_balance=1.08%
+  X_CO2 = 99.65%  |  T_max = 298.9 °C  |  q(z=0) = 0.2412 mol/kg
+
+--- A. ODE integral check [W/m²] ---
+  ∫ LHS dz  = +24003.59
+  ∫ RHS dz  = +24003.48
+  Difference = +0.11  (+0.000%)
+  (Should be < ~1% if ODE solver is accurate)
+
+  ∫ Q_rxn  dz = +24995.65  W/m²
+  ∫ Q_ads  dz = +13485.84  W/m²
+  ∫ Q_wall dz = +14478.01  W/m²
+  Net heat gen - wall = +24003.48  W/m²
+
+--- B. Solid H2O mass balance [mol/(m²·s)] ---
+  ∫ ρ_ads·ads dz         = 0.299685  (H2O adsorption rate integrated over bed)
+  u_s·ρ_ads·q(z=0)       = 0.299685  (H2O carried out by solid at z=0 exit)
+  Difference             = -0.000000  (-0.000%)
+  (Should be < ~1%: both sides equal ∫ρ_ads·ads dz by the solid ODE)
+
+--- C. Atom balance ---
+  CO2 consumed = 151.4740 mmol/(m²·s)
+  CH4 produced = 151.4740 mmol/(m²·s)   →  CH4/CO2 = 1.00000  (expect 1.00000)
+  H2  consumed = 605.8959 mmol/(m²·s)   →  H2/CO2  = 4.00000  (expect 4.00000)
+
+--- D. Total H2O mole balance [mol/(m²·s)] ---
+  H2O produced by rxn     = 302.9776 mmol/(m²·s)  (= 2 × ∫ρ_cat·r dz)
+  H2O out in gas  (z=L)   = 0.0042 mmol/(m²·s)  (gas-phase outlet flux)
+  H2O out in solid (z=0)  = 299.6854 mmol/(m²·s)  (u_s·ρ_ads·q(z=0))
+  Total H2O out           = 299.6895 mmol/(m²·s)
+  Difference (prod−out)   = +3.2880 mmol/(m²·s)  (+1.097%)
+  (Should be < ~1%: all H2O from reaction must leave via gas or solid)
+
+--- ODE residual (LHS − RHS) statistics [W/m³] ---
+  Max |residual| = 1069.10
+  RMS residual   = 77.04
+  Max |Q_rxn|    = 68684.20  (scale reference)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling>  python "A moving packed bed\cooled with solid heat convection\MPB molar flux\Energy balance check\energy_balance         

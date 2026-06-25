@@ -176,7 +176,7 @@ def _partial_pressures(F_CO2, F_H2, F_CH4, F_H2O):
 
 # region 3. DECOUPLED SOLVER
 # =============================================================================
-def solve_mpb(u_s, T_K, max_iter=400, tol=1e-4, N=100, q_init=None):
+def solve_mpb(u_s, T_K, max_iter=400, tol=1e-5, N=200, q_init=None):
     """
     Counter-current MPB — molar flux form, isothermal.
 

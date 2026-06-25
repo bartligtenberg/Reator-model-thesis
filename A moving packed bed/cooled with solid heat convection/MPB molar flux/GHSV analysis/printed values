@@ -1,0 +1,81 @@
+S C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\GHSV analysis\MPB_flux_form_GHSV_scan.py"
+
+=================================================================
+  GHSV = 0.05 NL/g_ads/h  |  u_g_STP = 8.6 mm/s
+  F_in_total = 0.3800 mol/(m²·s)  [CO2: 0.0152  H2: 0.0608  CH4: 0.3040]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.047 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=4.0000 mm/s  X=100.0%  q(0)=0.021  q_max=0.024  sat=0.84  T_max=282.4 C  [solid-dom, ok, 226 iter, err=8.61e-06]  (567.4s, ETA 66m 12s)
+  H2O balance [mol/(m²·s)]:  prod=0.03040  gas_out(sim)=0.00000  ads(solid)=0.02554  closure=84.0%
+
+=================================================================
+  GHSV = 0.1 NL/g_ads/h  |  u_g_STP = 17.3 mm/s
+  F_in_total = 0.7600 mol/(m²·s)  [CO2: 0.0304  H2: 0.1216  CH4: 0.6080]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.093 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=4.0000 mm/s  X=100.0%  q(0)=0.044  q_max=0.049  sat=0.90  T_max=284.7 C  [solid-dom, ok, 345 iter, err=7.00e-06]  (748.3s, ETA 65m 47s)
+  H2O balance [mol/(m²·s)]:  prod=0.06080  gas_out(sim)=0.00000  ads(solid)=0.05496  closure=90.4%
+
+=================================================================
+  GHSV = 0.2 NL/g_ads/h  |  u_g_STP = 34.5 mm/s
+  F_in_total = 1.5200 mol/(m²·s)  [CO2: 0.0608  H2: 0.2432  CH4: 1.2160]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.186 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=4.0000 mm/s  X=100.0%  q(0)=0.091  q_max=0.098  sat=0.93  T_max=288.7 C  [solid-dom, ok, 247 iter, err=6.83e-06]  (549.7s, ETA 51m 49s)
+  H2O balance [mol/(m²·s)]:  prod=0.12160  gas_out(sim)=0.00000  ads(solid)=0.11368  closure=93.5%
+
+=================================================================
+  GHSV = 0.3 NL/g_ads/h  |  u_g_STP = 51.8 mm/s
+  F_in_total = 2.2800 mol/(m²·s)  [CO2: 0.0912  H2: 0.3648  CH4: 1.8240]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.279 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=4.0000 mm/s  X=100.0%  q(0)=0.139  q_max=0.147  sat=0.94  T_max=292.2 C  [solid-dom, ok, 281 iter, err=8.85e-06]  (576.1s, ETA 40m 41s)
+  H2O balance [mol/(m²·s)]:  prod=0.18240  gas_out(sim)=0.00000  ads(solid)=0.17237  closure=94.5%
+
+=================================================================
+  GHSV = 0.4 NL/g_ads/h  |  u_g_STP = 69.0 mm/s
+  F_in_total = 3.0400 mol/(m²·s)  [CO2: 0.1216  H2: 0.4864  CH4: 2.4320]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.372 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=4.0000 mm/s  X=99.9%  q(0)=0.186  q_max=0.196  sat=0.95  T_max=295.4 C  [solid-dom, ok, 325 iter, err=9.39e-06]  (618.8s, ETA 30m 36s)
+  H2O balance [mol/(m²·s)]:  prod=0.24300  gas_out(sim)=0.00000  ads(solid)=0.23113  closure=95.1%
+
+=================================================================
+  GHSV = 0.5 NL/g_ads/h  |  u_g_STP = 86.3 mm/s
+  F_in_total = 3.8000 mol/(m²·s)  [CO2: 0.1520  H2: 0.6080  CH4: 3.0400]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.465 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=4.0000 mm/s  X=99.7%  q(0)=0.233  q_max=0.244  sat=0.96  T_max=298.6 C  [solid-dom, ok, 395 iter, err=8.76e-06]  (740.4s, ETA 21m 07s)
+  H2O balance [mol/(m²·s)]:  prod=0.30295  gas_out(sim)=0.00000  ads(solid)=0.28937  closure=95.5%
+
+=================================================================
+  GHSV = 0.75 NL/g_ads/h  |  u_g_STP = 129.4 mm/s
+  F_in_total = 5.7000 mol/(m²·s)  [CO2: 0.2280  H2: 0.9120  CH4: 4.5600]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.698 mm/s
+  non-SE fixed-bed conversion: 84.5%
+  u_s=4.0000 mm/s  X=98.1%  q(0)=0.469  q_max=0.360  sat=1.30  T_max=320.2 C  [solid-dom, not-conv, 400 iter, err=2.51e-02]  (723.8s, ETA 10m 46s)
+  H2O balance [mol/(m²·s)]:  prod=0.44724  gas_out(sim)=0.00008  ads(solid)=0.58221  closure=130.2%
+
+=================================================================
+  GHSV = 1.0 NL/g_ads/h  |  u_g_STP = 172.6 mm/s
+  F_in_total = 7.6000 mol/(m²·s)  [CO2: 0.3040  H2: 1.2160  CH4: 6.0800]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.615  |  tau_p = 3.0
+=================================================================
+  T_in = 280 C  |  u_s* = 0.930 mm/s
+  non-SE fixed-bed conversion: 84.0%
+  u_s=4.0000 mm/s  X=94.1%  q(0)=0.470  q_max=0.460  sat=1.02  T_max=320.0 C  [solid-dom, not-conv, 400 iter, err=8.35e-03]  (799.3s, ETA 0s)
+  H2O balance [mol/(m²·s)]:  prod=0.57210  gas_out(sim)=0.00029  ads(solid)=0.58420  closure=102.2%

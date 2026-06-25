@@ -1,0 +1,86 @@
+MPB flux form (isothermal): d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  dp = 3 mm
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  isothermal
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=0.5000 mm/s  X=82.1%  q(0)=0.420  [ok, 275 iter, err=8.63e-05]  (51.1s, ETA 5m 58s)
+    H2O balance [mmol/(m²·s)]:  produced=249.635  gas_out=92.520  solid_out=65.297  err=-36.8%
+  u_s=1.0000 mm/s  X=80.8%  q(0)=0.581  [ok, 396 iter, err=8.75e-05]  (76.5s, ETA 6m 23s)
+    H2O balance [mmol/(m²·s)]:  produced=245.496  gas_out=30.482  solid_out=180.594  err=-14.0%
+  u_s=2.0000 mm/s  X=98.9%  q(0)=0.807  [not-conv, 400 iter, err=3.20e-02]  (88.4s, ETA 6m 00s)
+    H2O balance [mmol/(m²·s)]:  produced=300.588  gas_out=0.116  solid_out=501.565  err=+66.9%
+  u_s=3.0000 mm/s  X=99.2%  q(0)=0.322  [ok, 55 iter, err=9.20e-05]  (8.8s, ETA 3m 44s)
+    H2O balance [mmol/(m²·s)]:  produced=301.440  gas_out=0.081  solid_out=300.284  err=-0.4%
+  u_s=4.0000 mm/s  X=99.2%  q(0)=0.242  [ok, 30 iter, err=6.66e-05]  (3.3s, ETA 2m 16s)
+    H2O balance [mmol/(m²·s)]:  produced=301.459  gas_out=0.081  solid_out=300.257  err=-0.4%
+  u_s=6.0000 mm/s  X=99.2%  q(0)=0.161  [ok, 22 iter, err=6.95e-05]  (2.2s, ETA 1m 16s)
+    H2O balance [mmol/(m²·s)]:  produced=301.474  gas_out=0.080  solid_out=300.292  err=-0.4%
+  u_s=8.0000 mm/s  X=99.2%  q(0)=0.121  [ok, 20 iter, err=6.76e-05]  (2.0s, ETA 33s)
+    H2O balance [mmol/(m²·s)]:  produced=301.481  gas_out=0.080  solid_out=300.303  err=-0.4%
+  u_s=10.0000 mm/s  X=99.2%  q(0)=0.097  [ok, 16 iter, err=8.91e-05]  (1.6s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=301.484  gas_out=0.079  solid_out=300.239  err=-0.4%
+
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\isothermal\gauss seidel\u_s sweep\MPB_flux_isothermal.py"
+MPB flux form (isothermal): d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  dp = 2.5 mm
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  isothermal
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=0.5000 mm/s  X=85.5%  q(0)=0.326  [not-conv, 400 iter, err=1.83e-02]  (305.5s, ETA 40m 44s)
+    H2O balance [mmol/(m²·s)]:  produced=260.067  gas_out=0.326  solid_out=50.637  err=-80.4%
+  u_s=1.0000 mm/s  X=85.9%  q(0)=0.488  [not-conv, 400 iter, err=1.65e-03]  (296.0s, ETA 35m 05s)
+    H2O balance [mmol/(m²·s)]:  produced=261.039  gas_out=0.311  solid_out=151.576  err=-41.8%
+  u_s=1.5000 mm/s  X=93.2%  q(0)=0.616  [not-conv, 400 iter, err=2.13e-02]  (305.8s, ETA 30m 14s)
+    H2O balance [mmol/(m²·s)]:  produced=283.359  gas_out=0.164  solid_out=286.928  err=+1.3%
+  u_s=2.0000 mm/s  X=97.0%  q(0)=0.723  [not-conv, 400 iter, err=2.76e-02]  (296.8s, ETA 25m 05s)
+    H2O balance [mmol/(m²·s)]:  produced=294.989  gas_out=0.079  solid_out=448.928  err=+52.2%
+  u_s=3.0000 mm/s  X=99.1%  q(0)=0.893  [not-conv, 400 iter, err=5.43e-02]  (240.7s, ETA 19m 15s)
+    H2O balance [mmol/(m²·s)]:  produced=301.138  gas_out=0.032  solid_out=832.312  err=+176.4%
+  u_s=4.0000 mm/s  X=99.2%  q(0)=0.241  [not-conv, 400 iter, err=4.69e-05]  (156.1s, ETA 13m 20s)
+    H2O balance [mmol/(m²·s)]:  produced=301.654  gas_out=0.020  solid_out=299.943  err=-0.6%
+  u_s=6.0000 mm/s  X=99.2%  q(0)=0.161  [not-conv, 400 iter, err=1.21e-04]  (124.4s, ETA 8m 12s)
+    H2O balance [mmol/(m²·s)]:  produced=301.665  gas_out=0.019  solid_out=300.331  err=-0.4%
+  u_s=8.0000 mm/s  X=99.2%  q(0)=0.121  [not-conv, 400 iter, err=1.54e-04]  (117.4s, ETA 3m 50s)
+    H2O balance [mmol/(m²·s)]:  produced=301.669  gas_out=0.019  solid_out=300.395  err=-0.4%
+  u_s=10.0000 mm/s  X=99.2%  q(0)=0.097  [not-conv, 400 iter, err=7.43e-05]  (114.1s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=301.671  gas_out=0.019  solid_out=300.440  err=-0.4%
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\isothermal\gauss seidel\u_s sweep\MPB_flux_isothermal.py"
+MPB flux form (isothermal): d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  d_p = 5.0 mm
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  isothermal
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=0.5000 mm/s  X=81.8%  q(0)=0.422  [not-conv, 400 iter, err=9.14e-05]  (138.2s, ETA 18m 25s)
+    H2O balance [mmol/(m²·s)]:  produced=248.779  gas_out=143.773  solid_out=65.545  err=-15.9%
+  u_s=1.0000 mm/s  X=80.2%  q(0)=0.585  [not-conv, 400 iter, err=1.16e-04]  (166.2s, ETA 17m 45s)
+    H2O balance [mmol/(m²·s)]:  produced=243.782  gas_out=48.181  solid_out=181.589  err=-5.7%
+  u_s=1.5000 mm/s  X=93.9%  q(0)=0.709  [not-conv, 400 iter, err=1.02e-02]  (200.4s, ETA 16m 49s)
+    H2O balance [mmol/(m²·s)]:  produced=285.387  gas_out=0.580  solid_out=330.558  err=+16.0%
+  u_s=2.0000 mm/s  X=99.1%  q(0)=0.799  [not-conv, 400 iter, err=3.51e-02]  (154.1s, ETA 13m 43s)
+    H2O balance [mmol/(m²·s)]:  produced=301.224  gas_out=0.091  solid_out=496.192  err=+64.8%
+  u_s=3.0000 mm/s  X=99.2%  q(0)=0.323  [not-conv, 400 iter, err=1.33e-04]  (65.1s, ETA 9m 39s)
+    H2O balance [mmol/(m²·s)]:  produced=301.440  gas_out=0.081  solid_out=300.991  err=-0.1%
+  u_s=4.0000 mm/s  X=99.2%  q(0)=0.242  [not-conv, 400 iter, err=4.11e-05]  (69.0s, ETA 6m 36s)
+    H2O balance [mmol/(m²·s)]:  produced=301.459  gas_out=0.081  solid_out=301.166  err=-0.1%
+  u_s=6.0000 mm/s  X=99.2%  q(0)=0.162  [not-conv, 400 iter, err=1.78e-04]  (58.4s, ETA 4m 03s)
+    H2O balance [mmol/(m²·s)]:  produced=301.474  gas_out=0.080  solid_out=301.110  err=-0.1%
+  u_s=8.0000 mm/s  X=99.2%  q(0)=0.121  [not-conv, 400 iter, err=1.71e-04]  (53.4s, ETA 1m 53s)
+    H2O balance [mmol/(m²·s)]:  produced=301.481  gas_out=0.080  solid_out=301.112  err=-0.1%
+  u_s=10.0000 mm/s  X=99.2%  q(0)=0.097  [not-conv, 400 iter, err=1.18e-04]  (48.8s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=301.484  gas_out=0.079  solid_out=301.051  err=-0.1%
+
+All done.  Total: 15m 53s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

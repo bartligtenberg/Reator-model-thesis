@@ -1,0 +1,84 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\MBP molar flux, varying u_s\MPB_flux_form.py"                                                                        
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=0.2500 mm/s  X=90.5%  q(0)=0.092  T_max=309.1 C  [gas-dom, not-conv, 400 iter, err=8.86e-04]  (239.0s, ETA 47m 49s)
+    H2O balance [mmol/(m²·s)]:  produced=274.977  gas_out=0.111  solid_out=7.161  err=-97.4%
+  u_s=0.5000 mm/s  X=92.3%  q(0)=0.148  T_max=300.9 C  [solid-dom, not-conv, 400 iter, err=2.08e-04]  (785.5s, ETA 93m 55s)
+    H2O balance [mmol/(m²·s)]:  produced=280.738  gas_out=0.022  solid_out=22.983  err=-91.8%
+  u_s=0.7500 mm/s  X=93.3%  q(0)=0.162  T_max=300.7 C  [solid-dom, not-conv, 400 iter, err=8.85e-04]  (756.7s, ETA 98m 57s)
+    H2O balance [mmol/(m²·s)]:  produced=283.542  gas_out=0.009  solid_out=37.821  err=-86.7%
+  u_s=1.0000 mm/s  X=95.0%  q(0)=0.198  T_max=300.6 C  [solid-dom, not-conv, 400 iter, err=1.53e-03]  (756.6s, ETA 95m 10s)
+    H2O balance [mmol/(m²·s)]:  produced=288.907  gas_out=0.006  solid_out=61.398  err=-78.7%
+  u_s=1.5000 mm/s  X=97.0%  q(0)=0.260  T_max=301.3 C  [solid-dom, not-conv, 400 iter, err=4.03e-03]  (778.2s, ETA 88m 25s)
+    H2O balance [mmol/(m²·s)]:  produced=294.871  gas_out=0.003  solid_out=121.139  err=-58.9%
+  u_s=2.0000 mm/s  X=98.7%  q(0)=0.291  T_max=301.3 C  [solid-dom, not-conv, 400 iter, err=5.10e-03]  (856.2s, ETA 81m 07s)
+    H2O balance [mmol/(m²·s)]:  produced=299.939  gas_out=0.001  solid_out=180.673  err=-39.8%
+  u_s=2.5000 mm/s  X=99.6%  q(0)=0.284  T_max=301.0 C  [solid-dom, not-conv, 400 iter, err=7.49e-03]  (750.7s, ETA 70m 19s)
+    H2O balance [mmol/(m²·s)]:  produced=302.683  gas_out=0.000  solid_out=220.521  err=-27.1%
+  u_s=3.0000 mm/s  X=99.8%  q(0)=0.249  T_max=305.5 C  [solid-dom, not-conv, 400 iter, err=1.16e-02]  (742.0s, ETA 59m 00s)
+    H2O balance [mmol/(m²·s)]:  produced=303.413  gas_out=0.000  solid_out=232.413  err=-23.4%
+  u_s=4.0000 mm/s  X=99.7%  q(0)=0.232  T_max=309.1 C  [solid-dom, not-conv, 400 iter, err=8.47e-03]  (773.1s, ETA 47m 41s)
+    H2O balance [mmol/(m²·s)]:  produced=303.070  gas_out=0.000  solid_out=287.867  err=-5.0%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.135  T_max=295.3 C  [solid-dom, ok, 160 iter, err=7.96e-05]  (281.0s, ETA 33m 35s)
+    H2O balance [mmol/(m²·s)]:  produced=302.865  gas_out=0.000  solid_out=209.572  err=-30.8%
+  u_s=6.0000 mm/s  X=99.6%  q(0)=0.123  T_max=293.2 C  [solid-dom, ok, 105 iter, err=9.32e-05]  (176.2s, ETA 20m 53s)
+    H2O balance [mmol/(m²·s)]:  produced=302.764  gas_out=0.000  solid_out=229.914  err=-24.1%
+  u_s=8.0000 mm/s  X=99.5%  q(0)=0.102  T_max=290.4 C  [solid-dom, ok, 71 iter, err=8.96e-05]  (115.9s, ETA 9m 44s)
+    H2O balance [mmol/(m²·s)]:  produced=302.607  gas_out=0.000  solid_out=254.693  err=-15.8%
+  u_s=10.0000 mm/s  X=99.5%  q(0)=0.086  T_max=288.6 C  [solid-dom, ok, 53 iter, err=9.26e-05]  (86.0s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=302.490  gas_out=0.000  solid_out=268.230  err=-11.3%
+
+
+
++ ... rs\wsbg4\anaconda2k25\shell\condabin\conda-hook.ps1) ; (conda activat ...
++                                                             ~~~~~
+    + CategoryInfo          : ObjectNotFound: (conda:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\MBP molar flux, varying u_s\MPB_flux_form.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=0.2500 mm/s  X=90.5%  q(0)=0.092  T_max=309.1 C  [gas-dom, not-conv, 400 iter, err=8.86e-04]  (221.8s, ETA 44m 22s)
+    H2O balance [mmol/(m²·s)]:  produced=274.977  gas_out=0.111  solid_out=7.161  err=-97.4%
+  u_s=0.5000 mm/s  X=92.3%  q(0)=0.148  T_max=300.9 C  [solid-dom, not-conv, 400 iter, err=2.08e-04]  (848.5s, ETA 98m 07s)
+    H2O balance [mmol/(m²·s)]:  produced=280.738  gas_out=0.022  solid_out=22.983  err=-91.8%
+  u_s=0.7500 mm/s  X=93.3%  q(0)=0.162  T_max=300.7 C  [solid-dom, not-conv, 400 iter, err=8.85e-04]  (884.3s, ETA 108m 35s)
+    H2O balance [mmol/(m²·s)]:  produced=283.542  gas_out=0.009  solid_out=37.821  err=-86.7%
+  u_s=1.0000 mm/s  X=95.0%  q(0)=0.198  T_max=300.6 C  [solid-dom, not-conv, 400 iter, err=1.53e-03]  (896.5s, ETA 106m 55s)
+    H2O balance [mmol/(m²·s)]:  produced=288.907  gas_out=0.006  solid_out=61.398  err=-78.7%
+  u_s=1.5000 mm/s  X=97.0%  q(0)=0.260  T_max=301.3 C  [solid-dom, not-conv, 400 iter, err=4.03e-03]  (860.1s, ETA 98m 58s)
+    H2O balance [mmol/(m²·s)]:  produced=294.871  gas_out=0.003  solid_out=121.139  err=-58.9%
+  u_s=2.0000 mm/s  X=98.7%  q(0)=0.291  T_max=301.3 C  [solid-dom, not-conv, 400 iter, err=5.10e-03]  (764.6s, ETA 87m 01s)
+    H2O balance [mmol/(m²·s)]:  produced=299.939  gas_out=0.001  solid_out=180.673  err=-39.8%
+  u_s=2.5000 mm/s  X=99.6%  q(0)=0.284  T_max=301.0 C  [solid-dom, not-conv, 400 iter, err=7.49e-03]  (751.0s, ETA 74m 40s)
+    H2O balance [mmol/(m²·s)]:  produced=302.683  gas_out=0.000  solid_out=220.521  err=-27.1%
+  u_s=3.0000 mm/s  X=99.8%  q(0)=0.249  T_max=305.5 C  [solid-dom, not-conv, 400 iter, err=1.16e-02]  (747.4s, ETA 62m 13s)
+    H2O balance [mmol/(m²·s)]:  produced=303.413  gas_out=0.000  solid_out=232.413  err=-23.4%
+  u_s=4.0000 mm/s  X=99.7%  q(0)=0.232  T_max=309.1 C  [solid-dom, not-conv, 400 iter, err=8.47e-03]  (750.2s, ETA 49m 48s)
+    H2O balance [mmol/(m²·s)]:  produced=303.070  gas_out=0.000  solid_out=287.867  err=-5.0%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.135  T_max=295.3 C  [solid-dom, ok, 160 iter, err=7.96e-05]  (281.5s, ETA 35m 01s)
+    H2O balance [mmol/(m²·s)]:  produced=302.865  gas_out=0.000  solid_out=209.572  err=-30.8%
+  u_s=6.0000 mm/s  X=99.6%  q(0)=0.123  T_max=293.2 C  [solid-dom, ok, 105 iter, err=9.32e-05]  (176.8s, ETA 21m 45s)
+    H2O balance [mmol/(m²·s)]:  produced=302.764  gas_out=0.000  solid_out=229.914  err=-24.1%
+  u_s=8.0000 mm/s  X=99.5%  q(0)=0.102  T_max=290.4 C  [solid-dom, ok, 71 iter, err=8.96e-05]  (116.7s, ETA 10m 08s)
+    H2O balance [mmol/(m²·s)]:  produced=302.607  gas_out=0.000  solid_out=254.693  err=-15.8%
+  u_s=10.0000 mm/s  X=99.5%  q(0)=0.086  T_max=288.6 C  [solid-dom, ok, 53 iter, err=9.26e-05]  (85.7s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=302.490  gas_out=0.000  solid_out=268.230  err=-11.3%
+
+
+
+

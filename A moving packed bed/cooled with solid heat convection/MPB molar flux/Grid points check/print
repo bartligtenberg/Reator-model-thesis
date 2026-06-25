@@ -1,0 +1,258 @@
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\Grid points check\MPB_flux_form grid points.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+  u_s* = 0.465 mm/s  |  non-SE X = 84.6%
+
+======================================================================
+  GRID CONFIG: N=50  uniform
+======================================================================
+  u_s=1.00 mm/s  X=94.3%  q(0)=0.404  q_sat=0.44  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-56.1%  T_max=302.1C  [solid-dom, not-conv, 200 iter, err=2.24e-03]  (489.3s, ETA 334m 21s)
+  u_s=2.00 mm/s  X=98.3%  q(0)=0.533  q_sat=1.11  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+10.8%  T_max=305.7C  [solid-dom, not-conv, 200 iter, err=9.71e-03]  (476.6s, ETA 321m 58s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.481  q_sat=1.48  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+47.7%  T_max=310.1C  [solid-dom, not-conv, 200 iter, err=1.70e-02]  (446.5s, ETA 306m 01s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.211  q_sat=0.87  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-13.4%  T_max=297.6C  [solid-dom, not-conv, 200 iter, err=1.92e-04]  (416.2s, ETA 289m 32s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.150  q_sat=0.92  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-7.9%  T_max=293.1C  [solid-dom, ok, 57 iter, err=9.72e-05]  (110.2s, ETA 239m 07s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.114  q_sat=0.94  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-6.0%  T_max=290.5C  [solid-dom, ok, 48 iter, err=9.45e-05]  (89.6s, ETA 202m 50s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.092  q_sat=0.95  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-5.1%  T_max=288.7C  [solid-dom, ok, 41 iter, err=9.21e-05]  (69.3s, ETA 174m 48s)
+
+======================================================================
+  GRID CONFIG: N=100 uniform
+======================================================================
+  u_s=1.00 mm/s  X=94.2%  q(0)=0.454  q_sat=0.49  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-50.6%  T_max=304.7C  [solid-dom, not-conv, 200 iter, err=4.95e-03]  (389.1s, ETA 176m 09s)
+  u_s=2.00 mm/s  X=98.2%  q(0)=0.595  q_sat=1.24  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+23.9%  T_max=307.4C  [solid-dom, not-conv, 200 iter, err=1.54e-02]  (440.6s, ETA 178m 54s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.544  q_sat=1.67  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+67.3%  T_max=311.6C  [solid-dom, not-conv, 200 iter, err=3.17e-02]  (475.6s, ETA 181m 29s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.231  q_sat=0.95  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-5.1%  T_max=298.5C  [solid-dom, not-conv, 200 iter, err=5.68e-04]  (434.8s, ETA 180m 15s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.158  q_sat=0.97  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-2.7%  T_max=293.5C  [solid-dom, ok, 58 iter, err=9.71e-05]  (127.0s, ETA 165m 12s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.119  q_sat=0.98  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-2.1%  T_max=290.7C  [solid-dom, ok, 48 iter, err=9.29e-05]  (94.7s, ETA 150m 56s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.096  q_sat=0.98  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-1.8%  T_max=288.8C  [solid-dom, ok, 42 iter, err=8.78e-05]  (77.6s, ETA 137m 54s)
+
+======================================================================
+  GRID CONFIG: N=100 refined
+======================================================================
+  u_s=1.00 mm/s  X=94.3%  q(0)=0.473  q_sat=0.51  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.7%  T_max=304.9C  [solid-dom, not-conv, 200 iter, err=3.11e-03]  (421.1s, ETA 136m 45s)
+  u_s=2.00 mm/s  X=98.3%  q(0)=0.617  q_sat=1.28  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+28.3%  T_max=306.7C  [solid-dom, not-conv, 200 iter, err=1.22e-02]  (461.9s, ETA 135m 57s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.568  q_sat=1.75  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+74.7%  T_max=311.3C  [solid-dom, not-conv, 200 iter, err=2.51e-02]  (666.6s, ETA 139m 23s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.242  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.7%  T_max=298.9C  [solid-dom, not-conv, 200 iter, err=3.25e-03]  (498.8s, ETA 137m 27s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=293.6C  [solid-dom, ok, 59 iter, err=8.98e-05]  (116.1s, ETA 127m 08s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.121  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.4%  T_max=290.7C  [solid-dom, ok, 48 iter, err=9.06e-05]  (95.6s, ETA 117m 17s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.4%  T_max=288.9C  [solid-dom, ok, 42 iter, err=8.74e-05]  (84.3s, ETA 108m 01s)
+
+======================================================================
+  GRID CONFIG: N=200 uniform
+======================================================================
+  u_s=1.00 mm/s  X=93.9%  q(0)=0.474  q_sat=0.52  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.4%  T_max=306.3C  [solid-dom, not-conv, 200 iter, err=7.56e-03]  (456.5s, ETA 105m 07s)
+  u_s=2.00 mm/s  X=98.1%  q(0)=0.620  q_sat=1.29  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+29.2%  T_max=307.8C  [solid-dom, not-conv, 200 iter, err=2.15e-02]  (604.4s, ETA 103m 50s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.575  q_sat=1.77  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+76.9%  T_max=311.9C  [solid-dom, not-conv, 200 iter, err=3.73e-02]  (1130.5s, ETA 108m 24s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.259  q_sat=1.06  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+6.0%  T_max=299.6C  [solid-dom, not-conv, 200 iter, err=1.51e-02]  (761.9s, ETA 106m 55s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.161  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.6%  T_max=293.6C  [solid-dom, ok, 58 iter, err=9.70e-05]  (160.7s, ETA 98m 24s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.121  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=290.7C  [solid-dom, ok, 48 iter, err=9.28e-05]  (93.6s, ETA 89m 42s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=288.9C  [solid-dom, ok, 42 iter, err=8.95e-05]  (75.2s, ETA 81m 22s)
+
+======================================================================
+  GRID CONFIG: N=200 refined
+======================================================================
+  u_s=1.00 mm/s  X=94.0%  q(0)=0.478  q_sat=0.52  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-47.9%  T_max=305.9C  [solid-dom, not-conv, 200 iter, err=7.31e-03]  (399.1s, ETA 75m 56s)
+  u_s=2.00 mm/s  X=98.2%  q(0)=0.626  q_sat=1.30  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+30.4%  T_max=307.6C  [solid-dom, not-conv, 200 iter, err=1.91e-02]  (386.2s, ETA 70m 19s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.580  q_sat=1.78  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+78.4%  T_max=311.8C  [solid-dom, not-conv, 200 iter, err=3.32e-02]  (428.4s, ETA 64m 55s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.287  q_sat=1.18  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+17.6%  T_max=301.0C  [solid-dom, not-conv, 200 iter, err=2.82e-02]  (384.9s, ETA 59m 10s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=293.6C  [solid-dom, ok, 59 iter, err=8.83e-05]  (110.4s, ETA 52m 09s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=290.8C  [solid-dom, ok, 48 iter, err=9.40e-05]  (84.4s, ETA 45m 19s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=288.9C  [solid-dom, ok, 42 iter, err=9.10e-05]  (74.2s, ETA 38m 46s)
+
+======================================================================
+  GRID CONFIG: N=400 uniform
+======================================================================
+  u_s=1.00 mm/s  X=93.8%  q(0)=0.479  q_sat=0.52  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-47.8%  T_max=306.6C  [solid-dom, not-conv, 200 iter, err=9.19e-03]  (379.8s, ETA 33m 21s)
+  u_s=2.00 mm/s  X=98.0%  q(0)=0.628  q_sat=1.31  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+30.9%  T_max=307.9C  [solid-dom, not-conv, 200 iter, err=2.34e-02]  (342.3s, ETA 27m 49s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.585  q_sat=1.80  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+79.9%  T_max=311.8C  [solid-dom, not-conv, 200 iter, err=4.03e-02]  (317.0s, ETA 22m 13s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.378  q_sat=1.55  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+54.9%  T_max=305.3C  [solid-dom, not-conv, 200 iter, err=4.20e-02]  (301.9s, ETA 16m 37s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=293.6C  [solid-dom, ok, 58 iter, err=9.71e-05]  (83.5s, ETA 10m 52s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=290.8C  [solid-dom, ok, 48 iter, err=9.49e-05]  (68.6s, ETA 5m 20s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=288.9C  [solid-dom, ok, 42 iter, err=9.36e-05]  (59.2s, ETA 0s)
+
+All done.  Total: 219m 44s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/Grid points check/MPB_flux_form grid points.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+  u_s* = 0.465 mm/s  |  non-SE X = 84.6%
+
+======================================================================
+  GRID CONFIG: N=50  uniform
+======================================================================
+  u_s=1.00 mm/s  X=94.3%  q(0)=0.404  q_sat=0.44  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-56.1%  T_max=302.1C  [solid-dom, not-conv, 200 iter, err=2.21e-03]  (340.2s, ETA 232m 28s)
+  u_s=2.00 mm/s  X=98.3%  q(0)=0.533  q_sat=1.11  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+10.8%  T_max=305.7C  [solid-dom, not-conv, 200 iter, err=9.64e-03]  (405.5s, ETA 248m 33s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.480  q_sat=1.48  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+47.7%  T_max=310.1C  [solid-dom, not-conv, 200 iter, err=1.71e-02]  (338.7s, ETA 234m 56s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.211  q_sat=0.87  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-13.4%  T_max=297.6C  [solid-dom, not-conv, 200 iter, err=2.00e-04]  (342.2s, ETA 225m 52s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.150  q_sat=0.92  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-7.9%  T_max=293.1C  [solid-dom, ok, 57 iter, err=9.86e-05]  (87.0s, ETA 186m 40s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.114  q_sat=0.94  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-6.0%  T_max=290.5C  [solid-dom, ok, 48 iter, err=9.45e-05]  (73.9s, ETA 158m 44s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.092  q_sat=0.95  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-5.1%  T_max=288.7C  [solid-dom, ok, 41 iter, err=8.39e-05]  (62.7s, ETA 137m 30s)
+
+======================================================================
+  GRID CONFIG: N=100 uniform
+======================================================================
+  u_s=1.00 mm/s  X=94.2%  q(0)=0.454  q_sat=0.49  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-50.6%  T_max=304.7C  [solid-dom, not-conv, 200 iter, err=4.96e-03]  (333.0s, ETA 140m 28s)
+  u_s=2.00 mm/s  X=98.2%  q(0)=0.595  q_sat=1.24  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+23.9%  T_max=307.4C  [solid-dom, not-conv, 200 iter, err=1.55e-02]  (357.5s, ETA 143m 02s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.544  q_sat=1.67  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+67.3%  T_max=311.6C  [solid-dom, not-conv, 200 iter, err=3.17e-02]  (397.0s, ETA 146m 00s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.231  q_sat=0.95  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-5.1%  T_max=298.5C  [solid-dom, not-conv, 200 iter, err=5.68e-04]  (387.5s, ETA 146m 46s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.158  q_sat=0.97  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-2.7%  T_max=293.5C  [solid-dom, ok, 58 iter, err=9.69e-05]  (96.9s, ETA 134m 14s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.119  q_sat=0.98  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-2.1%  T_max=290.7C  [solid-dom, ok, 48 iter, err=8.90e-05]  (79.3s, ETA 122m 44s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.096  q_sat=0.98  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-1.8%  T_max=288.8C  [solid-dom, ok, 42 iter, err=8.93e-05]  (69.0s, ETA 112m 20s)
+
+======================================================================
+  GRID CONFIG: N=100 refined
+======================================================================
+  u_s=1.00 mm/s  X=94.3%  q(0)=0.473  q_sat=0.51  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.7%  T_max=304.9C  [solid-dom, not-conv, 200 iter, err=3.12e-03]  (361.8s, ETA 111m 57s)
+  u_s=2.00 mm/s  X=98.3%  q(0)=0.617  q_sat=1.28  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+28.3%  T_max=306.7C  [solid-dom, not-conv, 200 iter, err=1.22e-02]  (352.9s, ETA 110m 37s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.568  q_sat=1.75  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+74.7%  T_max=311.3C  [solid-dom, not-conv, 200 iter, err=2.51e-02]  (421.7s, ETA 110m 27s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.242  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.7%  T_max=298.9C  [solid-dom, not-conv, 200 iter, err=3.32e-03]  (462.4s, ETA 110m 25s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=293.6C  [solid-dom, ok, 59 iter, err=9.05e-05]  (145.4s, ETA 103m 11s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.121  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.4%  T_max=290.7C  [solid-dom, ok, 48 iter, err=9.18e-05]  (130.2s, ETA 96m 09s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.4%  T_max=288.9C  [solid-dom, ok, 42 iter, err=8.57e-05]  (122.4s, ETA 89m 26s)
+
+======================================================================
+  GRID CONFIG: N=200 uniform
+======================================================================
+  u_s=1.00 mm/s  X=93.9%  q(0)=0.474  q_sat=0.52  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.4%  T_max=306.3C  [solid-dom, not-conv, 200 iter, err=7.56e-03]  (498.2s, ETA 88m 52s)
+  u_s=2.00 mm/s  X=98.1%  q(0)=0.620  q_sat=1.29  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+29.2%  T_max=307.8C  [solid-dom, not-conv, 200 iter, err=2.15e-02]  (483.2s, ETA 87m 24s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.575  q_sat=1.77  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+76.9%  T_max=311.9C  [solid-dom, not-conv, 200 iter, err=3.73e-02]  (496.5s, ETA 85m 33s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.259  q_sat=1.06  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+6.1%  T_max=299.7C  [solid-dom, not-conv, 200 iter, err=1.52e-02]  (470.7s, ETA 82m 54s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.161  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.6%  T_max=293.6C  [solid-dom, ok, 58 iter, err=9.57e-05]  (129.2s, ETA 76m 21s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.121  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=290.7C  [solid-dom, ok, 48 iter, err=9.25e-05]  (108.9s, ETA 69m 56s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=288.9C  [solid-dom, ok, 42 iter, err=8.86e-05]  (100.7s, ETA 63m 47s)
+
+======================================================================
+  GRID CONFIG: N=200 refined
+======================================================================
+  u_s=1.00 mm/s  X=94.0%  q(0)=0.478  q_sat=0.52  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-47.9%  T_max=305.9C  [solid-dom, not-conv, 200 iter, err=7.30e-03]  (514.1s, ETA 61m 01s)
+  u_s=2.00 mm/s  X=98.2%  q(0)=0.626  q_sat=1.30  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+30.4%  T_max=307.6C  [solid-dom, not-conv, 200 iter, err=1.91e-02]  (508.8s, ETA 57m 50s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.580  q_sat=1.78  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+78.4%  T_max=311.8C  [solid-dom, not-conv, 200 iter, err=3.32e-02]  (411.3s, ETA 53m 45s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.287  q_sat=1.18  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+17.6%  T_max=301.0C  [solid-dom, not-conv, 200 iter, err=2.82e-02]  (423.9s, ETA 49m 32s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=293.6C  [solid-dom, ok, 59 iter, err=8.78e-05]  (136.9s, ETA 43m 51s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=290.8C  [solid-dom, ok, 48 iter, err=9.42e-05]  (96.7s, ETA 38m 13s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=288.9C  [solid-dom, ok, 42 iter, err=9.11e-05]  (80.6s, ETA 32m 45s)
+
+======================================================================
+  GRID CONFIG: N=400 uniform
+======================================================================
+  u_s=1.00 mm/s  X=93.8%  q(0)=0.479  q_sat=0.52  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-47.8%  T_max=306.6C  [solid-dom, not-conv, 200 iter, err=9.19e-03]  (385.5s, ETA 28m 22s)
+  u_s=2.00 mm/s  X=98.0%  q(0)=0.628  q_sat=1.31  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+30.9%  T_max=307.9C  [solid-dom, not-conv, 200 iter, err=2.35e-02]  (335.1s, ETA 23m 45s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.585  q_sat=1.80  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+79.9%  T_max=311.8C  [solid-dom, not-conv, 200 iter, err=4.03e-02]  (330.7s, ETA 19m 05s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.377  q_sat=1.55  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+54.8%  T_max=305.3C  [solid-dom, not-conv, 200 iter, err=4.20e-02]  (321.7s, ETA 14m 21s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=293.6C  [solid-dom, ok, 58 iter, err=9.64e-05]  (90.3s, ETA 9m 24s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=290.8C  [solid-dom, ok, 48 iter, err=9.41e-05]  (78.7s, ETA 4m 37s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=288.9C  [solid-dom, ok, 42 iter, err=9.33e-05]  (84.6s, ETA 0s)
+
+All done.  Total: 190m 53s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\Grid points check\MPB_flux_form grid points.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+  u_s* = 0.465 mm/s  |  non-SE X = 84.6%
+
+======================================================================
+  GRID CONFIG: N=50  uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.6%  q(0)=0.395  q_sat=0.42  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-57.7%  T_max=304.5C  [solid-dom, not-conv, 600 iter, err=9.90e-04]  (1852.8s, ETA 1482m 17s)
+  u_s=2.00 mm/s  X=99.1%  q(0)=0.523  q_sat=1.08  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+7.8%  T_max=310.8C  [solid-dom, not-conv, 600 iter, err=4.62e-03]  (1663.7s, ETA 1377m 20s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.260  q_sat=0.80  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-20.0%  T_max=302.4C  [solid-dom, not-conv, 600 iter, err=1.01e-03]  (1647.9s, ETA 1319m 49s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.212  q_sat=0.87  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-13.2%  T_max=297.6C  [solid-dom, ok, 106 iter, err=9.81e-06]  (296.4s, ETA 1023m 55s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.149  q_sat=0.92  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-8.0%  T_max=293.1C  [solid-dom, ok, 69 iter, err=9.34e-06]  (185.9s, ETA 828m 12s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.114  q_sat=0.94  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-6.1%  T_max=290.5C  [solid-dom, ok, 60 iter, err=5.90e-06]  (147.1s, ETA 692m 03s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.092  q_sat=0.95  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-5.1%  T_max=288.7C  [solid-dom, ok, 52 iter, err=8.87e-06]  (115.2s, ETA 590m 55s)
+
+======================================================================
+  GRID CONFIG: N=100 uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.5%  q(0)=0.448  q_sat=0.48  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-52.1%  T_max=307.8C  [solid-dom, not-conv, 600 iter, err=9.65e-04]  (1850.0s, ETA 662m 46s)
+  u_s=2.00 mm/s  X=99.0%  q(0)=0.592  q_sat=1.22  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+22.4%  T_max=313.7C  [solid-dom, not-conv, 600 iter, err=8.41e-03]  (3376.4s, ETA 824m 51s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.434  q_sat=1.33  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+33.3%  T_max=316.4C  [solid-dom, not-conv, 600 iter, err=1.10e-02]  (2088.9s, ETA 859m 35s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.233  q_sat=0.96  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-4.5%  T_max=298.6C  [solid-dom, ok, 110 iter, err=9.24e-06]  (336.9s, ETA 780m 48s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.158  q_sat=0.97  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-2.7%  T_max=293.5C  [solid-dom, ok, 70 iter, err=8.64e-06]  (187.7s, ETA 706m 33s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.119  q_sat=0.98  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-2.1%  T_max=290.7C  [solid-dom, ok, 61 iter, err=9.26e-06]  (144.0s, ETA 641m 13s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.096  q_sat=0.98  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-1.9%  T_max=288.8C  [solid-dom, ok, 55 iter, err=9.91e-06]  (121.9s, ETA 583m 57s)
+
+======================================================================
+  GRID CONFIG: N=200 uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.3%  q(0)=0.469  q_sat=0.50  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-49.7%  T_max=309.6C  [solid-dom, not-conv, 600 iter, err=1.65e-03]  (1315.6s, ETA 579m 09s)
+  u_s=2.00 mm/s  X=98.8%  q(0)=0.625  q_sat=1.29  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+29.3%  T_max=314.6C  [solid-dom, not-conv, 600 iter, err=1.18e-02]  (1178.2s, ETA 567m 29s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.483  q_sat=1.48  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+48.4%  T_max=320.8C  [solid-dom, not-conv, 600 iter, err=1.63e-02]  (1090.3s, ETA 552m 07s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.241  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-1.1%  T_max=298.9C  [solid-dom, ok, 145 iter, err=9.42e-06]  (250.7s, ETA 512m 21s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.161  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.7%  T_max=293.6C  [solid-dom, ok, 70 iter, err=8.21e-06]  (117.8s, ETA 472m 50s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.121  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=290.7C  [solid-dom, ok, 62 iter, err=8.44e-06]  (102.1s, ETA 436m 41s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=0.99  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.5%  T_max=288.9C  [solid-dom, ok, 58 iter, err=9.35e-06]  (96.1s, ETA 403m 41s)
+
+======================================================================
+  GRID CONFIG: N=400 uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.1%  q(0)=0.474  q_sat=0.51  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-49.0%  T_max=310.2C  [solid-dom, not-conv, 600 iter, err=2.41e-03]  (1070.5s, ETA 393m 28s)
+  u_s=2.00 mm/s  X=98.7%  q(0)=0.637  q_sat=1.32  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+32.0%  T_max=314.7C  [solid-dom, not-conv, 600 iter, err=1.42e-02]  (1096.6s, ETA 383m 05s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.505  q_sat=1.55  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+55.1%  T_max=321.6C  [solid-dom, not-conv, 600 iter, err=1.83e-02]  (1083.8s, ETA 371m 49s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.243  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.3%  T_max=299.0C  [solid-dom, ok, 168 iter, err=8.22e-06]  (288.3s, ETA 347m 16s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.2%  T_max=293.6C  [solid-dom, ok, 72 iter, err=9.90e-06]  (123.9s, ETA 321m 50s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=290.8C  [solid-dom, ok, 63 iter, err=8.37e-06]  (105.4s, ETA 297m 52s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=288.9C  [solid-dom, ok, 54 iter, err=9.54e-06]  (91.4s, ETA 275m 19s)
+
+======================================================================
+  GRID CONFIG: N=600 uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.1%  q(0)=0.476  q_sat=0.51  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.8%  T_max=310.3C  [solid-dom, not-conv, 600 iter, err=2.63e-03]  (1070.8s, ETA 265m 28s)
+  u_s=2.00 mm/s  X=98.6%  q(0)=0.641  q_sat=1.33  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+32.9%  T_max=314.7C  [solid-dom, not-conv, 600 iter, err=1.49e-02]  (1058.1s, ETA 254m 58s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.511  q_sat=1.57  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+57.1%  T_max=321.7C  [solid-dom, not-conv, 600 iter, err=1.97e-02]  (1081.5s, ETA 244m 13s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.243  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=299.0C  [solid-dom, ok, 174 iter, err=9.83e-06]  (438.3s, ETA 227m 19s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.1%  T_max=293.6C  [solid-dom, ok, 72 iter, err=9.80e-06]  (532.4s, ETA 211m 46s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=290.8C  [solid-dom, ok, 61 iter, err=9.84e-06]  (447.3s, ETA 195m 59s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=288.9C  [solid-dom, ok, 55 iter, err=9.72e-06]  (408.9s, ETA 180m 25s)
+
+======================================================================
+  GRID CONFIG: N=800  uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.1%  q(0)=0.478  q_sat=0.51  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.6%  T_max=310.2C  [solid-dom, not-conv, 600 iter, err=2.63e-03]  (4592.2s, ETA 190m 31s)
+  u_s=2.00 mm/s  X=98.6%  q(0)=0.644  q_sat=1.33  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+33.4%  T_max=314.7C  [solid-dom, not-conv, 600 iter, err=1.47e-02]  (4568.6s, ETA 195m 48s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.513  q_sat=1.58  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+57.8%  T_max=321.8C  [solid-dom, not-conv, 600 iter, err=1.82e-02]  (3966.3s, ETA 193m 54s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.244  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=299.0C  [solid-dom, ok, 175 iter, err=9.88e-06]  (1107.6s, ETA 176m 29s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=293.6C  [solid-dom, ok, 72 iter, err=8.70e-06]  (445.8s, ETA 156m 32s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=290.8C  [solid-dom, ok, 61 iter, err=8.81e-06]  (376.5s, ETA 136m 58s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=288.9C  [solid-dom, ok, 56 iter, err=9.01e-06]  (346.2s, ETA 117m 57s)
+
+======================================================================
+  GRID CONFIG: N=1000 uniform
+======================================================================
+  u_s=1.00 mm/s  X=95.1%  q(0)=0.478  q_sat=0.51  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-48.5%  T_max=310.3C  [solid-dom, not-conv, 600 iter, err=2.69e-03]  (22472.1s, ETA 151m 01s)
+  u_s=2.00 mm/s  X=98.6%  q(0)=0.645  q_sat=1.34  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+33.6%  T_max=314.7C  [solid-dom, not-conv, 600 iter, err=1.48e-02]  (1743.4s, ETA 126m 17s)
+  u_s=3.00 mm/s  X=99.7%  q(0)=0.515  q_sat=1.58  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+58.3%  T_max=321.8C  [solid-dom, not-conv, 600 iter, err=1.92e-02]  (1336.7s, ETA 100m 46s)
+  u_s=4.00 mm/s  X=99.7%  q(0)=0.244  q_sat=1.00  *** q > q_max!  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=+0.0%  T_max=299.0C  [solid-dom, ok, 181 iter, err=9.50e-06]  (370.1s, ETA 74m 20s)
+  u_s=6.00 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=293.6C  [solid-dom, ok, 71 iter, err=7.91e-06]  (142.1s, ETA 48m 36s)
+  u_s=8.00 mm/s  X=99.5%  q(0)=0.122  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=290.8C  [solid-dom, ok, 61 iter, err=9.84e-06]  (122.1s, ETA 23m 50s)
+  u_s=10.00 mm/s  X=99.5%  q(0)=0.097  q_sat=1.00  CH4/CO2=1.000  H2/CO2=4.000  H2O_bal=-0.0%  T_max=288.9C  [solid-dom, ok, 55 iter, err=8.35e-06]  (109.7s, ETA 0s)
+
+All done.  Total: 1146m 02s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+

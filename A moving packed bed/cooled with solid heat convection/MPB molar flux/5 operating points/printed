@@ -1,0 +1,43 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\5 operating points\MPB_5_operating_points.py" 
+
+======================================================================
+  10% capacity  |  GHSV = 0.0750 NL/g_ads/h  |  u_g_STP = 12.9 mm/s
+  F_in_total = 0.5700 mol/(m²·s)  [CO2: 0.0228  H2: 0.0912  CH4: 0.4560]
+======================================================================
+  T_in = 280 C  |  u_s* = 0.070 mm/s  |  u_s = 5.000 mm/s  |  non-SE = 84.6%
+  X=100.0%  H2=0.00% [OK]  q(0)=0.579  T_max=307.6 C  [solid-dom, not-conv, 400 iter, err=1.14e-02]  (1613.8s, ETA 107m 35s)
+    H2O: prod=4.5600e-02  gas=4.6798e-09  ads=8.9995e-01  err=+1873.6%
+
+======================================================================
+  25% capacity  |  GHSV = 0.1875 NL/g_ads/h  |  u_g_STP = 32.4 mm/s
+  F_in_total = 1.4250 mol/(m²·s)  [CO2: 0.0570  H2: 0.2280  CH4: 1.1400]
+======================================================================
+  T_in = 280 C  |  u_s* = 0.174 mm/s  |  u_s = 5.000 mm/s  |  non-SE = 84.6%
+  X=99.9%  H2=0.02% [OK]  q(0)=0.521  T_max=307.1 C  [solid-dom, not-conv, 400 iter, err=3.21e-02]  (1211.9s, ETA 70m 38s)
+    H2O: prod=1.1390e-01  gas=1.6263e-08  ads=8.0891e-01  err=+610.2%
+
+======================================================================
+  50% capacity  |  GHSV = 0.3750 NL/g_ads/h  |  u_g_STP = 64.7 mm/s
+  F_in_total = 2.8500 mol/(m²·s)  [CO2: 0.1140  H2: 0.4560  CH4: 2.2800]
+======================================================================
+  T_in = 280 C  |  u_s* = 0.349 mm/s  |  u_s = 5.000 mm/s  |  non-SE = 84.6%
+  X=99.6%  H2=0.08% [OK]  q(0)=0.445  T_max=307.0 C  [solid-dom, not-conv, 400 iter, err=2.37e-02]  (1397.2s, ETA 46m 55s)
+    H2O: prod=2.2702e-01  gas=1.4238e-07  ads=6.9120e-01  err=+204.5%
+
+======================================================================
+  75% capacity  |  GHSV = 0.5625 NL/g_ads/h  |  u_g_STP = 97.1 mm/s
+  F_in_total = 4.2750 mol/(m²·s)  [CO2: 0.1710  H2: 0.6840  CH4: 3.4200]
+======================================================================
+  T_in = 280 C  |  u_s* = 0.523 mm/s  |  u_s = 5.000 mm/s  |  non-SE = 84.6%
+  X=99.3%  H2=0.13% [OK]  q(0)=0.370  T_max=308.1 C  [solid-dom, not-conv, 400 iter, err=2.65e-02]  (1500.5s, ETA 23m 50s)
+    H2O: prod=3.3962e-01  gas=4.0003e-07  ads=5.7527e-01  err=+69.4%
+
+======================================================================
+  100% capacity  |  GHSV = 0.7500 NL/g_ads/h  |  u_g_STP = 129.4 mm/s
+  F_in_total = 5.7000 mol/(m²·s)  [CO2: 0.2280  H2: 0.9120  CH4: 4.5600]
+======================================================================
+  T_in = 280 C  |  u_s* = 0.698 mm/s  |  u_s = 5.000 mm/s  |  non-SE = 84.5%
+  X=98.1%  H2=0.36% [OK]  q(0)=0.310  T_max=315.0 C  [solid-dom, not-conv, 400 iter, err=1.08e-02]  (1176.2s, ETA 0s)
+    H2O: prod=4.4740e-01  gas=2.0260e-06  ads=4.8094e-01  err=+7.5%
+
+All done.  Total: 115m 00s
