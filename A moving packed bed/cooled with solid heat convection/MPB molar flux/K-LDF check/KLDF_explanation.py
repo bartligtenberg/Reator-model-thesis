@@ -12,7 +12,7 @@ T_K    = 553.15  # 280 C
 
 # Particle / bed parameters
 d_p         = 0.75e-3
-eps_p       = 0.615
+eps_p       = 0.242
 tau_p       = 3.0
 rho_bed_ads = 1.22 / (np.pi/4 * 0.05**2 * 2.0)
 rho_p       = rho_bed_ads / (1 - 0.4)
@@ -33,7 +33,7 @@ def q_star_val(T, p):
     return rho_water(T)/MW_H2O * W0_DA * np.exp(-min((A/E_DA)**n_DA, 500.0))  # mol/kg
 
 def K_LDF_val(T, p):
-    D_M  = 2.5e-5*(T/300.0)**1.75
+    D_M = 3.36e-9 * T**1.75
     dp   = 1.0/1e5
     dqsp = (q_star_val(T, p+dp) - q_star_val(T, max(p-dp, 1e-15))) / 2.0
     dqsp = max(dqsp, 1e-30)

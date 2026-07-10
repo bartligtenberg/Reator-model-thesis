@@ -84,6 +84,7 @@ rho_ads = 998.2           # adsorbed-phase density (liquid water) [kg/m³]
 # --- Intraparticle transport parameters (Mette 2014, via Bareschino Eq. 24) ---
 eps_p   = 0.6             # intraparticle void fraction (pore volume fraction) [-]
 tau_p   = 3.0             # tortuosity factor (accounts for winding pore paths) [-]
+rho_p   = 1400   # [kg/m³]  particle density of sorbent (Bareschino)
 
 # --- Breakthrough criterion ---
 # Bareschino and Walspurger define breakthrough when the outlet H₂O
@@ -104,13 +105,13 @@ dz = L_b / (N - 1)       # node spacing                          [m]
 PARAM_SETS = {
     'Mette (2014)': {'W0': 341.00e-6, 'E': 1192.25e3, 'n': 1.55},
     'Kiefer (2022)':  {'W0':  90.17e-6, 'E': 1030.90e3, 'n': 1.55},
-    'Ligtenberg (2026)': {'W0':  190e-6, 'E':  1190.00e3, 'n': 1.55},  # hypothetical set for testing
+    'Ligtenberg (2026)': {'W0':  175e-6, 'E':  1192.25e3, 'n': 1.55},  # hypothetical set for testing
 }
 
 # --- Experimental reference data ---
 # Digitised from Bareschino Fig. 1(a); originally from Wei et al. (2021a). taken from wei fig 5.7, 350 C regeneration
 wei_exp_T   = [260, 280, 300, 320]          # temperature               [°C]
-wei_exp_cap = [1.56, 1.27, 1.0, 0.80]      # breakthrough capacity      [mmol/g]
+wei_exp_cap = [1.405, 1.151, 0.927, 0.740]      # breakthrough capacity table S. 5.2. (regen = 300C)      [mmol/g]
 
 # Temperature range to simulate (matching Bareschino Fig. 1a), no now they match Wei
 temperatures_C = [260, 280, 300, 320]
@@ -127,7 +128,7 @@ def P_sat_bar(T_K):
 
     Antoine equation:  log10(P_sat) = A - B / (T + C)
     with T in Kelvin and P_sat in bar.
-    Constants from NIST (valid ~274–441 K).
+    Constants from NIST (valid ~274–441 K). this is not great...
     """
     return 10.0 ** (5.40221 - 1838.675 / (T_K - 31.737))
 
@@ -170,46 +171,22 @@ def q_star_vec(T_K, p_arr, W0, E, n):
 
 def K_LDF_vec(T_K, p_arr, W0, E, n):
     """
-    Linear Driving Force (LDF) mass transfer coefficient [1/s],
-    from Bareschino (2023) Eq. 24 / Mette (2014).
+    Glueckauf LDF coefficient from pore diffusion [1/s].
 
-    Physical meaning: K_LDF sets how fast the solid loading q approaches
-    the equilibrium q*. A large K_LDF means fast adsorption (solid quickly
-    saturates); a small K_LDF means slow adsorption (dispersed breakthrough).
+    K_LDF = 15 · ε_p · D_M / (r_p² · τ · ρ_p · R · T · dq*/dp)
 
-    Formula (pore diffusion control):
-        K_LDF = 15 · D_eff · MW_H₂O · ε_p
-                ─────────────────────────────────────────────────
-                0.5 · d_p² · τ · ρ_ads · R · T · (dq*/dP)
-
-    where D_eff = D_M · ε_p / τ  (effective pore diffusivity),
-    D_M is the molecular diffusivity of H₂O in the gas [m²/s].
-
-    dq*/dP [mol/(kg·Pa)] is the local slope of the isotherm: it tells us
-    how much extra loading we get per unit pressure increase. A steep
-    isotherm (large slope) means diffusion is the bottleneck → lower K_LDF.
-    We compute this slope numerically with a central-difference step of 1 Pa.
+    where r_p = d_p/2, ρ_p is the particle density, and
+    dq*/dp [mol/(kg·Pa)] is the local isotherm slope (central difference, 1 Pa step).
+    Large dq*/dp → slow K_LDF (steep isotherm is the bottleneck).
     """
-    # Molecular diffusivity: Chapman-Enskog power-law approximation.
-    # Scales as T^1.75 (kinetic theory); reference value 2.5e-5 m²/s at 300 K.
-    D_M = 2.5e-5 * (T_K / 300.0) ** 1.75
-
-    p      = np.asarray(p_arr, dtype=float)
-    dp_bar = 1.0 / 1e5           # 1 Pa expressed in bar (central difference step)
-
-    p_lo = np.maximum(p - dp_bar, 1e-15)   # lower point (clamp above zero)
-    p_hi = p + dp_bar                       # upper point
-
-    # Central difference: Δq* over a 2 Pa window → units [mol/kg / Pa]
-    dqstar_dp = (q_star_vec(T_K, p_hi, W0, E, n)
-                 - q_star_vec(T_K, p_lo, W0, E, n)) / 2.0
-
-    # Where the isotherm is essentially flat (e.g. very low loading), the
-    # slope → 0 which would blow up K_LDF. Floor it to avoid division by zero.
+    D_M = 2.5e-5 * (T_K / 300.0) ** 1.75                                      # molecular diffusivity [m²/s]
+    p   = np.asarray(p_arr, dtype=float)
+    dp  = 1.0 / 1e5                                                             # 1 Pa in bar; dividing by 2.0 gives dq*/dp in mol/(kg·Pa)
+    dqstar_dp = (q_star_vec(T_K, p + dp, W0, E, n)
+                 - q_star_vec(T_K, np.maximum(p - dp, 1e-15), W0, E, n)) / 2.0
     dqstar_dp = np.maximum(dqstar_dp, 1e-30)
-
-    return (15.0 * D_M * MW_H2O * eps_p
-            / (0.5 * d_p**2 * tau_p * rho_ads * R_gas * T_K * dqstar_dp))
+    r_p = 0.5 * d_p
+    return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * R_gas * T_K * dqstar_dp)
 
 
 # =============================================================================
@@ -377,8 +354,6 @@ ax.scatter(wei_exp_T, wei_exp_cap,
 
 ax.set_xlabel('Temperature [°C]')
 ax.set_ylabel('H₂O breakthrough capacity [mmol$_{H_2O}$/g$_{ads}$]')
-ax.set_title('Bareschino et al. (2023) Fig. 1(a)\n'
-             '1D isothermal model, 100% CO₂ conversion assumed')
 ax.set_xlim(250, 330)
 ax.set_ylim(0, 3.)
 ax.legend(fontsize=9)

@@ -72,8 +72,8 @@ tau_p = 4.0      # [-]      pore tortuosity factor — Mette et al. (2015)
 rho_p = 1400     # [kg/m³]  particle (skeletal) density of sorbent — Bareschino et al. (2023)
 
 # --- Dubinin-Astakhov isotherm (H2O on 13X) --- fitted myself based on Wei et al. (2021)
-W0_DA = 190.00e-6   # [m³/kg_sorbent]  limiting micropore volume
-E_DA  = 1190e3      # [J/kg]           characteristic adsorption energy
+W0_DA = 150.00e-6   # [m³/kg_sorbent]  limiting micropore volume
+E_DA  = 1192e3      # [J/kg]           characteristic adsorption energy
 n_DA  = 1.55        # [-]              DA heterogeneity parameter
 
 # --- LHHW kinetics (Koschany et al. 2016, Table 6) ---
@@ -116,7 +116,7 @@ F_in_H2    = y_H2_in  * F_total_in   # [mol/(m²·s)]  H2 inlet molar flux
 F_in_CH4   = y_CH4_in * F_total_in   # [mol/(m²·s)]  CH4 inlet molar flux
 
 # --- MPB scan parameters ---
-U_S_LIST  = np.array([8.0, 6.0, 5.0, 4.0, 3.0, 2.75, 2.5, 2.4, 2.3, 2.2, 2.1, 2.0, 1.8, 1.6, 1.4, 1.2, 1.0, 0.8, 0.6, 0.4, 0.2, 0.1]) * 1e-3
+U_S_LIST  = np.array([8.0, 6.0, 5.0, 4.0, 3.0, 2.9, 2.8, 2.7, 2.6, 2.2, 1.8, 1.6, 1.2, 0.8, 0.4]) * 1e-3
 T_IN_LIST = [280]
 
 print(f"MPB flux form: d={d_b*100:.0f} cm, L={L_b:.1f} m, "
@@ -429,7 +429,7 @@ def solve_mpb(u_s, T_K, T_wall=None, max_iter=1000, tol=1e-5, N=400, q_init=None
                         (Q_rxn + Q_ads - Q_wall) / solid_denom]        # dT/dzeta [K/m]: solid-side energy balance, integrated in the solid's own direction of travel (zeta, i.e. z: L_b->0)
 
             ss = solve_ivp(solid_rhs_with_T, [0.0, L_b], [0.0, T_K],   # BCs at zeta=0 (solid's own inlet, z=L_b): q=0 (fresh sorbent), T=T_K -- assumes the solid enters at the same inlet temperature as the gas
-                           method='BDF', rtol=1e-4, atol=np.array([1e-8, 1.0]),  # atol for T is 1.0 K here (looser than the 1e-2 K used in the gas-dominant branch), since T now spans the full reactor's exotherm as a state variable rather than a small correction
+                           method='BDF', rtol=1e-4, atol=np.array([1e-8, 0.1]),  # atol for T is 1.0 K here (looser than the 1e-2 K used in the gas-dominant branch), since T now spans the full reactor's exotherm as a state variable rather than a small correction
                            max_step=1e-3,                              # caps BDF's internal step to 1e-3 m: without this the stiff T equation could take steps too large to resolve sharp reaction/adsorption fronts
                            t_eval=np.linspace(0.0, L_b, N), dense_output=False)
             if not ss.success:

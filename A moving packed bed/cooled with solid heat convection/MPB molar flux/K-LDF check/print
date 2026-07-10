@@ -1,0 +1,55 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\K-LDF check\MPB_flux_form K-LDF.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=6.0000 mm/s  X=99.6%  q(0)=0.162  q_sat=1.00  T_max=293.6 C  [solid-dom, ok, 484 iter, err=7.28e-06]  (1022.3s, ETA 153m 21s)
+    H2O balance [mmol/(m²·s)]:  produced=302.741  gas_out=0.005  solid_out=302.228  err=-0.2%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.195  q_sat=1.00  T_max=295.8 C  [solid-dom, ok, 86 iter, err=8.09e-06]  (184.4s, ETA 80m 26s)
+    H2O balance [mmol/(m²·s)]:  produced=302.840  gas_out=0.004  solid_out=302.232  err=-0.2%
+  u_s=4.0000 mm/s  X=99.7%  q(0)=0.243  q_sat=1.00  T_max=299.0 C  [solid-dom, ok, 113 iter, err=9.89e-06]  (244.5s, ETA 56m 26s)
+    H2O balance [mmol/(m²·s)]:  produced=302.960  gas_out=0.003  solid_out=302.044  err=-0.3%
+  u_s=3.0000 mm/s  X=99.7%  q(0)=0.323  q_sat=0.99  T_max=304.6 C  [solid-dom, ok, 192 iter, err=9.04e-06]  (511.2s, ETA 49m 03s)
+    H2O balance [mmol/(m²·s)]:  produced=303.110  gas_out=0.003  solid_out=300.784  err=-0.8%
+  u_s=2.5000 mm/s  X=99.7%  q(0)=0.384  q_sat=0.98  T_max=310.9 C  [solid-dom, ok, 345 iter, err=9.63e-06]  (978.1s, ETA 49m 00s)
+    H2O balance [mmol/(m²·s)]:  produced=303.204  gas_out=0.002  solid_out=298.082  err=-1.7%
+  u_s=2.4000 mm/s  X=99.7%  q(0)=0.397  q_sat=0.98  T_max=313.9 C  [solid-dom, not-conv, 600 iter, err=8.99e-05]  (2881.2s, ETA 64m 41s)
+    H2O balance [mmol/(m²·s)]:  produced=303.228  gas_out=0.002  solid_out=295.975  err=-2.4%
+  u_s=2.3000 mm/s  X=99.8%  q(0)=0.400  q_sat=0.94  T_max=317.3 C  [solid-dom, not-conv, 600 iter, err=5.61e-04]  (2519.4s, ETA 59m 34s)
+    H2O balance [mmol/(m²·s)]:  produced=303.256  gas_out=0.002  solid_out=285.927  err=-5.7%
+  u_s=2.2000 mm/s  X=99.8%  q(0)=0.399  q_sat=0.90  T_max=319.0 C  [solid-dom, not-conv, 600 iter, err=1.54e-03]  (1529.9s, ETA 41m 07s)
+    H2O balance [mmol/(m²·s)]:  produced=303.281  gas_out=0.002  solid_out=272.510  err=-10.1%
+  u_s=2.1000 mm/s  X=99.8%  q(0)=0.399  q_sat=0.86  T_max=319.8 C  [solid-dom, not-conv, 600 iter, err=2.63e-03]  (1466.4s, ETA 20m 59s)
+    H2O balance [mmol/(m²·s)]:  produced=303.301  gas_out=0.002  solid_out=260.314  err=-14.2%
+  u_s=2.0000 mm/s  X=99.8%  q(0)=0.401  q_sat=0.82  T_max=320.2 C  [solid-dom, not-conv, 600 iter, err=3.71e-03]  (1291.0s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=303.314  gas_out=0.002  solid_out=248.891  err=-17.9%
+
+All done.  Total: 210m 28s
+
+--- Running with K_LDF × 0.1 ---
+  u_s=6.000 mm/s  X=99.3%  q(0)=0.162  q_sat=1.00  [solid-dom, ok, 89 iter, err=9.92e-06]
+    H2O balance [mmol/(m²·s)]:  produced=301.930  gas_out=0.085  solid_out=301.826  err=-0.0%
+  u_s=5.000 mm/s  X=99.3%  q(0)=0.194  q_sat=1.00  [solid-dom, ok, 47 iter, err=9.09e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.004  gas_out=0.079  solid_out=301.936  err=+0.0%
+  u_s=4.000 mm/s  X=99.4%  q(0)=0.243  q_sat=1.00  [solid-dom, ok, 54 iter, err=9.20e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.093  gas_out=0.072  solid_out=302.021  err=-0.0%
+  u_s=3.000 mm/s  X=99.4%  q(0)=0.324  q_sat=1.00  [solid-dom, ok, 66 iter, err=9.70e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.205  gas_out=0.064  solid_out=302.153  err=+0.0%
+  u_s=2.500 mm/s  X=99.4%  q(0)=0.389  q_sat=1.00  [solid-dom, ok, 90 iter, err=8.13e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.275  gas_out=0.059  solid_out=302.196  err=-0.0%
+  u_s=2.400 mm/s  X=99.4%  q(0)=0.405  q_sat=1.00  [solid-dom, ok, 88 iter, err=9.26e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.291  gas_out=0.058  solid_out=302.272  err=+0.0%
+  u_s=2.300 mm/s  X=99.4%  q(0)=0.423  q_sat=1.00  [solid-dom, ok, 111 iter, err=9.68e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.307  gas_out=0.056  solid_out=302.233  err=-0.0%
+  u_s=2.200 mm/s  X=99.4%  q(0)=0.442  q_sat=1.00  [solid-dom, ok, 96 iter, err=9.50e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.325  gas_out=0.055  solid_out=302.273  err=+0.0%
+  u_s=2.100 mm/s  X=99.5%  q(0)=0.463  q_sat=1.00  *** q > q_max!  [solid-dom, ok, 142 iter, err=9.48e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.344  gas_out=0.054  solid_out=302.370  err=+0.0%
+  u_s=2.000 mm/s  X=99.5%  q(0)=0.487  q_sat=1.00  *** q > q_max!  [solid-dom, ok, 285 iter, err=9.83e-06]
+    H2O balance [mmol/(m²·s)]:  produced=302.365  gas_out=0.052  solid_out=302.715  err=+0.1%
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling>  python "A moving packed bed\cooled with solid heat convection\MPB molar flux\K-LDF check\MPB_flux_form K-LDF.py"

@@ -39,7 +39,9 @@ d_b     = 0.010                    # bed diameter                [m]
 L_b     = 0.100                    # bed length                  [m]
 A_b     = np.pi / 4 * d_b**2      # cross-sectional area        [m²]
 V_bed   = A_b * L_b                # total bed volume            [m³]
-m_cat   = 6.5e-3                   # catalyst/sorbent mass       [kg]
+m_cat_total     = 6.5e-3           # total bed material mass     [kg]  (Wei Fig. 5.10, 6.5 g — GHSV basis)
+active_fraction = 1              # fraction of m_cat_total treated as catalytically/sorptively active [-]
+m_cat   = m_cat_total * active_fraction   # active catalyst / sorbent mass [kg]
 rho_bed = m_cat / V_bed            # bulk density                [kg/m³]
 eps_b   = 0.40                     # void fraction               [-]
 
@@ -53,8 +55,8 @@ MW_H2O  = 0.018015                 # molar mass water            [kg/mol]
 R_gas   = 8.314                    # gas constant                [J/(mol·K)]
 
 # DA isotherm parameters — fitted to Wei (2022) 300 °C H2O breakthrough; Mette (2014) W0=340 overestimates
-W0_DA   = 175.00e-6                # micropore volume            [m³/kg]
-E_DA    = 1192.25e3                # characteristic energy       [J/kg]
+W0_DA   = 150.00e-6                # micropore volume            [m³/kg]
+E_DA    = 1190e3                # characteristic energy       [J/kg]
 n_DA    = 1.55                     # heterogeneity exponent      [-]
 
 # Operating conditions
@@ -202,10 +204,10 @@ y0[0*N : 1*N] = C_in_CO2
 y0[1*N : 2*N] = C_in_H2
 y0[2*N : 3*N] = C_in_CH4
 
-GHSV = Q_STP * 3600 * 1e6 / (m_cat * 1e3)
+GHSV = Q_STP * 3600 * 1e6 / (m_cat_total * 1e3)
 print(f"Validating Wei Fig. 5.10:  T = {T_C} °C,  P = {P_bar} bar,  "
       f"GHSV = {GHSV:.0f} mL/(g·h)")
-print(f"Bed density: {rho_bed:.1f} kg/m³")
+print(f"Bed density: {rho_bed:.1f} kg/m³  (active_fraction = {active_fraction:.0%} of {m_cat_total*1000:.1f} g)")
 print(f"Solving sorption-enhanced case for {t_end/60:.0f} min ...")
 
 sol = solve_ivp(
@@ -321,12 +323,18 @@ def fit_breakthrough_slope(t_arr, y_arr, frac_lo=0.10, frac_hi=0.90, t_max=None)
     return poly[0], (float(t_sel[0]), float(t_sel[-1])), poly
 
 
-slope_meas,  twin_meas,  poly_meas  = fit_breakthrough_slope(t_H2O_meas, H2O_meas, frac_lo=0.005, t_max=54.0)
-slope_model, twin_model, poly_model = fit_breakthrough_slope(t_min,      pct_H2O)
+# Measured slope: direct two-point slope between the digitised anchor points
+# (43.0 min, 0.06 mol%) and (48.308 min, 3.911 mol%) — matches the dashed line drawn on the plot.
+t_anchor_meas = (43.0, 48.308)
+y_anchor_meas = (0.06, 3.911)
+slope_meas = (y_anchor_meas[1] - y_anchor_meas[0]) / (t_anchor_meas[1] - t_anchor_meas[0])
+twin_meas  = t_anchor_meas
+
+slope_model, twin_model, poly_model = fit_breakthrough_slope(t_min, pct_H2O)
 
 print(f"\n--- H₂O breakthrough slope (K_LDF validation) ---")
 print(f"  Measured : {slope_meas:.3f} mol%/min  "
-      f"(fitted over t = {twin_meas[0]:.1f}–{twin_meas[1]:.1f} min)")
+      f"(two-point slope over t = {twin_meas[0]:.1f}–{twin_meas[1]:.1f} min)")
 print(f"  Model    : {slope_model:.3f} mol%/min  "
       f"(fitted over t = {twin_model[0]:.1f}–{twin_model[1]:.1f} min)")
 print(f"  Ratio (model / meas): {slope_model / slope_meas:.2f}")
@@ -356,7 +364,7 @@ h_H2O_m = ax1.scatter(t_H2O_meas, H2O_meas, color='olive',
 
 ax1.set_xlabel('Time (min)', fontsize=12)
 ax1.set_ylabel('H₂, CO₂, H₂O concentration (mol%)', fontsize=11)
-ax1.set_xlim(0, 65)
+ax1.set_xlim(0, 60)
 ax1.set_ylim(-0.5, 10.5)
 ax1.set_yticks([0, 2, 4, 6, 8, 10])
 
@@ -365,7 +373,7 @@ ax2 = ax1.twinx()
 
 h_CH4, = ax2.plot(t_min, pct_CH4,
                    color='tab:blue', lw=1.8, label='CH₄ (model)')
-h_Xeq, = ax2.plot([0, 65], [X_eq, X_eq],
+h_Xeq, = ax2.plot([0, 60], [X_eq, X_eq],
                    color='m', lw=1.5, ls='--',
                    label=f'CO₂ eq. conversion ({X_eq:.0f} %)')
 h_X,   = ax2.plot(t_min, X_CO2,
@@ -384,34 +392,26 @@ ax2.set_ylim(-10, 110)
 ax2.set_yticks([0, 20, 40, 60, 80, 100])
 
 # --- H₂O slope lines (K_LDF validation) ---
-t_zero_meas = -poly_meas[1] / poly_meas[0]   # extrapolate back to y = 0
-t_fit_meas  = np.linspace(t_zero_meas,   twin_meas[1],  80)
+t_fit_meas  = np.array([43.0, 48.308])
+y_fit_meas  = np.array([0.06, 3.911])
 t_fit_model = np.linspace(twin_model[0], twin_model[1], 80)
-h_slope_m,   = ax1.plot(t_fit_meas,  np.polyval(poly_meas,  t_fit_meas),
+h_slope_m,   = ax1.plot(t_fit_meas,  y_fit_meas,
                          color='olive', ls='--', lw=2.2, alpha=0.75,
                          label=f'H₂O slope meas. ({slope_meas:.2f} mol%/min)')
 h_slope_mod, = ax1.plot(t_fit_model, np.polyval(poly_model, t_fit_model),
                          color='darkgreen', ls='--', lw=2.2, alpha=0.75,
                          label=f'H₂O slope model ({slope_model:.2f} mol%/min)')
 
-ax1.text(0.98, 0.28,
-         f'H₂O breakthrough slope\n'
-         f'meas.  {slope_meas:.2f} mol%/min\n'
-         f'model {slope_model:.2f} mol%/min\n'
-         f'ratio   {slope_model/slope_meas:.2f}',
-         transform=ax1.transAxes, fontsize=9, ha='right', va='top',
-         bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8))
-
 # --- Combined legend ---
 all_handles = [h_CH4, h_CH4_m, h_Xeq, h_X, h_X_m,
                h_H2, h_H2_m, h_CO2, h_CO2_m, h_H2O, h_H2O_m,
                h_slope_m, h_slope_mod]
-ax2.legend(handles=all_handles, loc='center', fontsize=8.5,
-           framealpha=0.9, ncol=2)
+ax2.legend(handles=all_handles, loc='center left', bbox_to_anchor=(0.02, 0.5),
+           fontsize=8.5, framealpha=0.9, ncol=2)
 
 ax1.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig(os.path.join(_DIR, 'validation_fig5_10_wei_isothermal_with_measurements.png'),
-            dpi=150, bbox_inches='tight')
+            dpi=300, bbox_inches='tight')
 plt.show()

@@ -1,0 +1,72 @@
+All done.  Total: 227m 37s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\Temperature analysis\MPB_flux_form_temp.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+============================================================
+  T_in = 200 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 14.7%
+  u_s=5.0000 mm/s  X=14.8%  q(0)=0.029  T_max=201.3 C  [solid-dom, ok, 35 iter, err=9.13e-06]  (66.3s, ETA 7m 44s)
+    H2O balance [mmol/(m²·s)]:  produced=44.925  gas_out=0.071  solid_out=44.842  err=-0.0%
+
+============================================================
+  T_in = 220 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 32.8%
+  u_s=5.0000 mm/s  X=33.6%  q(0)=0.066  T_max=223.2 C  [solid-dom, ok, 52 iter, err=8.17e-06]  (95.4s, ETA 8m 05s)
+    H2O balance [mmol/(m²·s)]:  produced=102.006  gas_out=0.136  solid_out=101.838  err=-0.0%
+
+============================================================
+  T_in = 240 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 61.8%
+  u_s=5.0000 mm/s  X=64.6%  q(0)=0.126  T_max=246.7 C  [solid-dom, ok, 98 iter, err=6.77e-06]  (185.6s, ETA 9m 38s)
+    H2O balance [mmol/(m²·s)]:  produced=196.349  gas_out=0.185  solid_out=196.081  err=-0.0%
+
+============================================================
+  T_in = 260 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 86.2%
+  u_s=5.0000 mm/s  X=92.1%  q(0)=0.180  T_max=271.6 C  [solid-dom, ok, 249 iter, err=9.66e-06]  (456.7s, ETA 13m 24s)
+    H2O balance [mmol/(m²·s)]:  produced=280.050  gas_out=0.111  solid_out=279.697  err=-0.1%
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.195  T_max=295.8 C  [solid-dom, ok, 384 iter, err=9.83e-06]  (737.9s, ETA 15m 25s)
+    H2O balance [mmol/(m²·s)]:  produced=302.807  gas_out=0.007  solid_out=302.181  err=-0.2%
+
+============================================================
+  T_in = 300 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 80.3%
+  u_s=5.0000 mm/s  X=99.9%  q(0)=0.195  T_max=318.7 C  [solid-dom, ok, 649 iter, err=9.84e-06]  (1341.5s, ETA 16m 01s)
+    H2O balance [mmol/(m²·s)]:  produced=303.756  gas_out=0.000  solid_out=302.187  err=-0.5%
+
+============================================================
+  T_in = 320 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 75.2%
+  u_s=5.0000 mm/s  X=99.8%  q(0)=0.261  T_max=346.9 C  [solid-dom, not-conv, 1000 iter, err=1.85e-02]  (2008.5s, ETA 11m 38s)
+    H2O balance [mmol/(m²·s)]:  produced=303.527  gas_out=0.001  solid_out=405.290  err=+33.5%
+
+============================================================
+  T_in = 340 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 69.6%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.224  T_max=360.5 C  [solid-dom, not-conv, 1000 iter, err=6.35e-03]  (2102.9s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=302.647  gas_out=0.006  solid_out=348.373  err=+15.1%
+
+All done.  Total: 116m 35s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

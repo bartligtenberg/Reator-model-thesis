@@ -43,7 +43,7 @@ rho_bed_tot = (M_cat + M_ads) / V_bed
 # --- Particle properties — d_p is updated in scan loop ---
 D_P_LIST = [0.75e-3, 1.5e-3, 3.0e-3, 5.0e-3]
 d_p   = D_P_LIST[0]   # active value; overwritten in scan loop below
-eps_p = 0.615
+eps_p = 0.242
 tau_p = 3.0
 rho_p = 1400   # [kg/m³]  particle density of sorbent (Bareschino)
 
@@ -122,7 +122,7 @@ def q_star_vec(T_K, p_arr, W0, E, n):
     return np.where(p <= 0, 0.0, qs)
 
 def K_LDF_vec(T_K, p_arr, W0, E, n):
-    D_M  = 2.5e-5*(T_K/300.0)**1.75
+    D_M = 3.36e-9 * T_K**1.75
     p    = np.asarray(p_arr, dtype=float)
     dp   = 1.0/1e5
     dqsp = (q_star_vec(T_K, p+dp, W0, E, n)

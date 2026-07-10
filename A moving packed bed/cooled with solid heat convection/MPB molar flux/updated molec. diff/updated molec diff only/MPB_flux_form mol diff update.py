@@ -67,7 +67,7 @@ rho_bed_tot = (M_cat + M_ads) / V_bed
 
 # --- Particle properties (13X zeolite pellets) ---
 d_p   = 2.5e-3 
-eps_p = 0.615
+eps_p = 0.242
 tau_p = 3.0
 rho_p = 1400   # [kg/m³]  particle density of sorbent (Bareschino)
 

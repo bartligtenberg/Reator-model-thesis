@@ -55,8 +55,8 @@ rho_bed_ads = M_ads / V_bed
 rho_bed_tot = (M_cat + M_ads) / V_bed
 
 # --- Particle properties (13X zeolite pellets) ---
-d_p   = 5e-3
-eps_p = 0.615
+d_p   = 2.5e-3
+eps_p = 0.242
 tau_p = 3.0
 rho_p = 1400   # [kg/m³]  particle density of sorbent (Bareschino)
 
@@ -96,7 +96,7 @@ F_in_H2    = y_H2_in  * F_total_in
 F_in_CH4   = y_CH4_in * F_total_in
 
 # --- MPB scan parameters ---
-U_S_LIST  = np.array([0.5, 1, 1.5, 2, 3.0, 4.0, 6, 8, 10]) * 1e-3
+U_S_LIST  = np.array([8.0, 6.0, 5.0, 4.0, 3.0, 2.75, 2.5, 2.25, 2.0, 1.8, 1.6, 1.5, 1.4, 1.3, 1.2, 1.1, 1.0, 0.8, 0.6, 0.4, 0.2]) * 1e-3
 T_IN_LIST = [280]
 
 print(f"MPB flux form (isothermal): d={d_b*100:.0f} cm, L={L_b:.1f} m, "
@@ -127,7 +127,7 @@ def q_star_vec(T_K, p_arr, W0, E, n):
     return np.where(p <= 0, 0.0, qs)
 
 def K_LDF_vec(T_K, p_arr, W0, E, n):
-    D_M  = 2.5e-5*(T_K/300.0)**1.75                                           # molecular diffusivity [m²/s], power-law T-dependence (Chapman-Enskog)
+    D_M = 3.36e-9 * T_K**1.75                                                  # molecular diffusivity [m²/s], power-law T-dependence (Chapman-Enskog)
     p    = np.asarray(p_arr, dtype=float)                                      # ensure p is a numpy float array for vectorised operations
     dp   = 1.0/1e5                                                             # pressure step = 1 Pa expressed in bar; chosen so dividing by 2.0 gives dq*/dp in mol/(kg·Pa)
     dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
@@ -182,11 +182,11 @@ def _partial_pressures(F_CO2, F_H2, F_CH4, F_H2O):
 
 # region 3. DECOUPLED SOLVER
 # =============================================================================
-def solve_mpb(u_s, T_K, max_iter=400, tol=1e-5, N=200, q_init=None):
+def solve_mpb(u_s, T_K, max_iter=2000, tol=1e-5, N=400, q_init=None):
     """
     Counter-current MPB — molar flux form, isothermal.
 
-    State: F_i [mol/(m²·s)].  No energy balance.
+    State: F_i [mol/(m²·s)].  No energy balance.S
     Temperature fixed at T_K throughout the reactor.
     Partial pressures: p_i = (F_i/F_total) · P_bar.
     """
@@ -482,14 +482,18 @@ for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
     if e is None or e['res'] is None:
         continue
-    r   = e['res']
-    lbl = f"u_s = {e['u_s']*1e3:.3f} mm/s"
-    axes[0,0].plot(r['z'], r['C_CO2']*1e3, color=pal[k], lw=2, label=lbl)
-    axes[0,1].plot(r['z'], r['q'],          color=pal[k], lw=2, label=lbl)
-    p_H2O_z1 = r['C_H2O'] * R_gas * T_K_plot1 / 1e5
-    axes[0,1].plot(r['z'], q_star(T_K_plot1, p_H2O_z1), color=pal[k], lw=1.5, ls='--', alpha=0.6)
-    axes[1,0].plot(r['z'], r['X_CO2']*100,  color=pal[k], lw=2, label=lbl)
-    axes[1,1].plot(r['z'], r['r']*1e3,      color=pal[k], lw=2, label=lbl)
+    r    = e['res']
+    conv = r['converged']
+    ls   = '-'   if conv else '--'
+    alph = 1.0   if conv else 0.6
+    lbl  = f"u_s = {e['u_s']*1e3:.3f} mm/s" + ("" if conv else " (nc)")
+    axes[0,0].plot(r['z'], r['C_CO2']*1e3, color=pal[k], lw=2, ls=ls, alpha=alph, label=lbl)
+    axes[0,1].plot(r['z'], r['q'],          color=pal[k], lw=2, ls=ls, alpha=alph, label=lbl)
+    if conv:
+        p_H2O_z1 = r['C_H2O'] * R_gas * T_K_plot1 / 1e5
+        axes[0,1].plot(r['z'], q_star(T_K_plot1, p_H2O_z1), color=pal[k], lw=1.5, ls='--', alpha=0.6)
+    axes[1,0].plot(r['z'], r['X_CO2']*100,  color=pal[k], lw=2, ls=ls, alpha=alph, label=lbl)
+    axes[1,1].plot(r['z'], r['r']*1e3,      color=pal[k], lw=2, ls=ls, alpha=alph, label=lbl)
 if _p0 is not None:
     axes[0,0].plot(_p0['z'], _p0['C_CO2']*1e3, color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
     axes[0,1].plot(_p0['z'], _p0['q'],          color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
@@ -515,12 +519,16 @@ _savefig(f'iso_plot1_axial_profiles_T{T_C_PROF}C.png');  plt.show()
 fig, ax = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
     us_ok, X_ok = [], []
+    us_nc, X_nc = [], []
     for i_us in range(len(U_S_LIST)):
         e = all_results.get((T_C, i_us))
         if e and e['res']:
             m = get_metrics(e)
             if m:
-                us_ok.append(e['u_s']*1e3);  X_ok.append(m['X_CO2']*100)
+                if e['res']['converged']:
+                    us_ok.append(e['u_s']*1e3);  X_ok.append(m['X_CO2']*100)
+                else:
+                    us_nc.append(e['u_s']*1e3);  X_nc.append(m['X_CO2']*100)
     if us_ok:
         ax.semilogx(us_ok, X_ok, marker=markers[j], color=pal2[j],
                     lw=2, ms=6, label=f'{T_C} C (MPB)')
@@ -529,6 +537,9 @@ for j, T_C in enumerate(T_IN_LIST):
         if T_C in noSE_results:
             ax.axhline(noSE_results[T_C]['X_CO2_noSE']*100, color=pal2[j],
                        lw=1.5, ls='--', alpha=0.8, label=f'{T_C} C u_s=0 (fixed bed)')
+    if us_nc:
+        ax.semilogx(us_nc, X_nc, marker=markers[j], color=pal2[j],
+                    lw=1.5, ls='--', ms=6, alpha=0.6, mfc='none', label=f'{T_C} C (not conv)')
 ax.set_xlabel('u_s [mm/s]', fontsize=11);  ax.set_ylabel('CO2 conversion [%]', fontsize=11)
 ax.set_title(f'MPB flux form (isothermal)  — CO2 conversion vs solid velocity', fontsize=10)
 ax.legend(fontsize=9);  ax.grid(True, alpha=0.3);  ax.set_ylim(0, 105)
@@ -539,15 +550,22 @@ _savefig('iso_plot2_conversion_vs_us.png');  plt.show()
 fig, ax = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
     us_ok, util_ok = [], []
+    us_nc, util_nc = [], []
     for i_us in range(len(U_S_LIST)):
         e = all_results.get((T_C, i_us))
         if e and e['res']:
             m = get_metrics(e)
             if m:
-                us_ok.append(e['u_s']*1e3);  util_ok.append(m['sorbent_util']*100)
+                if e['res']['converged']:
+                    us_ok.append(e['u_s']*1e3);  util_ok.append(m['sorbent_util']*100)
+                else:
+                    us_nc.append(e['u_s']*1e3);  util_nc.append(m['sorbent_util']*100)
     if us_ok:
         ax.semilogx(us_ok, util_ok, marker=markers[j], color=pal2[j],
                     lw=2, ms=6, label=f'{T_C} C')
+    if us_nc:
+        ax.semilogx(us_nc, util_nc, marker=markers[j], color=pal2[j],
+                    lw=1.5, ls='--', ms=6, alpha=0.6, mfc='none', label=f'{T_C} C (not conv)')
 ax.axhline(100, color='grey', lw=1.5, ls='--', label='q = q* (fully saturated)')
 ax.set_xlabel('u_s [mm/s]', fontsize=11)
 ax.set_ylabel('Sorbent utilisation  q(z=0) / q*(p_H2O_max)  [%]', fontsize=11)
@@ -564,12 +582,16 @@ for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
     if e is None or e['res'] is None:
         continue
-    r   = e['res']
-    lbl = f"u_s = {e['u_s']*1e3:.3f} mm/s"
-    ax_q.plot(r['z'], r['q'],                          color=pal[k], lw=2, label=lbl)
-    p_H2O_z4 = r['C_H2O'] * R_gas * T_K_prof / 1e5
-    ax_q.plot(r['z'], q_star(T_K_prof, p_H2O_z4),    color=pal[k], lw=1.5, ls='--', alpha=0.6)
-    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_K_prof/1e2,  color=pal[k], lw=2, label=lbl)
+    r    = e['res']
+    conv = r['converged']
+    ls   = '-'   if conv else '--'
+    alph = 1.0   if conv else 0.6
+    lbl  = f"u_s = {e['u_s']*1e3:.3f} mm/s" + ("" if conv else " (nc)")
+    ax_q.plot(r['z'], r['q'],                          color=pal[k], lw=2, ls=ls, alpha=alph, label=lbl)
+    if conv:
+        p_H2O_z4 = r['C_H2O'] * R_gas * T_K_prof / 1e5
+        ax_q.plot(r['z'], q_star(T_K_prof, p_H2O_z4), color=pal[k], lw=1.5, ls='--', alpha=0.6)
+    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_K_prof/1e2,  color=pal[k], lw=2, ls=ls, alpha=alph, label=lbl)
 if _p0 is not None:
     ax_q.plot(_p0['z'], _p0['q'],                          color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
     ax_h.plot(_p0['z'], _p0['C_H2O']*R_gas*T_K_prof/1e2,  color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')

@@ -1,0 +1,42 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\MPB_flux_form active frac.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  M_cat(active) = 256.0 g  (active_fraction = 20%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+
+============================================================
+  T_in = 260 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 88.3%
+  u_s=8.0000 mm/s  X=100.0%  q(0)=0.122  T_max=272.4 C  [solid-dom, ok, 142 iter, err=6.01e-06]  (355.2s, ETA 71m 02s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=303.639  err=-0.1%
+  u_s=6.0000 mm/s  X=100.0%  q(0)=0.163  T_max=276.3 C  [solid-dom, ok, 25 iter, err=7.90e-06]  (66.9s, ETA 38m 41s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=303.699  err=-0.1%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.195  T_max=279.4 C  [solid-dom, ok, 29 iter, err=6.67e-06]  (78.2s, ETA 27m 47s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=303.631  err=-0.1%
+  u_s=4.0000 mm/s  X=100.0%  q(0)=0.244  T_max=284.0 C  [solid-dom, ok, 33 iter, err=8.62e-06]  (90.7s, ETA 22m 09s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=303.344  err=-0.2%
+  u_s=3.0000 mm/s  X=100.0%  q(0)=0.324  T_max=291.9 C  [solid-dom, ok, 59 iter, err=8.67e-06]  (131.9s, ETA 19m 16s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=302.415  err=-0.5%
+  u_s=2.9000 mm/s  X=100.0%  q(0)=0.335  T_max=292.9 C  [solid-dom, ok, 52 iter, err=9.15e-06]  (99.2s, ETA 15m 59s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=302.062  err=-0.6%
+  u_s=2.8000 mm/s  X=100.0%  q(0)=0.347  T_max=294.1 C  [solid-dom, ok, 54 iter, err=8.44e-06]  (131.8s, ETA 13m 37s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=301.799  err=-0.7%
+  u_s=2.7000 mm/s  X=100.0%  q(0)=0.359  T_max=295.4 C  [solid-dom, ok, 80 iter, err=5.64e-06]  (184.8s, ETA 11m 51s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=301.342  err=-0.9%
+  u_s=2.6000 mm/s  X=100.0%  q(0)=0.372  T_max=296.9 C  [solid-dom, ok, 74 iter, err=9.27e-06]  (185.3s, ETA 9m 48s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=300.761  err=-1.1%
+  u_s=2.2000 mm/s  X=100.0%  q(0)=0.420  T_max=305.7 C  [solid-dom, not-conv, 1000 iter, err=5.18e-04]  (3825.0s, ETA 25m 44s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=287.139  err=-5.5%
+  u_s=1.8000 mm/s  X=100.0%  q(0)=0.480  T_max=303.3 C  [solid-dom, not-conv, 1000 iter, err=4.72e-03]  (2624.7s, ETA 23m 33s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=268.224  err=-11.8%
+    [solve_ivp FAILED] solid IVP (solid-dominant): Required step size is less than spacing between numbers.  (zeta_last=1.7945 m, min solid_denom=-1467527.72 W/(m2.K))
+  u_s=1.4000 mm/s  FAILED  (7.2s, ETA 10m 48s)
+    [solve_ivp FAILED] solid IVP (solid-dominant): Required step size is less than spacing between numbers.  (zeta_last=1.5539 m, min solid_denom=-3445247943.81 W/(m2.K))
+  u_s=1.0000 mm/s  FAILED  (7.1s, ETA 0s)
+
+All done.  Total: 129m 48s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.

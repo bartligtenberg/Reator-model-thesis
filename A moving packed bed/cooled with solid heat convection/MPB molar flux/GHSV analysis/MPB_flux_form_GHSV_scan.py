@@ -30,13 +30,14 @@ rho_bed_ads = M_ads / V_bed
 rho_bed_tot = (M_cat + M_ads) / V_bed
 
 d_p   = 2.5e-3
-eps_p = 0.615
-tau_p = 3.0
+eps_p = 0.242
+tau_p = 4.0
 rho_p = 1400
 
-W0_DA = 190.00e-6
-E_DA  = 1190e3
-n_DA  = 1.55
+# --- Dubinin-Astakhov isotherm (H2O on 13X) --- fitted myself based on Wei et al. (2021)
+W0_DA = 150.00e-6   # [m³/kg_sorbent]  limiting micropore volume
+E_DA  = 1192e3      # [J/kg]           characteristic adsorption energy
+n_DA  = 1.55        # [-]              DA heterogeneity parameter
 
 T_ref_K = 555.0
 k_ref   = 3.46e-4
@@ -62,9 +63,9 @@ y_H2_in  = 0.16
 y_CH4_in = 0.80
 T_STP    = 273.15
 
-GHSV_LIST = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+GHSV_LIST = [0.05, 0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
 T_IN_LIST  = [280]
-U_S_LIST   = np.array([4.0]) * 1e-3
+U_S_LIST   = np.array([5.0]) * 1e-3
 
 # Placeholders — overwritten per GHSV in the solve loop
 F_total_in = 0.0
@@ -95,7 +96,7 @@ def q_star_vec(T_K, p_arr, W0, E, n):
     return np.where(p <= 0, 0.0, qs)
 
 def K_LDF_vec(T_K, p_arr, W0, E, n):
-    D_M  = 2.5e-5*(T_K/300.0)**1.75
+    D_M = 3.36e-9 * T_K**1.75
     p    = np.asarray(p_arr, dtype=float)
     dp   = 1.0/1e5
     dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
@@ -122,10 +123,9 @@ def reaction_rate_SI(T_K, p_CO2, p_H2, p_CH4, p_H2O):
 def q_star(T_K, p_H2O):
     return q_star_vec(T_K, p_H2O, W0_DA, E_DA, n_DA)
 
-_K_LDF_MAX = 20
 
 def K_LDF(T_K, p_H2O):
-    return np.minimum(K_LDF_vec(T_K, p_H2O, W0_DA, E_DA, n_DA), _K_LDF_MAX)
+    return K_LDF_vec(T_K, p_H2O, W0_DA, E_DA, n_DA)
 
 def equilibrium_conversion(T_K_val):
     K = K_eq_sabatier(T_K_val)
@@ -152,7 +152,7 @@ def _partial_pressures(F_CO2, F_H2, F_CH4, F_H2O):
 
 # region 3. DECOUPLED SOLVER
 # =============================================================================
-def solve_mpb(u_s, T_K, T_wall=None, max_iter=600, tol=1e-5, N=400, q_init=None):
+def solve_mpb(u_s, T_K, T_wall=None, max_iter=2000, tol=1e-5, N=400, q_init=None):
     if T_wall is None:
         T_wall = T_K
 
@@ -304,7 +304,7 @@ def solve_mpb(u_s, T_K, T_wall=None, max_iter=600, tol=1e-5, N=400, q_init=None)
                         (Q_rxn + Q_ads - Q_wall)/solid_denom]
 
             ss = solve_ivp(solid_rhs_with_T, [0.0, L_b], [0.0, T_K],
-                           method='BDF', rtol=1e-4, atol=np.array([1e-8, 1.0]),
+                           method='BDF', rtol=1e-4, atol=np.array([1e-8, 0.1]),
                            max_step=1e-3,
                            t_eval=np.linspace(0.0, L_b, N), dense_output=False)
             if not ss.success:
@@ -520,7 +520,7 @@ for ghsv in GHSV_LIST:
 
         for i_us, u_s in enumerate(U_S_LIST):
             t0  = time.perf_counter()
-            res = solve_mpb(u_s, T_K, T_wall=T_wall, max_iter=400, q_init=q_init)
+            res = solve_mpb(u_s, T_K, T_wall=T_wall, max_iter=800, q_init=q_init)
             dt  = time.perf_counter() - t0
             n_done  += 1
             elapsed  = time.perf_counter() - t_run_start

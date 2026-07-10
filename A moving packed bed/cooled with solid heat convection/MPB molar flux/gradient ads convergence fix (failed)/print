@@ -1,0 +1,70 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\gradient ads convergence fix\MPB_flux_form_grad_ads.py"
+MPB flux form (gradient-ads fix): d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch)  |  grad-ads below 3.0 mm/s
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=8.0000 mm/s  X=99.5%  q(0)=0.122  T_max=290.8 C  [solid-dom, ok, 172 iter, err=9.12e-06]   (435.3s, ETA 152m 21s)
+    H2O balance [mmol/(m²·s)]:  produced=302.586  gas_out=0.006  solid_out=302.091  err=-0.2%
+  u_s=6.0000 mm/s  X=99.6%  q(0)=0.162  T_max=293.6 C  [solid-dom, ok, 41 iter, err=8.86e-06]   (111.3s, ETA 91m 06s)
+    H2O balance [mmol/(m²·s)]:  produced=302.741  gas_out=0.005  solid_out=302.156  err=-0.2%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.194  T_max=295.8 C  [solid-dom, ok, 43 iter, err=9.74e-06]   (95.0s, ETA 67m 43s)
+    H2O balance [mmol/(m²·s)]:  produced=302.840  gas_out=0.004  solid_out=302.103  err=-0.2%
+  u_s=4.0000 mm/s  X=99.7%  q(0)=0.243  T_max=299.0 C  [solid-dom, ok, 58 iter, err=6.31e-06]   (131.4s, ETA 57m 58s)
+    H2O balance [mmol/(m²·s)]:  produced=302.960  gas_out=0.003  solid_out=301.847  err=-0.4%
+  u_s=3.0000 mm/s  X=99.7%  q(0)=0.322  T_max=304.6 C  [solid-dom, ok, 116 iter, err=9.81e-06]   (306.6s, ETA 61m 10s)
+    H2O balance [mmol/(m²·s)]:  produced=303.109  gas_out=0.003  solid_out=300.508  err=-0.9%
+  u_s=2.7500 mm/s  X=99.6%  q(0)=0.312  T_max=309.6 C  [solid-dom, not-conv, 600 iter, err=3.11e-01] (grad-ads)  (1433.6s, ETA 111m 42s)
+    H2O balance [mmol/(m²·s)]:  produced=302.855  gas_out=0.004  solid_out=266.905  err=-11.9%
+  u_s=2.5000 mm/s  X=99.7%  q(0)=0.455  T_max=323.9 C  [solid-dom, not-conv, 600 iter, err=7.80e-02] (grad-ads)  (1268.3s, ETA 135m 03s)
+    H2O balance [mmol/(m²·s)]:  produced=303.177  gas_out=0.002  solid_out=353.532  err=+16.6%
+  u_s=2.4000 mm/s  X=99.7%  q(0)=0.509  T_max=322.4 C  [solid-dom, not-conv, 600 iter, err=7.40e-02] (grad-ads)  (1696.2s, ETA 159m 46s)
+    H2O balance [mmol/(m²·s)]:  produced=302.956  gas_out=0.003  solid_out=379.762  err=+25.4%
+  u_s=2.3000 mm/s  X=99.4%  q(0)=0.574  T_max=320.5 C  [solid-dom, not-conv, 600 iter, err=7.55e-02] (grad-ads)  (3261.0s, ETA 210m 22s)
+    H2O balance [mmol/(m²·s)]:  produced=302.290  gas_out=0.008  solid_out=409.842  err=+35.6%
+  u_s=2.2000 mm/s  X=98.7%  q(0)=0.646  T_max=317.8 C  [solid-dom, not-conv, 600 iter, err=8.29e-02] (grad-ads)  (2156.9s, ETA 217m 55s)
+    H2O balance [mmol/(m²·s)]:  produced=300.103  gas_out=0.035  solid_out=441.397  err=+47.1%
+  u_s=2.1000 mm/s  X=94.8%  q(0)=0.714  T_max=314.6 C  [solid-dom, not-conv, 600 iter, err=7.90e-02] (grad-ads)  (1524.8s, ETA 207m 00s)
+    H2O balance [mmol/(m²·s)]:  produced=288.213  gas_out=0.113  solid_out=465.593  err=+61.6%
+  u_s=2.0000 mm/s  X=99.6%  q(0)=0.519  T_max=321.9 C  [solid-dom, not-conv, 600 iter, err=5.81e-02] (grad-ads)  (1455.8s, ETA 192m 43s)
+    H2O balance [mmol/(m²·s)]:  produced=302.699  gas_out=0.005  solid_out=322.620  err=+6.6%
+  u_s=1.8000 mm/s  X=98.4%  q(0)=0.619  T_max=319.0 C  [solid-dom, not-conv, 600 iter, err=5.15e-02] (grad-ads)  (1283.6s, ETA 174m 55s)
+    H2O balance [mmol/(m²·s)]:  produced=299.219  gas_out=0.041  solid_out=345.959  err=+15.6%
+  u_s=1.6000 mm/s  X=95.6%  q(0)=0.629  T_max=319.0 C  [solid-dom, not-conv, 600 iter, err=3.27e-02] (grad-ads)  (1335.1s, ETA 157m 05s)
+    H2O balance [mmol/(m²·s)]:  produced=290.523  gas_out=0.098  solid_out=312.645  err=+7.6%
+  u_s=1.4000 mm/s  X=81.4%  q(0)=0.603  T_max=319.3 C  [solid-dom, not-conv, 600 iter, err=7.67e-03] (grad-ads)  (1338.5s, ETA 138m 42s)
+    H2O balance [mmol/(m²·s)]:  produced=247.372  gas_out=0.336  solid_out=262.267  err=+6.2%
+  u_s=1.2000 mm/s  X=76.7%  q(0)=0.544  T_max=320.2 C  [solid-dom, not-conv, 600 iter, err=1.13e-04] (grad-ads)  (1222.5s, ETA 119m 06s)
+    H2O balance [mmol/(m²·s)]:  produced=233.192  gas_out=29.804  solid_out=202.831  err=-0.2%
+  u_s=1.0000 mm/s  X=77.6%  q(0)=0.475  T_max=323.6 C  [solid-dom, not-conv, 600 iter, err=4.96e-05] (grad-ads)  (1139.2s, ETA 98m 59s)
+    H2O balance [mmol/(m²·s)]:  produced=236.034  gas_out=51.739  solid_out=147.581  err=-15.6%
+  u_s=0.8000 mm/s  X=78.9%  q(0)=0.398  T_max=328.4 C  [solid-dom, ok, 260 iter, err=9.11e-06] (grad-ads)  (475.4s, ETA 76m 33s)
+    H2O balance [mmol/(m²·s)]:  produced=239.893  gas_out=61.495  solid_out=98.908  err=-33.1%
+  u_s=0.6000 mm/s  X=80.3%  q(0)=0.314  T_max=342.1 C  [solid-dom, ok, 91 iter, err=8.29e-06] (grad-ads)  (167.6s, ETA 54m 50s)
+    H2O balance [mmol/(m²·s)]:  produced=244.055  gas_out=60.141  solid_out=58.513  err=-51.4%
+  u_s=0.4000 mm/s  FAILED  (53.6s, ETA 34m 49s)
+  u_s=0.2000 mm/s  X=83.1%  q(0)=0.186  T_max=369.5 C  [gas-dom, not-conv, 600 iter, err=6.51e-04] (grad-ads)  (156.1s, ETA 16m 42s)
+    H2O balance [mmol/(m²·s)]:  produced=252.633  gas_out=131.689  solid_out=11.538  err=-43.3%
+  u_s=0.1000 mm/s  X=83.8%  q(0)=0.131  T_max=341.5 C  [gas-dom, not-conv, 600 iter, err=1.01e-04] (grad-ads)  (144.9s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=254.868  gas_out=113.433  solid_out=4.068  err=-53.9%
+
+All done.  Total: 353m 13s
+
+Retry pass (backwards) for non-converged solutions...
+  RETRY u_s=1.00 mm/s  [still-nc, 600 iter, err=3.68e-05]  (kept)  (1086.9s)
+  RETRY u_s=1.20 mm/s  [ok, 338 iter, err=9.99e-06]  (kept)  (561.5s)
+  RETRY u_s=1.40 mm/s  [still-nc, 600 iter, err=6.69e-03]  (kept)  (1074.7s)
+  RETRY u_s=1.60 mm/s  [still-nc, 600 iter, err=3.14e-02]  (kept)  (1038.0s)
+  RETRY u_s=1.80 mm/s  [still-nc, 600 iter, err=4.83e-02]  (kept)  (1035.3s)
+  RETRY u_s=2.00 mm/s  [still-nc, 600 iter, err=6.96e-02]  (discarded)  (1823.6s)
+  RETRY u_s=2.10 mm/s  [still-nc, 600 iter, err=7.88e-02]  (kept)  (3544.4s)
+  RETRY u_s=2.20 mm/s  [still-nc, 600 iter, err=6.99e-02]  (kept)  (3527.8s)
+  RETRY u_s=2.30 mm/s  [still-nc, 600 iter, err=7.91e-02]  (discarded)  (3604.7s)
+  RETRY u_s=2.40 mm/s  [still-nc, 600 iter, err=9.22e-02]  (discarded)  (3611.8s)
+  RETRY u_s=2.50 mm/s  [still-nc, 600 iter, err=1.02e-01]  (discarded)  (25907.9s)
+  RETRY u_s=2.75 mm/s  [still-nc, 600 iter, err=1.12e-01]  (kept)  (1554.0s)
+Retry pass done. 12 solution(s) re-run.

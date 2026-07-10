@@ -1,0 +1,272 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\MPB_flux_form active frac.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=327 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.465 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=8.0000 mm/s  X=100.0%  q(0)=0.122  T_max=293.5 C  [solid-dom, ok, 171 iter, err=9.05e-06]  (365.4s, ETA 85m 16s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=302.150  err=-0.6%
+  u_s=6.0000 mm/s  X=100.0%  q(0)=0.162  T_max=298.1 C  [solid-dom, ok, 48 iter, err=8.76e-06]  (151.8s, ETA 56m 02s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=301.900  err=-0.7%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.194  T_max=301.9 C  [solid-dom, ok, 31 iter, err=6.23e-06]  (90.2s, ETA 40m 30s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=301.574  err=-0.8%
+  u_s=4.0000 mm/s  X=100.0%  q(0)=0.242  T_max=307.7 C  [solid-dom, ok, 33 iter, err=5.75e-06]  (121.7s, ETA 33m 25s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=301.059  err=-1.0%
+  u_s=3.0000 mm/s  X=100.0%  q(0)=0.320  T_max=317.6 C  [solid-dom, ok, 528 iter, err=9.23e-06]  (880.9s, ETA 53m 40s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=298.243  err=-1.9%
+  u_s=2.9000 mm/s  X=100.0%  q(0)=0.330  T_max=319.0 C  [solid-dom, ok, 76 iter, err=8.47e-06]  (124.2s, ETA 43m 21s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=297.123  err=-2.3%
+  u_s=2.8000 mm/s  X=100.0%  q(0)=0.340  T_max=320.4 C  [solid-dom, ok, 105 iter, err=5.90e-06]  (238.2s, ETA 37m 34s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=295.893  err=-2.7%
+  u_s=2.7000 mm/s  X=100.0%  q(0)=0.351  T_max=321.9 C  [solid-dom, ok, 155 iter, err=8.60e-06]  (385.4s, ETA 34m 23s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=294.339  err=-3.2%
+  u_s=2.6000 mm/s  X=100.0%  q(0)=0.361  T_max=323.4 C  [solid-dom, ok, 612 iter, err=8.94e-06]  (1604.1s, ETA 44m 01s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=291.546  err=-4.1%
+  u_s=2.2000 mm/s  FAILED  (4.2s, ETA 33m 03s)
+  u_s=1.8000 mm/s  FAILED  (9.6s, ETA 24m 05s)
+  u_s=1.6000 mm/s  FAILED  (6.9s, ETA 16m 35s)
+  u_s=1.2000 mm/s  FAILED  (6.4s, ETA 10m 13s)
+  u_s=0.8000 mm/s  FAILED  (9.3s, ETA 4m 45s)
+  u_s=0.4000 mm/s  X=84.2%  q(0)=0.100  T_max=463.2 C  [gas-dom, not-conv, 1000 iter, err=1.29e-03]  (2420.5s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=255.974  gas_out=50.150  solid_out=12.486  err=-75.5%
+
+All done.  Total: 106m 58s
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\30% active catalyst GHSV\MPB_flux_form_GHSV_scan_30% active.py"
+
+=================================================================
+  GHSV = 0.05 NL/g_ads/h  |  u_g_STP = 8.6 mm/s
+  F_in_total = 0.3800 mol/(m²·s)  [CO2: 0.0152  H2: 0.0608  CH4: 0.3040]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.047 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.016  q_max=0.020  sat=0.80  T_max=282.0 C  [solid-dom, ok, 200 iter, err=9.10e-06]  (614.6s, ETA 204m 52s)
+  H2O balance [mol/(m²·s)]:  prod=0.03040  gas_out(sim)=0.00000  ads(solid)=0.02431  closure=80.0%
+
+=================================================================
+  GHSV = 0.1 NL/g_ads/h  |  u_g_STP = 17.3 mm/s
+  F_in_total = 0.7600 mol/(m²·s)  [CO2: 0.0304  H2: 0.1216  CH4: 0.6080]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.093 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.035  q_max=0.039  sat=0.91  T_max=284.2 C  [solid-dom, ok, 211 iter, err=6.48e-06]  (556.0s, ETA 185m 22s)
+  H2O balance [mol/(m²·s)]:  prod=0.06080  gas_out(sim)=0.00000  ads(solid)=0.05511  closure=90.6%
+
+=================================================================
+  GHSV = 0.2 NL/g_ads/h  |  u_g_STP = 34.5 mm/s
+  F_in_total = 1.5200 mol/(m²·s)  [CO2: 0.0608  H2: 0.2432  CH4: 1.2160]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.186 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.075  q_max=0.078  sat=0.96  T_max=288.5 C  [solid-dom, ok, 219 iter, err=9.78e-06]  (488.4s, ETA 165m 55s)
+  H2O balance [mol/(m²·s)]:  prod=0.12160  gas_out(sim)=0.00000  ads(solid)=0.11725  closure=96.4%
+
+=================================================================
+  GHSV = 0.3 NL/g_ads/h  |  u_g_STP = 51.8 mm/s
+  F_in_total = 2.2800 mol/(m²·s)  [CO2: 0.0912  H2: 0.3648  CH4: 1.8240]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.279 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.115  q_max=0.117  sat=0.98  T_max=292.9 C  [solid-dom, ok, 237 iter, err=5.51e-06]  (683.2s, ETA 165m 55s)
+  H2O balance [mol/(m²·s)]:  prod=0.18240  gas_out(sim)=0.00000  ads(solid)=0.17917  closure=98.2%
+
+=================================================================
+  GHSV = 0.4 NL/g_ads/h  |  u_g_STP = 69.0 mm/s
+  F_in_total = 3.0400 mol/(m²·s)  [CO2: 0.1216  H2: 0.4864  CH4: 2.4320]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.372 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.155  q_max=0.157  sat=0.99  T_max=297.4 C  [solid-dom, ok, 311 iter, err=7.33e-06]  (936.3s, ETA 174m 52s)
+  H2O balance [mol/(m²·s)]:  prod=0.24320  gas_out(sim)=0.00000  ads(solid)=0.24046  closure=98.9%
+
+=================================================================
+  GHSV = 0.5 NL/g_ads/h  |  u_g_STP = 86.3 mm/s
+  F_in_total = 3.8000 mol/(m²·s)  [CO2: 0.1520  H2: 0.6080  CH4: 3.0400]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.465 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.194  q_max=0.196  sat=0.99  T_max=301.9 C  [solid-dom, ok, 363 iter, err=8.28e-06]  (792.0s, ETA 169m 37s)
+  H2O balance [mol/(m²·s)]:  prod=0.30400  gas_out(sim)=0.00000  ads(solid)=0.30156  closure=99.2%
+
+=================================================================
+  GHSV = 0.6 NL/g_ads/h  |  u_g_STP = 103.6 mm/s
+  F_in_total = 4.5600 mol/(m²·s)  [CO2: 0.1824  H2: 0.7296  CH4: 3.6480]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.558 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.233  q_max=0.235  sat=0.99  T_max=306.5 C  [solid-dom, ok, 466 iter, err=5.80e-06]  (1156.9s, ETA 174m 15s)
+  H2O balance [mol/(m²·s)]:  prod=0.36480  gas_out(sim)=0.00000  ads(solid)=0.36236  closure=99.3%
+
+=================================================================
+  GHSV = 0.7 NL/g_ads/h  |  u_g_STP = 120.8 mm/s
+  F_in_total = 5.3200 mol/(m²·s)  [CO2: 0.2128  H2: 0.8512  CH4: 4.2560]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.651 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.272  q_max=0.274  sat=0.99  T_max=311.3 C  [solid-dom, ok, 613 iter, err=7.48e-06]  (2560.9s, ETA 210m 56s)
+  H2O balance [mol/(m²·s)]:  prod=0.42560  gas_out(sim)=0.00000  ads(solid)=0.42286  closure=99.4%
+
+=================================================================
+  GHSV = 0.8 NL/g_ads/h  |  u_g_STP = 138.1 mm/s
+  F_in_total = 6.0800 mol/(m²·s)  [CO2: 0.2432  H2: 0.9728  CH4: 4.8640]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.744 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.408  q_max=0.313  sat=1.30  T_max=319.8 C  [solid-dom, not-conv, 800 iter, err=2.65e-02]  (2642.2s, ETA 231m 48s)
+  H2O balance [mol/(m²·s)]:  prod=0.48634  gas_out(sim)=0.00000  ads(solid)=0.63342  closure=130.2%
+
+=================================================================
+  GHSV = 0.9 NL/g_ads/h  |  u_g_STP = 155.3 mm/s
+  F_in_total = 6.8400 mol/(m²·s)  [CO2: 0.2736  H2: 1.0944  CH4: 5.4720]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.837 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.432  q_max=0.352  sat=1.23  T_max=317.7 C  [solid-dom, not-conv, 800 iter, err=1.71e-02]  (1687.1s, ETA 222m 10s)
+  H2O balance [mol/(m²·s)]:  prod=0.54697  gas_out(sim)=0.00000  ads(solid)=0.67048  closure=122.6%
+
+=================================================================
+  GHSV = 1.0 NL/g_ads/h  |  u_g_STP = 172.6 mm/s
+  F_in_total = 7.6000 mol/(m²·s)  [CO2: 0.3040  H2: 1.2160  CH4: 6.0800]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 0.930 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=99.9%  q(0)=0.449  q_max=0.391  sat=1.15  T_max=317.1 C  [solid-dom, not-conv, 800 iter, err=1.03e-02]  (1454.8s, ETA 205m 39s)
+  H2O balance [mol/(m²·s)]:  prod=0.60752  gas_out(sim)=0.00000  ads(solid)=0.69766  closure=114.8%
+
+=================================================================
+  GHSV = 1.1 NL/g_ads/h  |  u_g_STP = 189.9 mm/s
+  F_in_total = 8.3601 mol/(m²·s)  [CO2: 0.3344  H2: 1.3376  CH4: 6.6880]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.023 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=99.8%  q(0)=0.462  q_max=0.430  sat=1.08  T_max=316.8 C  [solid-dom, not-conv, 800 iter, err=4.93e-03]  (1223.5s, ETA 184m 57s)
+  H2O balance [mol/(m²·s)]:  prod=0.66773  gas_out(sim)=0.00001  ads(solid)=0.71784  closure=107.5%
+
+=================================================================
+  GHSV = 1.2 NL/g_ads/h  |  u_g_STP = 207.1 mm/s
+  F_in_total = 9.1201 mol/(m²·s)  [CO2: 0.3648  H2: 1.4592  CH4: 7.2960]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.116 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=99.7%  q(0)=0.470  q_max=0.468  sat=1.00  T_max=316.6 C  [solid-dom, not-conv, 800 iter, err=7.33e-04]  (1227.7s, ETA 164m 21s)
+  H2O balance [mol/(m²·s)]:  prod=0.72710  gas_out(sim)=0.00004  ads(solid)=0.73033  closure=100.4%
+
+=================================================================
+  GHSV = 1.3 NL/g_ads/h  |  u_g_STP = 224.4 mm/s
+  F_in_total = 9.8801 mol/(m²·s)  [CO2: 0.3952  H2: 1.5808  CH4: 7.9040]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.209 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=98.9%  q(0)=0.473  q_max=0.503  sat=0.94  T_max=316.5 C  [solid-dom, not-conv, 800 iter, err=2.34e-03]  (1201.8s, ETA 143m 33s)
+  H2O balance [mol/(m²·s)]:  prod=0.78178  gas_out(sim)=0.00045  ads(solid)=0.73404  closure=94.0%
+
+=================================================================
+  GHSV = 1.4 NL/g_ads/h  |  u_g_STP = 241.6 mm/s
+  F_in_total = 10.6401 mol/(m²·s)  [CO2: 0.4256  H2: 1.7024  CH4: 8.5121]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.302 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=93.0%  q(0)=0.468  q_max=0.510  sat=0.92  T_max=316.1 C  [solid-dom, not-conv, 800 iter, err=2.70e-03]  (1188.0s, ETA 122m 45s)
+  H2O balance [mol/(m²·s)]:  prod=0.79172  gas_out(sim)=0.00322  ads(solid)=0.72717  closure=92.3%
+
+=================================================================
+  GHSV = 1.5 NL/g_ads/h  |  u_g_STP = 258.9 mm/s
+  F_in_total = 11.4001 mol/(m²·s)  [CO2: 0.4560  H2: 1.8240  CH4: 9.1201]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.395 mm/s
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=83.7%  q(0)=0.457  q_max=0.492  sat=0.93  T_max=314.9 C  [solid-dom, not-conv, 800 iter, err=1.86e-03]  (1192.2s, ETA 102m 07s)
+  H2O balance [mol/(m²·s)]:  prod=0.76378  gas_out(sim)=0.00791  ads(solid)=0.71036  closure=94.0%
+
+=================================================================
+  GHSV = 1.6 NL/g_ads/h  |  u_g_STP = 276.2 mm/s
+  F_in_total = 12.1601 mol/(m²·s)  [CO2: 0.4864  H2: 1.9456  CH4: 9.7281]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.488 mm/s
+  non-SE fixed-bed conversion: 84.5%
+  u_s=5.0000 mm/s  X=79.1%  q(0)=0.442  q_max=0.495  sat=0.89  T_max=314.5 C  [solid-dom, not-conv, 800 iter, err=1.01e-04]  (1186.2s, ETA 81m 32s)
+  H2O balance [mol/(m²·s)]:  prod=0.76952  gas_out(sim)=0.06886  ads(solid)=0.68595  closure=98.1%
+
+=================================================================
+  GHSV = 1.7 NL/g_ads/h  |  u_g_STP = 293.4 mm/s
+  F_in_total = 12.9201 mol/(m²·s)  [CO2: 0.5168  H2: 2.0672  CH4: 10.3361]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.581 mm/s
+  non-SE fixed-bed conversion: 84.5%
+  u_s=5.0000 mm/s  FAILED  (3.4s, ETA 57m 46s)
+
+=================================================================
+  GHSV = 1.8 NL/g_ads/h  |  u_g_STP = 310.7 mm/s
+  F_in_total = 13.6801 mol/(m²·s)  [CO2: 0.5472  H2: 2.1888  CH4: 10.9441]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.674 mm/s
+  non-SE fixed-bed conversion: 84.4%
+  u_s=5.0000 mm/s  FAILED  (3.5s, ETA 36m 29s)
+
+=================================================================
+  GHSV = 1.9 NL/g_ads/h  |  u_g_STP = 327.9 mm/s
+  F_in_total = 14.4401 mol/(m²·s)  [CO2: 0.5776  H2: 2.3104  CH4: 11.5521]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.768 mm/s
+  non-SE fixed-bed conversion: 84.4%
+  u_s=5.0000 mm/s  FAILED  (4.8s, ETA 17m 20s)
+
+=================================================================
+  GHSV = 2.0 NL/g_ads/h  |  u_g_STP = 345.2 mm/s
+  F_in_total = 15.2001 mol/(m²·s)  [CO2: 0.6080  H2: 2.4320  CH4: 12.1601]
+  d_p = 2.5 mm  |  rho_p = 1400 kg/m³  |  eps_p = 0.242  |  tau_p = 4.0
+  M_cat(active) = 384.0 g  (active_fraction = 30%, scaled from reference M_cat = 64.0 g @ 5% active; total bed solids mass unaffected, sorbent kept at 100% = 1220.0 g)
+=================================================================
+  T_in = 280 C  |  u_s* = 1.861 mm/s
+  non-SE fixed-bed conversion: 84.3%
+  u_s=5.0000 mm/s  FAILED  (3.1s, ETA 0s)
+
+All done.  Total: 346m 47s
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+

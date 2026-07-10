@@ -1,0 +1,760 @@
+"""
+Moving Packed Bed (MPB) Reactor Model — GHSV Sweep
+===================================================
+Sweeps GHSV ∈ {0.5, 1.0, 1.5, 2.0, 3.0, 4.0} NL/g_ads/h at T_in = 280 C.
+For each GHSV, sweeps u_s over U_S_LIST (400 Gauss-Seidel iterations max).
+F_in_* globals are recomputed per GHSV before each solve block.
+"""
+
+import os
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+from scipy.optimize import brentq
+from scipy.interpolate import interp1d
+
+
+# region 1. PARAMETERS
+# =============================================================================
+d_b   = 0.050
+L_b   = 2.000
+A_b   = np.pi / 4 * d_b**2
+V_bed = A_b * L_b
+eps_b = 0.4
+
+M_cat = 0.064   # [kg] fixed physical mass basis for total bed solids (rho_bed_tot) — not scaled by active_fraction
+M_ads = 1.22
+
+active_fraction_ref = 0.05   # [-] active fraction implicitly assumed when M_cat above was calibrated
+active_fraction     = 0.30   # [-] target active fraction for this run
+M_cat_active = M_cat * (active_fraction / active_fraction_ref)   # [kg] active catalyst mass, reaction-rate basis only
+
+rho_bed_cat = M_cat_active / V_bed   # catalyst bulk density (reaction terms), scales with active_fraction
+rho_bed_ads = M_ads / V_bed
+rho_bed_tot = (M_cat + M_ads) / V_bed   # total solids mass/density basis, unaffected by active_fraction
+
+d_p   = 2.5e-3
+eps_p = 0.242
+tau_p = 4.0
+rho_p = 1400
+
+# --- Dubinin-Astakhov isotherm (H2O on 13X) --- fitted myself based on Wei et al. (2021)
+W0_DA = 150.00e-6   # [m³/kg_sorbent]  limiting micropore volume
+E_DA  = 1192e3      # [J/kg]           characteristic adsorption energy
+n_DA  = 1.55        # [-]              DA heterogeneity parameter
+
+T_ref_K = 555.0
+k_ref   = 3.46e-4
+Ea_k    = 77.5e3
+A_OH    = 0.50;  dH_OH  =  22.4e3
+A_H2    = 0.44;  dH_H2  =  -6.2e3
+A_mix   = 0.88;  dH_mix = -10.0e3
+P_FLOOR = 1e-4
+
+dH_r   = -165.0e3
+dH_ads =  -45.0e3
+Cp_cat = 1100.0
+Cp_CO2 = 45.4;  Cp_H2 = 29.3;  Cp_CH4 = 46.9;  Cp_H2O = 34.2
+
+U_a    = 2000.0
+R_gas  = 8.314
+MW_H2O = 0.018015
+
+P_bar = 1.0
+P_Pa  = P_bar * 1e5
+y_CO2_in = 0.04
+y_H2_in  = 0.16
+y_CH4_in = 0.80
+T_STP    = 273.15
+
+GHSV_LIST = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]   # [NL/g_ads/h]
+T_IN_LIST  = [280]
+U_S_LIST   = np.array([5.0]) * 1e-3
+
+# Placeholders — overwritten per GHSV in the solve loop
+F_total_in = 0.0
+F_in_CO2   = 0.0
+F_in_H2    = 0.0
+F_in_CH4   = 0.0
+# endregion
+
+
+# region 2. FUNCTIONS
+# =============================================================================
+def P_sat_bar(T_K):
+    log10_p = (29.8605 - 3.1522e3/T_K - 7.3037*np.log10(T_K)
+               + 2.4247e-9*T_K + 1.8090e-6*T_K**2)
+    return 10.0**np.clip(log10_p, -10, 10) * 133.322e-5
+
+def rho_water(T_K):
+    return 996.0 / (1.0 + 2.0e-3*(T_K - 298.15))
+
+def q_star_vec(T_K, p_arr, W0, E, n):
+    p      = np.asarray(p_arr, dtype=float)
+    Psat   = P_sat_bar(T_K)
+    p_safe = np.clip(p, 1e-15, Psat*(1-1e-10))
+    A_raw  = (R_gas/MW_H2O)*T_K*np.log(Psat/p_safe)
+    A      = np.where((p <= 0)|(p >= Psat), 0.0, A_raw)
+    W      = W0*np.exp(-np.minimum((A/E)**n, 500.0))
+    qs     = rho_water(T_K)/MW_H2O*W
+    return np.where(p <= 0, 0.0, qs)
+
+def K_LDF_vec(T_K, p_arr, W0, E, n):
+    D_M = 3.36e-9 * T_K**1.75
+    p    = np.asarray(p_arr, dtype=float)
+    dp   = 1.0/1e5
+    dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
+            - q_star_vec(T_K, np.maximum(p-dp, 1e-15), W0, E, n)) / 2.0
+    dqsp = np.maximum(dqsp, 1e-30)
+    r_p  = 0.5 * d_p
+    return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * R_gas * T_K * dqsp)
+
+def K_eq_sabatier(T_K):
+    return 137.0*T_K**(-3.994)*np.exp(158700.0/(R_gas*T_K))
+
+def reaction_rate_SI(T_K, p_CO2, p_H2, p_CH4, p_H2O):
+    vH    = lambda dH: np.exp(-dH/R_gas*(1.0/T_K - 1.0/T_ref_K))
+    k     = k_ref*np.exp(-Ea_k/R_gas*(1.0/T_K - 1.0/T_ref_K))
+    K_OH  = A_OH*vH(dH_OH);  K_H2 = A_H2*vH(dH_H2);  K_mix = A_mix*vH(dH_mix)
+    K_eq  = K_eq_sabatier(T_K)
+    p_CO2_s = np.maximum(p_CO2, P_FLOOR);  p_H2_s = np.maximum(p_H2, P_FLOOR)
+    beta  = (p_CH4*p_H2O**2)/(K_eq*p_CO2_s*p_H2_s**4)
+    f_eq  = np.maximum(1.0 - np.where(np.isfinite(beta), beta, 1e10), 0.0)
+    DEN   = (1.0 + K_OH*np.maximum(p_H2O, 0)/p_H2_s**0.5
+             + K_H2*p_H2_s**0.5 + K_mix*p_CO2_s**0.5)
+    return k*(p_CO2_s*p_H2_s)**0.5*f_eq/DEN**2*1000.0
+
+def q_star(T_K, p_H2O):
+    return q_star_vec(T_K, p_H2O, W0_DA, E_DA, n_DA)
+
+
+def K_LDF(T_K, p_H2O):
+    return K_LDF_vec(T_K, p_H2O, W0_DA, E_DA, n_DA)
+
+def equilibrium_conversion(T_K_val):
+    K = K_eq_sabatier(T_K_val)
+    def f(X):
+        d = 1.0 - 0.08*X
+        return ((0.80+0.04*X)/d * (0.08*X/d)**2
+                / ((0.04*(1-X)/d)*(0.16*(1-X)/d)**4 + 1e-100) - K)
+    try:
+        return brentq(f, 1e-9, 1-1e-9)*100.0
+    except Exception:
+        return 100.0
+
+def _gas_cap(F_CO2, F_H2, F_CH4, F_H2O):
+    return F_CO2*Cp_CO2 + F_H2*Cp_H2 + F_CH4*Cp_CH4 + F_H2O*Cp_H2O
+
+def _partial_pressures(F_CO2, F_H2, F_CH4, F_H2O):
+    F_tot = F_CO2 + F_H2 + F_CH4 + F_H2O
+    if F_tot < 1e-30:
+        return 0.0, 0.0, 0.0, 0.0
+    return (F_CO2/F_tot*P_bar, F_H2/F_tot*P_bar,
+            F_CH4/F_tot*P_bar, F_H2O/F_tot*P_bar)
+# endregion
+
+
+# region 3. DECOUPLED SOLVER
+# =============================================================================
+def solve_mpb(u_s, T_K, T_wall=None, max_iter=2000, tol=1e-5, N=400, q_init=None):
+    if T_wall is None:
+        T_wall = T_K
+
+    solid_cap     = u_s * rho_bed_tot * Cp_cat
+    gas_cap_in    = _gas_cap(F_in_CO2, F_in_H2, F_in_CH4, 0.0)
+    gas_dominates = (solid_cap < gas_cap_in)
+
+    z_grid = np.linspace(0.0, L_b, N)
+    if q_init is not None:
+        q_prof = np.interp(z_grid, np.linspace(0, L_b, len(q_init)), q_init)
+    else:
+        q_prof = np.zeros(N)
+    T_prof = T_K * np.ones(N)
+
+    converged = False
+    err       = 1.0
+
+    for it in range(max_iter):
+        q_fn = interp1d(z_grid, q_prof, kind='linear',
+                        bounds_error=False, fill_value=(q_prof[0], q_prof[-1]))
+        T_fn = interp1d(z_grid, T_prof, kind='linear',
+                        bounds_error=False, fill_value=(T_prof[0], T_prof[-1]))
+
+        if gas_dominates:
+            def gas_rhs(z, y):
+                F_CO2_l = max(y[0], 0.0);  F_H2_l  = max(y[1], 0.0)
+                F_CH4_l = max(y[2], 0.0);  F_H2O_l = max(y[3], 0.0)
+                T_l     = max(y[4], 200.0)
+                q_l     = max(float(q_fn(z)), 0.0)
+                p_CO2, p_H2, p_CH4, p_H2O = _partial_pressures(
+                    F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+                r   = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                              np.array([p_CH4]), np.array([p_H2O]))[0])
+                qs  = float(q_star(T_l, np.array([p_H2O]))[0])
+                Kl  = float(K_LDF(T_l,  np.array([p_H2O]))[0])
+                ads = Kl*(qs - q_l)
+                gas_cap_l = _gas_cap(F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+                denom     = gas_cap_l - solid_cap
+                Q_rxn  = (-dH_r)   * rho_bed_cat * r
+                Q_ads  = (-dH_ads) * rho_bed_ads * ads
+                Q_wall = U_a * (T_l - T_wall)
+                return [-rho_bed_cat*r, -4.0*rho_bed_cat*r, +rho_bed_cat*r,
+                        2.0*rho_bed_cat*r - rho_bed_ads*ads,
+                        (Q_rxn + Q_ads - Q_wall)/denom]
+
+            gs = solve_ivp(gas_rhs, [0.0, L_b],
+                           [F_in_CO2, F_in_H2, F_in_CH4, 0.0, T_K],
+                           method='BDF', rtol=1e-4,
+                           atol=np.array([1e-8, 1e-8, 1e-8, 1e-8, 1e-2]),
+                           t_eval=z_grid, dense_output=False)
+            if not gs.success:
+                return None
+
+            F_CO2_prof = np.maximum(gs.y[0], 0.0);  F_H2_prof  = np.maximum(gs.y[1], 0.0)
+            F_CH4_prof = np.maximum(gs.y[2], 0.0);  F_H2O_prof = np.maximum(gs.y[3], 0.0)
+            T_prof_new = np.maximum(gs.y[4], 200.0)
+
+            F_tot_prof = np.maximum(F_CO2_prof+F_H2_prof+F_CH4_prof+F_H2O_prof, 1e-30)
+            p_H2O_prof = F_H2O_prof / F_tot_prof * P_bar
+            p_H2O_fn   = interp1d(z_grid, p_H2O_prof, kind='linear',
+                                   bounds_error=False,
+                                   fill_value=(p_H2O_prof[0], p_H2O_prof[-1]))
+            T_fn_new   = interp1d(z_grid, T_prof_new, kind='linear',
+                                   bounds_error=False,
+                                   fill_value=(T_prof_new[0], T_prof_new[-1]))
+
+            def solid_rhs(zeta, q_arr):
+                z_pos   = L_b - float(zeta)
+                T_local = float(T_fn_new(z_pos))
+                p_H2O_l = max(float(p_H2O_fn(z_pos)), 0.0)
+                qs  = float(q_star(T_local, np.array([p_H2O_l]))[0])
+                Kl  = float(K_LDF(T_local,  np.array([p_H2O_l]))[0])
+                q_val = max(float(q_arr[0]), 0.0)
+                return [Kl*(qs - q_val)/u_s]
+
+            ss = solve_ivp(solid_rhs, [0.0, L_b], [0.0],
+                           method='BDF', rtol=1e-4, atol=1e-8,
+                           t_eval=np.linspace(0.0, L_b, N), dense_output=False)
+            if not ss.success:
+                return None
+
+            z_from_zeta = L_b - ss.t
+            q_from_zeta = np.maximum(ss.y[0], 0.0)
+            sort_idx    = np.argsort(z_from_zeta)
+            q_new = np.interp(z_grid, z_from_zeta[sort_idx], q_from_zeta[sort_idx])
+
+            q_prof_new = 0.5*q_prof + 0.5*q_new
+            T_prof     = 0.5*T_prof + 0.5*T_prof_new
+            scale      = max(np.max(q_prof_new), 1e-8)
+            err        = np.max(np.abs(q_prof_new - q_prof)) / scale
+            q_prof     = q_prof_new
+
+        else:
+            def gas_rhs_no_T(z, y):
+                F_CO2_l = max(y[0], 0.0);  F_H2_l  = max(y[1], 0.0)
+                F_CH4_l = max(y[2], 0.0);  F_H2O_l = max(y[3], 0.0)
+                T_l     = max(float(T_fn(z)), 200.0)
+                q_l     = max(float(q_fn(z)), 0.0)
+                p_CO2, p_H2, p_CH4, p_H2O = _partial_pressures(
+                    F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+                r   = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                              np.array([p_CH4]), np.array([p_H2O]))[0])
+                qs  = float(q_star(T_l, np.array([p_H2O]))[0])
+                Kl  = float(K_LDF(T_l,  np.array([p_H2O]))[0])
+                ads = Kl*(qs - q_l)
+                return [-rho_bed_cat*r, -4.0*rho_bed_cat*r, +rho_bed_cat*r,
+                        2.0*rho_bed_cat*r - rho_bed_ads*ads]
+
+            gs = solve_ivp(gas_rhs_no_T, [0.0, L_b],
+                           [F_in_CO2, F_in_H2, F_in_CH4, 0.0],
+                           method='BDF', rtol=1e-4,
+                           atol=np.array([1e-8, 1e-8, 1e-8, 1e-8]),
+                           t_eval=z_grid, dense_output=False)
+            if not gs.success:
+                return None
+
+            F_CO2_prof = np.maximum(gs.y[0], 0.0);  F_H2_prof  = np.maximum(gs.y[1], 0.0)
+            F_CH4_prof = np.maximum(gs.y[2], 0.0);  F_H2O_prof = np.maximum(gs.y[3], 0.0)
+            F_tot_prof = np.maximum(F_CO2_prof+F_H2_prof+F_CH4_prof+F_H2O_prof, 1e-30)
+
+            _mk = lambda p: interp1d(z_grid, p, kind='linear',
+                                     bounds_error=False, fill_value=(p[0], p[-1]))
+            F_CO2_fn = _mk(F_CO2_prof);  F_H2_fn  = _mk(F_H2_prof)
+            F_CH4_fn = _mk(F_CH4_prof);  F_H2O_fn = _mk(F_H2O_prof)
+            F_tot_fn = _mk(F_tot_prof)
+
+            def solid_rhs_with_T(zeta, y_arr):
+                q_val = max(float(y_arr[0]), 0.0)
+                T_val = max(float(y_arr[1]), 200.0)
+                z_pos = L_b - float(zeta)
+                F_CO2_l = max(float(F_CO2_fn(z_pos)), 0.0)
+                F_H2_l  = max(float(F_H2_fn(z_pos)),  0.0)
+                F_CH4_l = max(float(F_CH4_fn(z_pos)), 0.0)
+                F_H2O_l = max(float(F_H2O_fn(z_pos)), 0.0)
+                F_tot_l = max(float(F_tot_fn(z_pos)), 1e-30)
+                p_CO2 = F_CO2_l/F_tot_l*P_bar;  p_H2  = F_H2_l /F_tot_l*P_bar
+                p_CH4 = F_CH4_l/F_tot_l*P_bar;  p_H2O = F_H2O_l/F_tot_l*P_bar
+                r   = float(reaction_rate_SI(T_val, np.array([p_CO2]), np.array([p_H2]),
+                                              np.array([p_CH4]), np.array([p_H2O]))[0])
+                qs  = float(q_star(T_val, np.array([p_H2O]))[0])
+                Kl  = float(K_LDF(T_val, np.array([p_H2O]))[0])
+                ads = Kl*(qs - q_val)
+                gas_cap_l   = _gas_cap(F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+                solid_denom = solid_cap - gas_cap_l
+                Q_rxn  = (-dH_r)   * rho_bed_cat * r
+                Q_ads  = (-dH_ads) * rho_bed_ads * ads
+                Q_wall = U_a * (T_val - T_wall)
+                return [Kl*(qs - q_val)/u_s,
+                        (Q_rxn + Q_ads - Q_wall)/solid_denom]
+
+            ss = solve_ivp(solid_rhs_with_T, [0.0, L_b], [0.0, T_K],
+                           method='BDF', rtol=1e-4, atol=np.array([1e-8, 0.1]),
+                           max_step=1e-3,
+                           t_eval=np.linspace(0.0, L_b, N), dense_output=False)
+            if not ss.success:
+                return None
+
+            z_from_zeta = L_b - ss.t
+            q_from_zeta = np.maximum(ss.y[0], 0.0)
+            T_from_zeta = np.maximum(ss.y[1], 200.0)
+            sort_idx    = np.argsort(z_from_zeta)
+            q_new  = np.interp(z_grid, z_from_zeta[sort_idx], q_from_zeta[sort_idx])
+            T_new  = np.interp(z_grid, z_from_zeta[sort_idx], T_from_zeta[sort_idx])
+
+            q_prof_new = 0.5*q_prof + 0.5*q_new
+            T_prof_new = 0.5*T_prof + 0.5*T_new
+            err_q = np.max(np.abs(q_prof_new - q_prof)) / max(np.max(q_prof_new), 1e-8)
+            err_T = np.max(np.abs(T_prof_new - T_prof)) / T_K
+            err   = max(err_q, err_T)
+            q_prof = q_prof_new
+            T_prof = T_prof_new
+
+        if err < tol:
+            converged = True
+            break
+
+    # Final recompute on fine grid
+    z_fine = np.linspace(0.0, L_b, 300)
+    q_fn_f = interp1d(z_grid, q_prof, kind='linear',
+                      bounds_error=False, fill_value=(q_prof[0], q_prof[-1]))
+    T_fn_f = interp1d(z_grid, T_prof, kind='linear',
+                      bounds_error=False, fill_value=(T_prof[0], T_prof[-1]))
+
+    if gas_dominates:
+        def gas_rhs_final(z, y):
+            F_CO2_l = max(y[0], 0.0);  F_H2_l  = max(y[1], 0.0)
+            F_CH4_l = max(y[2], 0.0);  F_H2O_l = max(y[3], 0.0)
+            T_l     = max(y[4], 200.0)
+            q_l     = max(float(q_fn_f(z)), 0.0)
+            p_CO2, p_H2, p_CH4, p_H2O = _partial_pressures(
+                F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+            r   = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                          np.array([p_CH4]), np.array([p_H2O]))[0])
+            qs  = float(q_star(T_l, np.array([p_H2O]))[0])
+            Kl  = float(K_LDF(T_l, np.array([p_H2O]))[0])
+            ads = Kl*(qs - q_l)
+            gas_cap_l = _gas_cap(F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+            denom = gas_cap_l - solid_cap
+            Q_rxn = (-dH_r)*rho_bed_cat*r;  Q_ads = (-dH_ads)*rho_bed_ads*ads
+            Q_wall = U_a*(T_l - T_wall)
+            return [-rho_bed_cat*r, -4.0*rho_bed_cat*r, +rho_bed_cat*r,
+                    2.0*rho_bed_cat*r - rho_bed_ads*ads,
+                    (Q_rxn + Q_ads - Q_wall)/denom]
+
+        gf = solve_ivp(gas_rhs_final, [0.0, L_b],
+                       [F_in_CO2, F_in_H2, F_in_CH4, 0.0, T_K],
+                       method='BDF', rtol=1e-6,
+                       atol=np.array([1e-10, 1e-10, 1e-10, 1e-10, 1e-3]),
+                       t_eval=z_fine, dense_output=False)
+        F_CO2f = np.maximum(gf.y[0], 0.0);  F_H2f  = np.maximum(gf.y[1], 0.0)
+        F_CH4f = np.maximum(gf.y[2], 0.0);  F_H2Of = np.maximum(gf.y[3], 0.0)
+        T_fine = np.maximum(gf.y[4], 200.0)
+
+    else:
+        def gas_rhs_final_no_T(z, y):
+            F_CO2_l = max(y[0], 0.0);  F_H2_l  = max(y[1], 0.0)
+            F_CH4_l = max(y[2], 0.0);  F_H2O_l = max(y[3], 0.0)
+            T_l     = max(float(T_fn_f(z)), 200.0)
+            q_l     = max(float(q_fn_f(z)), 0.0)
+            p_CO2, p_H2, p_CH4, p_H2O = _partial_pressures(
+                F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+            r   = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                          np.array([p_CH4]), np.array([p_H2O]))[0])
+            qs  = float(q_star(T_l, np.array([p_H2O]))[0])
+            Kl  = float(K_LDF(T_l, np.array([p_H2O]))[0])
+            ads = Kl*(qs - q_l)
+            return [-rho_bed_cat*r, -4.0*rho_bed_cat*r, +rho_bed_cat*r,
+                    2.0*rho_bed_cat*r - rho_bed_ads*ads]
+
+        gf = solve_ivp(gas_rhs_final_no_T, [0.0, L_b],
+                       [F_in_CO2, F_in_H2, F_in_CH4, 0.0],
+                       method='BDF', rtol=1e-6,
+                       atol=np.array([1e-10, 1e-10, 1e-10, 1e-10]),
+                       t_eval=z_fine, dense_output=False)
+        F_CO2f = np.maximum(gf.y[0], 0.0);  F_H2f  = np.maximum(gf.y[1], 0.0)
+        F_CH4f = np.maximum(gf.y[2], 0.0);  F_H2Of = np.maximum(gf.y[3], 0.0)
+        T_fine = np.interp(z_fine, z_grid, T_prof)
+
+    q_fine  = np.interp(z_fine, z_grid, q_prof)
+    F_totf  = np.maximum(F_CO2f+F_H2f+F_CH4f+F_H2Of, 1e-30)
+    p_CO2f  = F_CO2f/F_totf*P_bar;  p_H2f  = F_H2f /F_totf*P_bar
+    p_CH4f  = F_CH4f/F_totf*P_bar;  p_H2Of = F_H2Of/F_totf*P_bar
+    r_fine  = reaction_rate_SI(T_fine, p_CO2f, p_H2f, p_CH4f, p_H2Of)
+    X_CO2   = np.clip(1.0 - F_CO2f/F_in_CO2, 0.0, 1.0)
+    u_g_fine = F_totf * R_gas * T_fine / P_Pa
+
+    return dict(z=z_fine,
+                C_CO2=F_CO2f/u_g_fine, C_H2=F_H2f/u_g_fine,
+                C_CH4=F_CH4f/u_g_fine, C_H2O=F_H2Of/u_g_fine,
+                q=q_fine, T=T_fine, r=r_fine, X_CO2=X_CO2,
+                converged=converged, n_iter=it+1, conv_err=float(err),
+                gas_dominates=gas_dominates)
+# endregion
+
+
+# region 4. HELPERS
+# =============================================================================
+def _compute_noSE(T_K, T_wall, N=300):
+    def rhs(_z, y):
+        F_CO2_l = max(y[0], 0.0);  F_H2_l  = max(y[1], 0.0)
+        F_CH4_l = max(y[2], 0.0);  F_H2O_l = max(y[3], 0.0)
+        T_l     = max(y[4], 200.0)
+        p_CO2, p_H2, p_CH4, p_H2O = _partial_pressures(
+            F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+        r = float(reaction_rate_SI(T_l, np.array([p_CO2]), np.array([p_H2]),
+                                   np.array([p_CH4]), np.array([p_H2O]))[0])
+        gc     = _gas_cap(F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+        Q_rxn  = (-dH_r)*rho_bed_cat*r
+        Q_wall = U_a*(T_l - T_wall)
+        return [-rho_bed_cat*r, -4.0*rho_bed_cat*r,
+                +rho_bed_cat*r,  2.0*rho_bed_cat*r,
+                (Q_rxn - Q_wall)/gc]
+    z_g = np.linspace(0, L_b, N)
+    sol = solve_ivp(rhs, [0, L_b], [F_in_CO2, F_in_H2, F_in_CH4, 0.0, T_K],
+                    method='BDF', rtol=1e-5,
+                    atol=np.array([1e-9, 1e-9, 1e-9, 1e-9, 1e-2]), t_eval=z_g)
+    F_CO2_f = np.maximum(sol.y[0], 0.0)
+    T_f     = np.maximum(sol.y[4], 200.0)
+    F_tot_f = np.maximum(sol.y[0]+sol.y[1]+sol.y[2]+sol.y[3], 1e-30)
+    p_H2O_f = np.maximum(sol.y[3], 0.0)/F_tot_f*P_bar
+    p_CO2_f = F_CO2_f/F_tot_f*P_bar
+    p_H2_f  = np.maximum(sol.y[1], 0.0)/F_tot_f*P_bar
+    p_CH4_f = np.maximum(sol.y[2], 0.0)/F_tot_f*P_bar
+    r_f     = reaction_rate_SI(T_f, p_CO2_f, p_H2_f, p_CH4_f, p_H2O_f)
+    X_f     = np.clip(1.0 - F_CO2_f/F_in_CO2, 0.0, 1.0)
+    u_g_f   = F_tot_f*R_gas*T_f/P_Pa
+    return dict(X_CO2_noSE=float(X_f[-1]),
+                profile=dict(z=z_g,
+                             C_CO2=F_CO2_f/u_g_f,
+                             C_H2O=np.maximum(sol.y[3], 0.0)/u_g_f,
+                             q=q_star(T_f, p_H2O_f), r=r_f, X_CO2=X_f, T=T_f))
+
+def _q_physics_init(T_K, N=150):
+    def rhs_noads(_z, y):
+        F_CO2_l = max(y[0], 0.0);  F_H2_l  = max(y[1], 0.0)
+        F_CH4_l = max(y[2], 0.0);  F_H2O_l = max(y[3], 0.0)
+        p_CO2, p_H2, p_CH4, p_H2O = _partial_pressures(
+            F_CO2_l, F_H2_l, F_CH4_l, F_H2O_l)
+        r = float(reaction_rate_SI(T_K, np.array([p_CO2]), np.array([p_H2]),
+                                   np.array([p_CH4]), np.array([p_H2O]))[0])
+        return [-rho_bed_cat*r, -4.0*rho_bed_cat*r,
+                +rho_bed_cat*r,  2.0*rho_bed_cat*r]
+    z_g = np.linspace(0, L_b, N)
+    sol = solve_ivp(rhs_noads, [0, L_b], [F_in_CO2, F_in_H2, F_in_CH4, 0.0],
+                    method='BDF', rtol=1e-4, atol=1e-8, t_eval=z_g)
+    F_CO2_f = np.maximum(sol.y[0], 0.0)
+    F_tot_f = np.maximum(sol.y[0]+sol.y[1]+sol.y[2]+sol.y[3], 1e-30)
+    p_H2O_f = np.maximum(sol.y[3], 0.0)/F_tot_f*P_bar
+    return dict(q=q_star(T_K, p_H2O_f))
+
+def _fmt_seconds(s):
+    s = int(s)
+    return f"{s//60}m {s%60:02d}s" if s >= 60 else f"{s}s"
+
+def get_metrics(entry):
+    res = entry['res']
+    if res is None:
+        return None
+    T_K = entry['T_K']
+    X_out      = float(res['X_CO2'][-1])
+    q_out      = float(res['q'][0])
+    T_max      = float(np.max(res['T']))
+    p_H2O_peak = float(np.max(res['C_H2O']))*R_gas*T_K/1e5
+    qs_peak    = float(q_star(T_K, np.array([max(p_H2O_peak, 1e-8)]))[0])
+    return dict(X_CO2=X_out, q_out=q_out, T_max=T_max,
+                sorbent_util=q_out/max(qs_peak, 1e-10))
+# endregion
+
+
+# region 5. SOLVE LOOP
+# =============================================================================
+all_results  = {}
+noSE_results = {}
+n_total      = len(GHSV_LIST) * len(T_IN_LIST) * len(U_S_LIST)
+n_done       = 0
+t_run_start  = time.perf_counter()
+
+for ghsv in GHSV_LIST:
+    Q_STP      = ghsv * M_ads / 3600.0
+    u_g_STP_g  = Q_STP / A_b
+    F_total_in = u_g_STP_g * P_Pa / (R_gas * T_STP)
+    F_in_CO2   = y_CO2_in * F_total_in
+    F_in_H2    = y_H2_in  * F_total_in
+    F_in_CH4   = y_CH4_in * F_total_in
+
+    print(f"\n{'='*65}")
+    print(f"  GHSV = {ghsv} NL/g_ads/h  |  u_g_STP = {u_g_STP_g*1e3:.1f} mm/s")
+    print(f"  F_in_total = {F_total_in:.4f} mol/(m²·s)  "
+          f"[CO2: {F_in_CO2:.4f}  H2: {F_in_H2:.4f}  CH4: {F_in_CH4:.4f}]")
+    print(f"  d_p = {d_p*1e3:.1f} mm  |  rho_p = {rho_p} kg/m³  |  eps_p = {eps_p}  |  tau_p = {tau_p}")
+    print(f"  M_cat(active) = {M_cat_active*1000:.1f} g  (active_fraction = {active_fraction:.0%}, "
+          f"scaled from reference M_cat = {M_cat*1000:.1f} g @ {active_fraction_ref:.0%} active; "
+          f"total bed solids mass unaffected, sorbent kept at 100% = {M_ads*1000:.1f} g)")
+    print(f"{'='*65}")
+
+    for T_C in T_IN_LIST:
+        T_K    = T_C + 273.15
+        T_wall = T_K
+
+        gas_cap_in = _gas_cap(F_in_CO2, F_in_H2, F_in_CH4, 0.0)
+        u_s_star   = gas_cap_in / (rho_bed_tot * Cp_cat)
+        print(f"  T_in = {T_C} C  |  u_s* = {u_s_star*1e3:.3f} mm/s")
+
+        q_init = _q_physics_init(T_K)['q'][::-1]
+        _noSE  = _compute_noSE(T_K, T_wall)
+        noSE_results[(ghsv, T_C)] = _noSE
+        print(f"  non-SE fixed-bed conversion: {_noSE['X_CO2_noSE']*100:.1f}%")
+
+        for i_us, u_s in enumerate(U_S_LIST):
+            t0  = time.perf_counter()
+            res = solve_mpb(u_s, T_K, T_wall=T_wall, max_iter=800, q_init=q_init)
+            dt  = time.perf_counter() - t0
+            n_done  += 1
+            elapsed  = time.perf_counter() - t_run_start
+            eta      = elapsed/n_done*(n_total - n_done)
+
+            if res is not None:
+                X_out  = float(res['X_CO2'][-1])*100
+                q_out  = float(res['q'][0])
+                T_max  = float(np.max(res['T'])) - 273.15
+                regime = "gas"  if res['gas_dominates'] else "solid"
+                tag    = "ok"   if res['converged']     else "not-conv"
+                q_max_val = 2.0 * F_in_CO2 * (X_out / 100.0) / (rho_bed_ads * u_s)
+                sat       = q_out / q_max_val if q_max_val > 0 else float('inf')
+                print(f"  u_s={u_s*1e3:.4f} mm/s  X={X_out:.1f}%  "
+                      f"q(0)={q_out:.3f}  q_max={q_max_val:.3f}  sat={sat:.2f}  T_max={T_max:.1f} C  "
+                      f"[{regime}-dom, {tag}, {res['n_iter']} iter, err={res['conv_err']:.2e}]"
+                      f"  ({dt:.1f}s, ETA {_fmt_seconds(eta)})")
+                F_H2O_prod = 2.0 * F_in_CO2 * (X_out / 100.0)
+                F_H2O_ads  = u_s * rho_bed_ads * q_out
+                sum_C_out  = (res['C_CO2'][-1] + res['C_H2'][-1]
+                              + res['C_CH4'][-1] + res['C_H2O'][-1])
+                y_H2O_out  = res['C_H2O'][-1] / max(sum_C_out, 1e-30)
+                y_CO2_out  = res['C_CO2'][-1]  / max(sum_C_out, 1e-30)
+                F_CO2_out  = F_in_CO2 * (1.0 - X_out / 100.0)
+                F_tot_out  = F_CO2_out / max(y_CO2_out, 1e-15)
+                F_H2O_gas  = y_H2O_out * F_tot_out
+                closure    = (F_H2O_gas + F_H2O_ads) / F_H2O_prod * 100.0 if F_H2O_prod > 1e-30 else 0.0
+                print(f"  H2O balance [mol/(m²·s)]:  prod={F_H2O_prod:.5f}  "
+                      f"gas_out(sim)={F_H2O_gas:.5f}  ads(solid)={F_H2O_ads:.5f}  "
+                      f"closure={closure:.1f}%")
+                q_init = np.interp(np.linspace(0, L_b, 150), res['z'], res['q'])
+            else:
+                print(f"  u_s={u_s*1e3:.4f} mm/s  FAILED  ({dt:.1f}s, ETA {_fmt_seconds(eta)})")
+
+            all_results[(ghsv, T_C, i_us)] = {'res': res, 'u_s': u_s,
+                                               'T_K': T_K, 'T_wall': T_wall,
+                                               'ghsv': ghsv}
+
+print(f"\nAll done.  Total: {_fmt_seconds(time.perf_counter() - t_run_start)}")
+# endregion
+
+
+# region 6. PLOTS
+# =============================================================================
+SAVE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def _savefig(name):
+    stem, ext = os.path.splitext(name)
+    name      = f'{stem}_active_frac_{active_fraction:.0%}{ext}'
+    plt.savefig(os.path.join(SAVE_DIR, name), dpi=150, bbox_inches='tight')
+
+T_C_PLOT = T_IN_LIST[0]
+T_K_PLOT = T_C_PLOT + 273.15
+markers  = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']
+pal_ghsv = plt.cm.viridis(np.linspace(0.1, 0.85, len(GHSV_LIST)))
+
+def _ls(res):
+    return '--' if not res['converged'] else '-'
+
+def _lbl(ghsv, res, suffix=''):
+    nc = ' (nc)' if not res['converged'] else ''
+    return f'GHSV={ghsv:.2f}{suffix}{nc}'
+
+
+# ── Plot 1: Axial profiles — all GHSVs combined ───────────────────────────────
+fig, axes = plt.subplots(2, 2, figsize=(13, 9))
+fig.suptitle(f'MPB axial profiles  |  u_s = {U_S_LIST[0]*1e3:.1f} mm/s  |  '
+             f'T_in = {T_C_PLOT} C  |  U_a = {U_a:.0f} W/(m³·K)\n'
+             f'solid = converged  |  dashed = not converged', fontsize=11)
+for j_g, ghsv in enumerate(GHSV_LIST):
+    e = all_results.get((ghsv, T_C_PLOT, 0))
+    if e is None or e['res'] is None:
+        continue
+    r, c = e['res'], pal_ghsv[j_g]
+    axes[0,0].plot(r['z'], r['C_CO2']*1e3, color=c, lw=2, ls=_ls(r), label=_lbl(ghsv, r))
+    axes[0,1].plot(r['z'], r['q'],          color=c, lw=2, ls=_ls(r), label=_lbl(ghsv, r))
+    axes[1,0].plot(r['z'], r['X_CO2']*100,  color=c, lw=2, ls=_ls(r), label=_lbl(ghsv, r))
+    axes[1,1].plot(r['z'], r['r']*1e3,      color=c, lw=2, ls=_ls(r), label=_lbl(ghsv, r))
+for ax, (yl, ti) in zip(axes.flat, [
+        ('C_CO2 [mmol/m³]', 'CO2 concentration'),
+        ('q [mol/kg]',       'Solid H2O loading'),
+        ('CO2 conversion [%]', 'CO2 conversion'),
+        ('r [mmol/(kg_cat·s)]', 'Reaction rate')]):
+    ax.set_xlabel('z [m]', fontsize=10);  ax.set_ylabel(yl, fontsize=10)
+    ax.set_title(ti, fontsize=10);        ax.legend(fontsize=7);  ax.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig('gscan_plot1_axial_allGHSV.png');  plt.close()
+
+
+# ── Plot 4: H2O profiles — all GHSVs combined ─────────────────────────────────
+fig, (ax_q, ax_h) = plt.subplots(1, 2, figsize=(13, 5))
+fig.suptitle(f'H2O profiles  |  u_s = {U_S_LIST[0]*1e3:.1f} mm/s  |  '
+             f'T_in = {T_C_PLOT} C  |  U_a = {U_a:.0f} W/(m³·K)\n'
+             f'solid = converged  |  dashed = not converged', fontsize=11)
+for j_g, ghsv in enumerate(GHSV_LIST):
+    e = all_results.get((ghsv, T_C_PLOT, 0))
+    if e is None or e['res'] is None:
+        continue
+    r, c = e['res'], pal_ghsv[j_g]
+    ax_q.plot(r['z'], r['q'],                          color=c, lw=2, ls=_ls(r), label=_lbl(ghsv, r))
+    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_K_PLOT/1e2,  color=c, lw=2, ls=_ls(r), label=_lbl(ghsv, r))
+ax_q.set_xlabel('z [m]');  ax_q.set_ylabel('q [mol/kg]')
+ax_q.set_title('Solid H2O loading');  ax_q.legend(fontsize=7);  ax_q.grid(True, alpha=0.3)
+ax_h.set_xlabel('z [m]');  ax_h.set_ylabel('p_H2O [mbar]')
+ax_h.set_title('Gas-phase H2O partial pressure');  ax_h.legend(fontsize=7);  ax_h.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig('gscan_plot4_H2O_allGHSV.png');  plt.close()
+
+
+# ── Plot 5: Temperature — all GHSVs combined ──────────────────────────────────
+fig, ax_T = plt.subplots(figsize=(9, 5))
+fig.suptitle(f'Temperature profiles  |  u_s = {U_S_LIST[0]*1e3:.1f} mm/s  |  '
+             f'T_in = {T_C_PLOT} C  |  U_a = {U_a:.0f} W/(m³·K)\n'
+             f'solid = converged  |  dashed = not converged', fontsize=11)
+for j_g, ghsv in enumerate(GHSV_LIST):
+    e = all_results.get((ghsv, T_C_PLOT, 0))
+    if e is None or e['res'] is None:
+        continue
+    r = e['res']
+    reg = 'g' if r['gas_dominates'] else 's'
+    ax_T.plot(r['z'], r['T']-273.15, color=pal_ghsv[j_g], lw=2, ls=_ls(r),
+              label=_lbl(ghsv, r, f' ({reg})'))
+ax_T.axhline(T_C_PLOT, color='grey', lw=1.5, ls=':', label=f'T_wall = {T_C_PLOT} °C')
+ax_T.set_xlabel('z [m]', fontsize=10);  ax_T.set_ylabel('T [°C]', fontsize=10)
+ax_T.set_title('(g) = gas-dominated  |  (s) = solid-dominated', fontsize=9)
+ax_T.legend(fontsize=7);  ax_T.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig('gscan_plot5_temperature_allGHSV.png');  plt.close()
+
+
+# ── Combined summary plots: 2 (conversion), 3 (sorbent util), 6 (Tmax) ───────
+eq_conv = equilibrium_conversion(T_K_PLOT)
+pal_us  = plt.cm.plasma(np.linspace(0.1, 0.8, len(U_S_LIST)))
+
+# Plot 2: CO2 conversion vs GHSV — one line per u_s
+fig2, ax2 = plt.subplots(figsize=(10, 6))
+for i_us, u_s in enumerate(U_S_LIST):
+    ghsv_c, X_c, ghsv_nc, X_nc = [], [], [], []
+    noSE_ghsv, noSE_X = [], []
+    for ghsv in GHSV_LIST:
+        e = all_results.get((ghsv, T_C_PLOT, i_us))
+        if e and e['res']:
+            m = get_metrics(e)
+            if m:
+                (ghsv_c if e['res']['converged'] else ghsv_nc).append(ghsv)
+                (X_c    if e['res']['converged'] else X_nc   ).append(m['X_CO2']*100)
+        noSE_val = noSE_results.get((ghsv, T_C_PLOT), {}).get('X_CO2_noSE')
+        if noSE_val is not None:
+            noSE_ghsv.append(ghsv);  noSE_X.append(noSE_val*100)
+    c, mk = pal_us[i_us], markers[i_us % len(markers)]
+    lbl = f'u_s={u_s*1e3:.2f} mm/s (MPB)'
+    if ghsv_c:
+        ax2.plot(ghsv_c, X_c, marker=mk, color=c, lw=2, ms=6, ls='-', label=lbl)
+    if ghsv_nc:
+        ax2.plot(ghsv_nc, X_nc, marker=mk, color=c, lw=2, ms=6, ls='--', mfc='none',
+                 label=lbl + ' (nc)')
+if noSE_ghsv:
+    ax2.plot(noSE_ghsv, noSE_X, marker='x', color='steelblue', lw=1.5, ms=6, ls=':',
+             label='Fixed bed (no SE)')
+ax2.axhline(eq_conv, color='k', lw=1.5, ls=':', label=f'Thermo. eq. ({T_C_PLOT} C)')
+ax2.set_xlabel('GHSV [NL/g_ads/h]', fontsize=11);  ax2.set_ylabel('CO2 conversion [%]', fontsize=11)
+ax2.set_title(f'T_in = {T_C_PLOT} C  |  U_a = {U_a:.0f} W/(m³·K)  — Conversion vs GHSV\n'
+              f'solid = converged  |  dashed + open = not converged', fontsize=10)
+ax2.legend(fontsize=8);  ax2.grid(True, alpha=0.3);  ax2.set_ylim(0, 105)
+plt.tight_layout()
+_savefig('gscan_plot2_conversion_all.png');  plt.close()
+
+# Plot 3: Sorbent utilisation vs GHSV — one line per u_s
+fig3, ax3 = plt.subplots(figsize=(10, 6))
+for i_us, u_s in enumerate(U_S_LIST):
+    ghsv_c, util_c, ghsv_nc, util_nc = [], [], [], []
+    for ghsv in GHSV_LIST:
+        e = all_results.get((ghsv, T_C_PLOT, i_us))
+        if e and e['res']:
+            m = get_metrics(e)
+            if m:
+                (ghsv_c  if e['res']['converged'] else ghsv_nc ).append(ghsv)
+                (util_c  if e['res']['converged'] else util_nc ).append(m['sorbent_util']*100)
+    c, mk = pal_us[i_us], markers[i_us % len(markers)]
+    lbl = f'u_s={u_s*1e3:.2f} mm/s'
+    if ghsv_c:
+        ax3.plot(ghsv_c, util_c, marker=mk, color=c, lw=2, ms=6, ls='-', label=lbl)
+    if ghsv_nc:
+        ax3.plot(ghsv_nc, util_nc, marker=mk, color=c, lw=2, ms=6, ls='--', mfc='none',
+                 label=lbl + ' (nc)')
+ax3.axhline(100, color='grey', lw=1.5, ls='--', label='q = q* (fully saturated)')
+ax3.set_xlabel('GHSV [NL/g_ads/h]', fontsize=11)
+ax3.set_ylabel('Sorbent utilisation  q(z=0)/q*(p_H2O_max) [%]', fontsize=11)
+ax3.set_title(f'T_in = {T_C_PLOT} C  |  U_a = {U_a:.0f} W/(m³·K)  — Sorbent utilisation\n'
+              f'solid = converged  |  dashed + open = not converged', fontsize=10)
+ax3.legend(fontsize=8);  ax3.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig('gscan_plot3_sorbent_util_all.png');  plt.close()
+
+# Plot 6: Peak temperature rise vs GHSV — one line per u_s
+fig6, ax6 = plt.subplots(figsize=(10, 6))
+noSE_ghsv_T, noSE_dT = [], []
+for i_us, u_s in enumerate(U_S_LIST):
+    ghsv_c, dT_c, ghsv_nc, dT_nc = [], [], [], []
+    for ghsv in GHSV_LIST:
+        e = all_results.get((ghsv, T_C_PLOT, i_us))
+        if e and e['res']:
+            m = get_metrics(e)
+            if m:
+                (ghsv_c if e['res']['converged'] else ghsv_nc).append(ghsv)
+                (dT_c   if e['res']['converged'] else dT_nc  ).append(m['T_max'] - T_K_PLOT)
+        if i_us == 0:
+            noSE_prof = noSE_results.get((ghsv, T_C_PLOT), {}).get('profile')
+            if noSE_prof is not None:
+                noSE_ghsv_T.append(ghsv)
+                noSE_dT.append(float(np.max(noSE_prof['T'])) - T_K_PLOT)
+    c, mk = pal_us[i_us], markers[i_us % len(markers)]
+    lbl = f'u_s={u_s*1e3:.2f} mm/s (MPB)'
+    if ghsv_c:
+        ax6.plot(ghsv_c, dT_c, marker=mk, color=c, lw=2, ms=6, ls='-', label=lbl)
+    if ghsv_nc:
+        ax6.plot(ghsv_nc, dT_nc, marker=mk, color=c, lw=2, ms=6, ls='--', mfc='none',
+                 label=lbl + ' (nc)')
+if noSE_ghsv_T:
+    ax6.plot(noSE_ghsv_T, noSE_dT, marker='x', color='steelblue', lw=1.5, ms=6, ls=':',
+             label='Fixed bed (no SE)')
+ax6.set_xlabel('GHSV [NL/g_ads/h]', fontsize=11)
+ax6.set_ylabel('ΔT_max = T_peak − T_in  [K]', fontsize=11)
+ax6.set_title(f'T_in = {T_C_PLOT} C  |  U_a = {U_a:.0f} W/(m³·K)  — Peak temperature rise\n'
+              f'solid = converged  |  dashed + open = not converged', fontsize=10)
+ax6.legend(fontsize=8);  ax6.grid(True, alpha=0.3)
+plt.tight_layout()
+_savefig('gscan_plot6_Tmax_all.png');  plt.close()
+# endregion

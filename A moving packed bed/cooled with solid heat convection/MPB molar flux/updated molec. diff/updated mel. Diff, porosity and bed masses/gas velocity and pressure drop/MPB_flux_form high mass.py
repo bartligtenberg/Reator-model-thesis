@@ -124,7 +124,7 @@ F_in_H2    = y_H2_in  * F_total_in
 F_in_CH4   = y_CH4_in * F_total_in
 
 # --- MPB scan parameters ---
-U_S_LIST  = np.array([4]) * 1e-3
+U_S_LIST  = np.array([3, 4, 5]) * 1e-3
 T_IN_LIST = [280]
 
 print(f"MPB flux form: d={d_b*100:.0f} cm, L={L_b:.1f} m, "

@@ -37,7 +37,7 @@ rho_bed_cat = M_cat / V_bed
 rho_bed_ads = M_ads / V_bed
 rho_bed_tot = (M_cat + M_ads) / V_bed
 
-d_p   = 2.5e-3;  eps_p = 0.615;  tau_p = 3.0;  rho_p = 1400.0
+d_p   = 2.5e-3;  eps_p = 0.242;  tau_p = 4.0;  rho_p = 1400.0
 
 W0_DA = 190.00e-6;  E_DA = 1190e3;  n_DA = 1.55
 
@@ -89,7 +89,7 @@ def q_star_vec(T_K, p_arr, W0, E, n):
     return np.where(p <= 0, 0.0, qs)
 
 def K_LDF_vec(T_K, p_arr, W0, E, n):
-    D_M  = 2.5e-5*(T_K/300.0)**1.75
+    D_M = 3.36e-9 * T_K**1.75
     p    = np.asarray(p_arr, dtype=float)
     dp   = 1.0/1e5
     dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
@@ -318,7 +318,7 @@ def solve_mpb(u_s, T_K, T_wall=None, max_iter=1000, tol=1e-5, N=400, q_init=None
 # =============================================================================
 # 3. CASE TO CHECK  — change U_S_CHECK or T_IN_C as needed
 # =============================================================================
-U_S_CHECK = 4.0e-3   # solid velocity [m/s]
+U_S_CHECK = 5.0e-3   # solid velocity [m/s]
 T_IN_C    = 280
 T_K_check = T_IN_C + 273.15
 T_wall    = T_K_check
@@ -502,15 +502,28 @@ Q_rxn_cum  = cumulative_trapezoid(Q_rxn_local,  z, initial=0.0)
 Q_ads_cum  = cumulative_trapezoid(Q_ads_local,  z, initial=0.0)
 Q_wall_cum = cumulative_trapezoid(Q_wall_local, z, initial=0.0)
 net_cum    = Q_rxn_cum + Q_ads_cum - Q_wall_cum
+
+# Split LHS = gas_cap*dT/dz - solid_cap*dT/dz into its two convective pieces
+# so the countercurrent solid stream's heat removal is visible on its own,
+# instead of being buried inside the combined "net" curve.
+gas_conv_local   = gas_cap_prof * dTdz
+solid_conv_local = -solid_cap_val * dTdz
+gas_conv_cum     = cumulative_trapezoid(gas_conv_local,   z, initial=0.0)
+solid_conv_cum   = cumulative_trapezoid(solid_conv_local, z, initial=0.0)
+
 ax.plot(z, Q_rxn_cum,  lw=2, color='crimson',    label='∫Q_rxn dz')
 ax.plot(z, Q_ads_cum,  lw=2, color='darkorange', label='∫Q_ads dz')
 ax.plot(z, Q_wall_cum, lw=2, color='steelblue',  label='∫Q_wall dz  (heat removed)')
+ax.plot(z, gas_conv_cum,   lw=1.5, color='teal',   ls=':',
+        label='∫gas_cap·dT/dz dz  (gas convective term)')
+ax.plot(z, solid_conv_cum, lw=1.5, color='purple', ls=':',
+        label='∫−solid_cap·dT/dz dz  (solid convective removal)')
 ax.plot(z, net_cum,    lw=2, color='black', ls='--',
         label='∫(Q_rxn+Q_ads−Q_wall) dz  (= ∫LHS dz)')
 ax.axhline(0, color='grey', lw=0.8, ls=':')
 ax.set_xlabel('z [m]');  ax.set_ylabel('[W/m²]')
 ax.set_title('Cumulative energy budget along z')
-ax.legend(fontsize=8);  ax.grid(True, alpha=0.3)
+ax.legend(fontsize=7);  ax.grid(True, alpha=0.3)
 
 # Panel 3 — Local source terms
 ax = axes[1, 0]

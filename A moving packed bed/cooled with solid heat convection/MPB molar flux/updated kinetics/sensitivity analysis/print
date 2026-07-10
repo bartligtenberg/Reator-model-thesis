@@ -1,0 +1,14 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\MPB_flux_form.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=621 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.245 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.192  T_max=291.7 C  [solid-dom, ok, 276 iter, err=7.73e-06]  (781.8s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=304.002  gas_out=0.000  solid_out=297.834  err=-2.0%
+
+All done.  Total: 13m 01s
