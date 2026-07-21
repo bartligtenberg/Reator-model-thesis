@@ -1,0 +1,44 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "Wei kin + ads (LHHW)\isothermal\updated KLDF\updated Kldf, active fraction and mole flux\validation fig 5.10 wei, isothermal + measurements active fraction + mole flux.py"
+Validating Wei Fig. 5.10 (molar-flux form):  T = 260 °C,  P = 1.0 bar,  GHSV = 923 mL/(g·h)
+Bed (sorbent) density: 827.6 kg/m³  |  Catalyst density: 165.5 kg/m³  (active_fraction = 20% of 6.5 g)
+Inlet velocity: 41.420 mm/s  |  Inlet total molar flux F_total_in = 0.9344 mol/(m²·s)
+Solving sorption-enhanced case for 120 min ...
+Done.
+
+N2 concentration diagnostic: max rise above inlet = 11.02% (expected: carrier gas shrinks as reaction+adsorption remove moles, so N2 gets concentrated -- this is NOT an error)
+Velocity floor never engaged on the accepted solution (exact mass conservation holds).
+Outlet/inlet velocity ratio at t_end: 0.9577
+CO2 equilibrium conversion at 260 °C: 84.6 %
+CH4 mol% at full CO2 conversion (N2 dilution): 86.2 %  (Wei caption: 94 %)
+
+Max CO2 conversion — model: 99.3 %  |  measurements: 100.0 %
+
+--- H₂O breakthrough slope (K_LDF validation) ---
+  Measured : 0.726 mol%/min  (two-point slope over t = 43.0–48.3 min)
+  Model    : 0.712 mol%/min  (fitted over t = 45.4–50.8 min)
+  Ratio (model / meas): 0.98
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+***
+
+
+OneDrive/Documenten/Master EFPT/thesis/reactor modelling/Wei kin + ads (LHHW)/isothermal/updated KLDF/updated Kldf, active fraction and mole flux/validation fig 5.10 wei, isothermal + measurements active fraction + mole flux.py"
+Validating Wei Fig. 5.10 (molar-flux form):  T = 240 °C,  P = 1.0 bar,  GHSV = 923 mL/(g·h)
+Bed (sorbent) density: 827.6 kg/m³  |  Catalyst density: 165.5 kg/m³  (active_fraction = 20% of 6.5 g)
+Inlet velocity: 39.866 mm/s  |  Inlet total molar flux F_total_in = 0.9344 mol/(m²·s)
+Solving sorption-enhanced case for 120 min ...
+Done.
+
+N2 concentration diagnostic: max rise above inlet = 9.88% (expected: carrier gas shrinks as reaction+adsorption remove moles, so N2 gets concentrated -- this is NOT an error)
+Velocity floor never engaged on the accepted solution (exact mass conservation holds).
+Outlet/inlet velocity ratio at t_end: 0.9572
+CO2 equilibrium conversion at 240 °C: 88.5 %
+CH4 mol% at full CO2 conversion (N2 dilution): 86.2 %  (Wei caption: 94 %)
+
+Max CO2 conversion — model: 90.0 %  |  measurements: 100.0 %
+
+--- H₂O breakthrough slope (K_LDF validation) ---
+  Measured : 0.726 mol%/min  (two-point slope over t = 43.0–48.3 min)
+  Model    : 0.345 mol%/min  (fitted over t = 54.4–66.2 min)
+  Ratio (model / meas): 0.48

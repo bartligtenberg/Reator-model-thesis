@@ -51,7 +51,7 @@ L_b     = 0.100             # bed length                          [m]
 A_b     = np.pi / 4 * d_b**2   # cross-sectional area            [m²]
 V_bed   = A_b * L_b             # total bed volume                [m³]
 m_cat_total     = 6.5e-3    # total bed material mass (catalyst = sorbent, same particles) [kg]  (Wei Fig. 5.3)
-active_fraction = 0.05       # fraction of m_cat_total treated as catalytically active (reaction only) [-]
+active_fraction = 0.20       # fraction of m_cat_total treated as catalytically active (reaction only) [-]
 m_cat       = m_cat_total * active_fraction   # active catalyst mass   [kg]  (reaction rate basis)
 rho_bed_cat = m_cat       / V_bed             # catalyst bulk density  [kg_cat / m³_bed]  (reaction terms)
 rho_bed_ads = m_cat_total / V_bed             # sorbent bulk density   [kg_sorb/m³_bed] (adsorption + heat-capacity terms — always 100% of mass)
@@ -66,7 +66,7 @@ tau_p = 4.0                 # tortuosity factor                    [-]
 rho_ads = 998.2             # liquid water density                 [kg/m³]
 
 # --------------- DA isotherm parameters: Mette (2014) ------------------------
-W0_DA = 150.00e-6           # micropore volume                     [m³/kg_sorbent]
+W0_DA = 190.00e-6           # micropore volume                     [m³/kg_sorbent]
 E_DA  = 1192.25e3           # characteristic adsorption energy     [J/kg]
 n_DA  = 1.55                # DA heterogeneity parameter           [-]
 

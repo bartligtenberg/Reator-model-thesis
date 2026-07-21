@@ -23,16 +23,38 @@ A_b   = np.pi / 4 * d_b**2
 V_bed = A_b * L_b
 eps_b = 0.4
 
-M_cat = 0.064   # [kg] fixed physical mass basis for total bed solids (rho_bed_tot) — not scaled by active_fraction
-M_ads = 1.22
+# M_cat = 0.064   # [kg] fixed physical mass basis for total bed solids (rho_bed_tot) — not scaled by active_fraction
+# M_ads = 1.22
 
-active_fraction_ref = 0.05   # [-] active fraction implicitly assumed when M_cat above was calibrated
-active_fraction     = 0.30   # [-] target active fraction for this run
-M_cat_active = M_cat * (active_fraction / active_fraction_ref)   # [kg] active catalyst mass, reaction-rate basis only
+# active_fraction_ref = 0.05   # [-] active fraction implicitly assumed when M_cat above was calibrated
+# active_fraction     = 0.30   # [-] target active fraction for this run
+# M_cat_active = M_cat * (active_fraction / active_fraction_ref)   # [kg] active catalyst mass, reaction-rate basis only
 
-rho_bed_cat = M_cat_active / V_bed   # catalyst bulk density (reaction terms), scales with active_fraction
-rho_bed_ads = M_ads / V_bed
-rho_bed_tot = (M_cat + M_ads) / V_bed   # total solids mass/density basis, unaffected by active_fraction
+# rho_bed_cat = M_cat_active / V_bed   # catalyst bulk density (reaction terms), scales with active_fraction
+# rho_bed_ads = M_ads / V_bed
+# rho_bed_tot = (M_cat + M_ads) / V_bed   # total solids mass/density basis, unaffected by active_fraction
+
+bifuctional_mass = 0.4   # [kg]  mass of bifunctional 5%Ni-2.5%Ce/13X material
+M_zeolite_added  = 0   # [kg]  additional pure 13X zeolite mixed in — 100% sorbent-active, 0% catalytically active (no Ni)
+
+M_ads = bifuctional_mass * 0.925 + M_zeolite_added   # [kg]  sorbent mass: 92.5% of the bifunctional material acts as sorbent, plus all of the added pure zeolite
+
+active_fraction = 0.20   # [-]  fraction of the bifunctional material's mass that is catalytically active
+M_cat_active = bifuctional_mass * active_fraction   # [kg]  active catalyst mass — only the bifunctional material carries Ni; the added zeolite contributes none
+
+M_solid_physical = bifuctional_mass + M_zeolite_added   # [kg]  true physical solid mass present (catalyst+sorbent material), before filler
+
+# --- Inert filler (thermal buffering / dilution / flow aid) ---
+# Assumed to share the same particle density (rho_p), heat capacity (Cp_cat) and particle
+# diameter (d_p) as the bifunctional material / zeolite, so no separate filler properties
+# are needed. Chemically inert: adds to total bed solids mass (rho_bed_tot) only -- never to
+# rho_bed_cat (reaction) or rho_bed_ads (adsorption). Sized to fill the remaining bed volume
+# at the assumed bed void fraction eps_b (tops the bed up to eps_b packing density).
+M_filler = (1 - eps_b) * V_bed * rho_p - M_solid_physical   # [kg]
+
+rho_bed_cat = M_cat_active / V_bed   # [kg_cat/m³_bed]  catalyst bulk density (reaction terms)
+rho_bed_ads = M_ads / V_bed          # [kg_ads/m³_bed]  sorbent bulk density (adsorption terms)
+rho_bed_tot = (M_solid_physical + M_filler) / V_bed  # [kg_solid/m³_bed]  total solids bulk density (cat+ads material+filler) — physical solid mass basis for heat capacity
 
 d_p   = 2.5e-3
 eps_p = 0.242
@@ -40,7 +62,7 @@ tau_p = 4.0
 rho_p = 1400
 
 # --- Dubinin-Astakhov isotherm (H2O on 13X) --- fitted myself based on Wei et al. (2021)
-W0_DA = 150.00e-6   # [m³/kg_sorbent]  limiting micropore volume
+W0_DA = 190.00e-6   # [m³/kg_sorbent]  limiting micropore volume
 E_DA  = 1192e3      # [J/kg]           characteristic adsorption energy
 n_DA  = 1.55        # [-]              DA heterogeneity parameter
 

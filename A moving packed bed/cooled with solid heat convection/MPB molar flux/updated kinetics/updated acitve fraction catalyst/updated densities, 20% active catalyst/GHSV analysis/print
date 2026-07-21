@@ -1,0 +1,88 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/GHSV analysis/MPB_flux_form active frac GHSV.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV sweep = [0.5, 1.0, 1.5, 2.0] m3_STP/(kg_ads.h)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 400.0 g, active_fraction = 20%
+  M_cat(active)   = 80.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 370.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2898.7 g  (87.9% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+
+#################################################################
+  GHSV = 0.5 m3_STP/(kg_ads.h)  |  u_g_STP = 26.2 mm/s  |  F_in_total = 1.1525 mol/(m2.s)
+#################################################################
+
+============================================================
+  T_in = 280 C  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.055 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+forrtl: error (200): program aborting due to control-C event
+Image              PC                Routine            Line        Source             
+libifcoremd.dll    00007FFC8F1DDF54  Unknown               Unknown  Unknown
+KERNELBASE.dll     00007FFD59CA3E3D  Unknown               Unknown  Unknown
+KERNEL32.DLL       00007FFD5A20E957  Unknown               Unknown  Unknown
+ntdll.dll          00007FFD5C36AD6C  Unknown               Unknown  Unknown
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/GHSV analysis/MPB_flux_form active frac GHSV.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV sweep = [0.5, 1.0, 1.5, 2.0] m3_STP/(kg_ads.h)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+
+#################################################################
+  GHSV = 0.5 m3_STP/(kg_ads.h)  |  u_g_STP = 52.3 mm/s  |  F_in_total = 2.3049 mol/(m2.s)
+#################################################################
+
+============================================================
+  T_in = 280 C  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.110 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=100.0%  q(0)=0.195  T_max=284.9 C  [solid-dom, ok, 191 iter, err=8.82e-06]  (345.0s, ETA 17m 15s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.835  err=-0.3%
+
+#################################################################
+  GHSV = 1.0 m3_STP/(kg_ads.h)  |  u_g_STP = 104.7 mm/s  |  F_in_total = 4.6099 mol/(m2.s)
+#################################################################
+
+============================================================
+  T_in = 280 C  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=99.9%  q(0)=0.390  T_max=289.6 C  [solid-dom, ok, 430 iter, err=8.51e-06]  (708.7s, ETA 17m 33s)
+    H2O balance [mmol/(m²·s)]:  produced=368.530  gas_out=0.001  solid_out=367.879  err=-0.2%
+
+#################################################################
+  GHSV = 1.5 m3_STP/(kg_ads.h)  |  u_g_STP = 157.0 mm/s  |  F_in_total = 6.9148 mol/(m2.s)
+#################################################################
+
+============================================================
+  T_in = 280 C  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.329 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.628  T_max=294.5 C  [solid-dom, not-conv, 1000 iter, err=5.43e-03]  (1656.0s, ETA 15m 03s)
+    H2O balance [mmol/(m²·s)]:  produced=551.066  gas_out=0.039  solid_out=591.924  err=+7.4%
+
+#################################################################
+  GHSV = 2.0 m3_STP/(kg_ads.h)  |  u_g_STP = 209.4 mm/s  |  F_in_total = 9.2197 mol/(m2.s)
+#################################################################
+
+============================================================
+  T_in = 280 C  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.439 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.0000 mm/s  X=79.9%  q(0)=0.583  T_max=292.7 C  [solid-dom, not-conv, 1000 iter, err=2.93e-03]  (1598.0s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=589.214  gas_out=9.469  solid_out=549.330  err=-5.2%
+
+All done.  Total: 71m 48s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

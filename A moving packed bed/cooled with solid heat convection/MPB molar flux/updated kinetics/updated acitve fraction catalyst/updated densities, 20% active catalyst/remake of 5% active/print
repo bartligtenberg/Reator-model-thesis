@@ -1,0 +1,35 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\u_s sweep 30% active cat\remake of 5% active\MPB_flux_form active frac.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=317 kg/m3, u_g_STP=86.3 mm/s
+  F_in_total = 3.8000 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 320.0 g, active_fraction = 20%
+  M_cat(active)   = 64.0 g
+  zeolite added   = 924.0 g
+  M_ads           = 1220.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 0.0 g  (0.0% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 317 kg/m3)
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 86.3 mm/s  |  U_a = 2000 W/(m3·K)
+  u_s* = 0.480 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=8.0000 mm/s  X=99.5%  q(0)=0.122  T_max=291.0 C  [solid-dom, ok, 143 iter, err=7.01e-06]  (225.7s, ETA 22m 34s)
+    H2O balance [mmol/(m²·s)]:  produced=302.576  gas_out=0.009  solid_out=302.245  err=-0.1%
+  u_s=6.0000 mm/s  X=99.6%  q(0)=0.162  T_max=294.0 C  [solid-dom, ok, 34 iter, err=7.46e-06]  (52.9s, ETA 11m 36s)
+    H2O balance [mmol/(m²·s)]:  produced=302.730  gas_out=0.007  solid_out=302.314  err=-0.1%
+  u_s=5.0000 mm/s  X=99.6%  q(0)=0.195  T_max=296.2 C  [solid-dom, ok, 39 iter, err=9.58e-06]  (61.4s, ETA 7m 33s)
+    H2O balance [mmol/(m²·s)]:  produced=302.828  gas_out=0.006  solid_out=302.361  err=-0.2%
+  u_s=4.0000 mm/s  X=99.7%  q(0)=0.243  T_max=299.4 C  [solid-dom, ok, 54 iter, err=7.50e-06]  (83.2s, ETA 5m 17s)
+    H2O balance [mmol/(m²·s)]:  produced=302.945  gas_out=0.005  solid_out=302.200  err=-0.2%
+  u_s=3.0000 mm/s  X=99.7%  q(0)=0.323  T_max=305.1 C  [solid-dom, ok, 91 iter, err=9.24e-06]  (140.9s, ETA 3m 45s)
+    H2O balance [mmol/(m²·s)]:  produced=303.091  gas_out=0.004  solid_out=301.373  err=-0.6%
+  u_s=2.8000 mm/s  X=99.7%  q(0)=0.346  T_max=306.9 C  [solid-dom, ok, 316 iter, err=9.15e-06]  (489.7s, ETA 2m 55s)
+    H2O balance [mmol/(m²·s)]:  produced=303.124  gas_out=0.004  solid_out=300.868  err=-0.7%
+  u_s=2.6000 mm/s  X=99.7%  q(0)=0.372  T_max=309.4 C  [solid-dom, ok, 142 iter, err=9.82e-06]  (219.6s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=303.161  gas_out=0.003  solid_out=300.223  err=-1.0%
+
+All done.  Total: 21m 13s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

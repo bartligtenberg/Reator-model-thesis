@@ -1,11 +1,13 @@
 """
 Ergun pressure drop estimate for the MPB reactor.
 
-Parameters taken from MPB_flux_form high mass.py:
+Parameters taken from "MPB_flux_form active frac.py" (updated densities, 20% active
+catalyst) -- same density structure used in peclet_numbers.py:
   - bed geometry: d_b = 5 cm, L = 2 m, eps_b = 0.4
   - particle:     d_p = 2.5 mm, rho_p = 1400 kg/m3 (Bareschino)
-  - mass loading: derived from full bed packing (not fixed at Bareschino 1.22 kg)
-  - flow:         GHSV = 0.5 m3_STP / (kg_ads * h), T = 280 C, P = 1 bar
+  - mass loading: 5wt%Ni-2.5wt%Ce/13X bifunctional pellet (only active_fraction of its
+                  mass is catalytically active) + inert filler topping the bed to eps_b
+  - flow:         GHSV = 1.0 m3_STP / (kg_ads * h), T = 280 C, P = 1 bar
 """
 
 import numpy as np
@@ -23,23 +25,31 @@ eps_b = 0.40            # bed void fraction (inter-particle)
 # Particle properties — 5%Ni 2.5%Ce / 13X zeolite bi-functional pellets
 # -------------------------------------------------------------------------
 d_p   = 2.5e-3          # particle diameter                [m]
-rho_p = 1400            # particle (skeletal) density      [kg/m3]  Bareschino
+rho_p = 1400.0          # particle (skeletal) density      [kg/m3]  Bareschino
 
 # -------------------------------------------------------------------------
-# Catalyst and sorbent masses — derived from full packing of the bed
-# (this is the "high mass" consistent approach; Bareschino used M_ads = 1.22 kg)
+# Catalyst / sorbent / filler masses — matches MPB_flux_form active frac.py:
+# a single bifunctional pellet carries both functions; only active_fraction of its
+# mass is catalytically active (Ni); inert filler tops the bed up to eps_b packing.
 # -------------------------------------------------------------------------
-f_Ni  = 0.050           # Ni mass fraction in pellet
-f_Ce  = 0.025           # Ce mass fraction in pellet
-f_ads = 1.0 - f_Ni - f_Ce    # zeolite 13X fraction = 0.925
+bifunctional_mass = 0.4    # [kg]  mass of 5wt%Ni-2.5wt%Ce/13X bifunctional material
+M_zeolite_added   = 0.0    # [kg]  additional pure 13X zeolite (sorbent-only, no Ni)
+active_fraction   = 0.20   # [-]   fraction of bifunctional material mass that is catalytically active
 
-# Total solid mass that fills the bed at eps_b = 0.4
-M_total = V_bed * (1 - eps_b) * rho_p   # [kg]
-M_cat   = (f_Ni + f_Ce) * M_total       # [kg] catalytic metal fraction
-M_ads   = f_ads * M_total               # [kg] adsorbent (zeolite 13X) fraction
+M_ads        = bifunctional_mass * 0.925 + M_zeolite_added   # [kg] sorbent mass (92.5% of bifunctional material + zeolite added)
+M_cat_active = bifunctional_mass * active_fraction            # [kg] active catalyst mass
+M_solid_phys = bifunctional_mass + M_zeolite_added             # [kg] physical solid mass before filler
+M_filler     = (1 - eps_b) * V_bed * rho_p - M_solid_phys       # [kg] inert filler, tops bed to eps_b packing at rho_p
 
-print(f"Bed packing: M_total = {M_total:.3f} kg  "
-      f"(M_cat = {M_cat:.3f} kg, M_ads = {M_ads:.3f} kg)")
+rho_bed_cat  = M_cat_active / V_bed              # [kg_cat/m³_bed]
+rho_bed_ads  = M_ads / V_bed                     # [kg_ads/m³_bed]
+rho_bed_fill = M_filler / V_bed                  # [kg_fill/m³_bed]
+rho_bed_tot  = (M_solid_phys + M_filler) / V_bed  # [kg_solid/m³_bed]
+
+print(f"Bed packing: M_cat_active = {M_cat_active*1e3:.1f} g, M_ads = {M_ads*1e3:.1f} g, "
+      f"M_filler = {M_filler*1e3:.1f} g  "
+      f"-> rho_bed_cat={rho_bed_cat:.1f}  rho_bed_ads={rho_bed_ads:.1f}  "
+      f"rho_bed_fill={rho_bed_fill:.1f}  rho_bed_tot={rho_bed_tot:.1f} kg/m3_bed")
 
 # -------------------------------------------------------------------------
 # Operating conditions
@@ -85,7 +95,7 @@ mu_mix = sum(ys[i] * mus[i] / sum(ys[j] * phi[i, j] for j in range(3))
 # GHSV defined per kg adsorbent at STP (0 C, 1 bar), corrected to T via ideal gas
 # -------------------------------------------------------------------------
 T_STP  = 273.15         # [K]
-GHSV   = 0.5            # [m3_STP / (kg_ads * h)]
+GHSV   = 1.0            # [m3_STP / (kg_ads * h)]
 
 Q_STP  = GHSV * M_ads / 3600   # volumetric flow at STP   [m3/s]
 u_STP  = Q_STP / A_b            # superficial velocity at STP  [m/s]
@@ -117,7 +127,7 @@ visc_frac = A_visc * mu_mix * u0 / dPdz * 100
 print()
 print("=== Ergun pressure drop estimate ===")
 print(f"  d_p         = {d_p*1e3:.1f} mm")
-print(f"  M_ads       = {M_ads:.3f} kg  (full bed packing, 92.5 wt% zeolite)")
+print(f"  M_ads       = {M_ads:.3f} kg  (92.5 wt% of bifunctional material)")
 print(f"  u0          = {u0*1e3:.1f} mm/s  at {T-273.15:.0f} C")
 print(f"  rho_g       = {rho_g:.4f} kg/m3")
 print(f"  mu_mix      = {mu_mix*1e6:.2f} uPa*s  (Wilke)")

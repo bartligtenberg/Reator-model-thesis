@@ -50,7 +50,7 @@ L_b     = 0.100                    # bed length                  [m]
 A_b     = np.pi / 4 * d_b**2      # cross-sectional area        [m²]
 V_bed   = A_b * L_b                # total bed volume            [m³]
 m_cat_total     = 6.5e-3           # total bed material mass     [kg]  (Wei Fig. 5.10, 6.5 g — GHSV basis)
-active_fraction = 0.10              # fraction of m_cat_total that is catalytically active (Ni) [-]
+active_fraction = 0.20              # fraction of m_cat_total that is catalytically active (Ni) [-]
 rho_bed = m_cat_total / V_bed      # full bulk density — all material adsorbs (sorbent) [kg/m³]
 rho_cat = active_fraction * rho_bed  # catalytically active density, used for reaction rate only [kg/m³]
 eps_b   = 0.40                     # void fraction               [-]
@@ -65,7 +65,7 @@ MW_H2O  = 0.018015                 # molar mass water            [kg/mol]
 R_gas   = 8.314                    # gas constant                [J/(mol·K)]
 
 # DA isotherm parameters — fitted to Wei (2022) 300 °C H2O breakthrough; Mette (2014) W0=340 overestimates
-W0_DA   = 150.00e-6                # micropore volume            [m³/kg]
+W0_DA   = 190.00e-6                # micropore volume            [m³/kg]
 E_DA    = 1190e3                # characteristic energy       [J/kg]
 n_DA    = 1.55                     # heterogeneity exponent      [-]
 
@@ -407,6 +407,8 @@ CH4_meas   = np.array([ 0.403, 73.387, 90.726, 92.339, 92.742, 92.944, 93.145,
 t_X_meas   = np.array([0,   4.7,  10,  15,  20,  25,  30,  35,  40,  43,  47,  50,  52])
 X_meas     = np.array([0,100, 100, 100, 100, 100, 100, 100, 100,  100,  100,  100,  100])
 
+print(f"\nMax CO2 conversion — model: {np.max(X_CO2):.1f} %  |  measurements: {np.max(X_meas):.1f} %")
+
 
 # =============================================================================
 # 7b. H₂O SLOPE COMPARISON  (K_LDF validation via breakthrough steepness)
@@ -430,18 +432,15 @@ def fit_breakthrough_slope(t_arr, y_arr, frac_lo=0.10, frac_hi=0.90, t_max=None)
     return poly[0], (float(t_sel[0]), float(t_sel[-1])), poly
 
 
-# Measured slope: direct two-point slope between the digitised anchor points
-# (43.0 min, 0.06 mol%) and (48.308 min, 3.911 mol%) — matches the dashed line drawn on the plot.
-t_anchor_meas = (43.0, 48.308)
-y_anchor_meas = (0.06, 3.911)
-slope_meas = (y_anchor_meas[1] - y_anchor_meas[0]) / (t_anchor_meas[1] - t_anchor_meas[0])
-twin_meas  = t_anchor_meas
+# Measured slope: same 10–90 % linear-fit method as the model, applied to the
+# digitised measured H2O breakthrough data — apples-to-apples comparison.
+slope_meas, twin_meas, poly_meas = fit_breakthrough_slope(t_H2O_meas, H2O_meas, frac_lo=0.10, frac_hi=0.75)
 
-slope_model, twin_model, poly_model = fit_breakthrough_slope(t_min, pct_H2O)
+slope_model, twin_model, poly_model = fit_breakthrough_slope(t_min, pct_H2O, frac_lo=0.10, frac_hi=0.75)
 
 print(f"\n--- H₂O breakthrough slope (K_LDF validation) ---")
 print(f"  Measured : {slope_meas:.3f} mol%/min  "
-      f"(two-point slope over t = {twin_meas[0]:.1f}–{twin_meas[1]:.1f} min)")
+      f"(fitted over t = {twin_meas[0]:.1f}–{twin_meas[1]:.1f} min)")
 print(f"  Model    : {slope_model:.3f} mol%/min  "
       f"(fitted over t = {twin_model[0]:.1f}–{twin_model[1]:.1f} min)")
 print(f"  Ratio (model / meas): {slope_model / slope_meas:.2f}")
@@ -499,10 +498,9 @@ ax2.set_ylim(-10, 110)
 ax2.set_yticks([0, 20, 40, 60, 80, 100])
 
 # --- H₂O slope lines (K_LDF validation) ---
-t_fit_meas  = np.array([43.0, 48.308])
-y_fit_meas  = np.array([0.06, 3.911])
+t_fit_meas  = np.linspace(twin_meas[0], twin_meas[1], 80)
 t_fit_model = np.linspace(twin_model[0], twin_model[1], 80)
-h_slope_m,   = ax1.plot(t_fit_meas,  y_fit_meas,
+h_slope_m,   = ax1.plot(t_fit_meas,  np.polyval(poly_meas, t_fit_meas),
                          color='olive', ls='--', lw=2.2, alpha=0.75,
                          label=f'H₂O slope meas. ({slope_meas:.2f} mol%/min)')
 h_slope_mod, = ax1.plot(t_fit_model, np.polyval(poly_model, t_fit_model),
