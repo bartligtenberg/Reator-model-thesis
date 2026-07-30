@@ -53,14 +53,15 @@ m_cat_total     = 6.5e-3           # total bed material mass     [kg]  (Wei Fig.
 active_fraction = 0.20              # fraction of m_cat_total that is catalytically active (Ni) [-]
 rho_bed = m_cat_total / V_bed      # full bulk density — all material adsorbs (sorbent) [kg/m³]
 rho_cat = active_fraction * rho_bed  # catalytically active density, used for reaction rate only [kg/m³]
+rho_p   = 1.40e3                     # particle skeletal density     [kg/m³]  (5%Ni2.5%Ce/13X, Wei thesis)
 eps_b   = 0.40                     # void fraction               [-]
 
 # Particle transport properties — Bareschino et al. (2023) Table 1, 13X zeolite pellets
 d_p     = 0.75e-3                  # particle diameter           [m]
-eps_p   = 0.6                    # intraparticle void fraction [-]
+eps_p   = 0.242                    # intraparticle void fraction [-]
 tau_p   = 4.0                      # tortuosity                  [-]
 
-rho_ads = 998.2                    # liquid water density        [kg/m³]
+rho_ads = 791                    # liquid water density at 260C        [kg/m³]
 MW_H2O  = 0.018015                 # molar mass water            [kg/mol]
 R_gas   = 8.314                    # gas constant                [J/(mol·K)]
 
@@ -102,7 +103,7 @@ U_FLOOR_FRAC = 1e-3                 # floor on F_tot_rightface, as a fraction of
 U_CEIL_FRAC  = 10.0                 # defensive ceiling, same units                          [-]
 
 # Spatial discretisation
-N  = 50
+N  = 100
 dz = L_b / (N - 1)
 
 
@@ -110,9 +111,14 @@ dz = L_b / (N - 1)
 # 2. THERMODYNAMIC AND KINETIC FUNCTIONS  (copied unchanged from SEM LHHW.py)
 # =============================================================================
 
-def P_sat_bar(T):
-    # Antoine equation for water (T in K, returns bar)
-    return 10.0 ** (5.40221 - 1838.675 / (T - 31.737))
+def P_sat_bar(T_K):
+    """
+    Saturation vapour pressure of water [bar]. log10(P/mmHg) = D + E/T + F*log10(T) + G*T + H*T^2, with D=29.8605, E=-3.1522e3, F=-7.3037, G=2.4247e-9, H=1.8090e-6 — Eq. S.17 in
+    Bareschino et al. (2023) supplementary material, credited there to Kowalska & Ambrozek (2017). Converted to bar via 1 mmHg = 133.322e-5 bar. np.clip prevents overflow at extreme temperatures.
+    """
+    log10_p = (29.8605 - 3.1522e3/T_K - 7.3037*np.log10(T_K)
+               + 2.4247e-9*T_K + 1.8090e-6*T_K**2)
+    return 10.0**np.clip(log10_p, -10, 10) * 133.322e-5   # [mmHg] -> [bar
 
 
 def q_star_vec(T, p_arr, W0, E, n):
@@ -124,23 +130,33 @@ def q_star_vec(T, p_arr, W0, E, n):
     A_raw  = (R_gas / MW_H2O) * T * np.log(Psat / p_safe)
     A      = np.where((p <= 0.0) | (p >= Psat), 0.0, A_raw)
     W      = W0 * np.exp(-np.minimum((A / E) ** n, 500.0))
-    return np.where(p <= 0.0, 0.0, rho_ads / MW_H2O * W)
+    return np.where(p <= 0.0, 0.0, rho_ads / MW_H2O * W) #in mol/kg (not kg/kg like literature)
 
 
-def K_LDF_vec(T, p_arr, W0, E, n):
-    # Glueckauf LDF coefficient: K_LDF = 15*D_eff / (r_p^2 * dq*/dC)
-    # dq*/dp obtained by numerical central difference to handle the nonlinear DA isotherm
-    # D_M: molecular diffusivity of H2O vapour, Chapman-Enskog T^1.75 scaling (Bareschino 2023)
-    D_M       = 3.36e-9 * T_K**1.75
-    p         = np.asarray(p_arr, dtype=float)
-    dp_bar    = 1.0 / 1e5
-    p_lo      = np.maximum(p - dp_bar, 1e-15)
-    p_hi      = p + dp_bar
-    dqstar_dp = (q_star_vec(T, p_hi, W0, E, n)
-                 - q_star_vec(T, p_lo, W0, E, n)) / 2.0
-    dqstar_dp = np.maximum(dqstar_dp, 1e-30)
-    return (15.0 * D_M * MW_H2O * eps_p
-            / (0.5 * d_p**2 * tau_p * rho_ads * R_gas * T * dqstar_dp))
+# def K_LDF_vec(T, p_arr, W0, E, n):
+#     # Glueckauf LDF coefficient: K_LDF = 15*D_eff / (r_p^2 * dq*/dC)
+#     # dq*/dp obtained by numerical central difference to handle the nonlinear DA isotherm
+#     # D_M: molecular diffusivity of H2O vapour, Chapman-Enskog T^1.75 scaling (Bareschino 2023)
+#     D_M       = 3.36e-9 * T_K**1.75
+#     p         = np.asarray(p_arr, dtype=float)
+#     dp_bar    = 1.0 / 1e5
+#     p_lo      = np.maximum(p - dp_bar, 1e-15)
+#     p_hi      = p + dp_bar
+#     dqstar_dp = (q_star_vec(T, p_hi, W0, E, n)
+#                  - q_star_vec(T, p_lo, W0, E, n)) / 2.0
+#     dqstar_dp = np.maximum(dqstar_dp, 1e-30)
+#     return (15.0 * D_M * MW_H2O * eps_p
+#             / (0.5 * d_p**2 * tau_p * rho_ads * R_gas * T * dqstar_dp))
+
+def K_LDF_vec(T_K, p_arr, W0, E, n):
+    D_M = 3.36e-9 * T_K**1.75                                                  # molecular diffusivity [m²/s], power-law T-dependence (Chapman-Enskog) from supplementary material of Bareschino et al. (2023)
+    p    = np.asarray(p_arr, dtype=float)                                      # ensure p (water pressure)is a numpy float array for vectorised operations
+    dp   = 1.0/1e5                                                             # pressure step = 1 Pa expressed in bar; chosen so dividing by 2.0 [Pa] gives dq*/dp in mol/(kg·Pa)
+    dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
+            - q_star_vec(T_K, np.maximum(p-dp, 1e-15), W0, E, n)) / 2.0      # central finite difference: dq*/dp [mol/(kg·Pa)]; np.maximum prevents zero/negative pressure in DA log
+    dqsp = np.maximum(dqsp, 1e-30)                                             # guard against division by zero when isotherm slope is numerically flat
+    r_p = 0.5 * d_p                                                            # particle radius [m]
+    return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * R_gas * T_K * dqsp)  # Glueckauf LDF coefficient from pore diffusion [1/s]: large dq*/dp → slow K_LDF. no molecular water weight because in mol/kg and not kg/kg
 
 
 def K_eq_sabatier(T):
@@ -498,19 +514,18 @@ ax2.set_ylim(-10, 110)
 ax2.set_yticks([0, 20, 40, 60, 80, 100])
 
 # --- H₂O slope lines (K_LDF validation) ---
-t_fit_meas  = np.linspace(twin_meas[0], twin_meas[1], 80)
-t_fit_model = np.linspace(twin_model[0], twin_model[1], 80)
-h_slope_m,   = ax1.plot(t_fit_meas,  np.polyval(poly_meas, t_fit_meas),
-                         color='olive', ls='--', lw=2.2, alpha=0.75,
-                         label=f'H₂O slope meas. ({slope_meas:.2f} mol%/min)')
-h_slope_mod, = ax1.plot(t_fit_model, np.polyval(poly_model, t_fit_model),
-                         color='darkgreen', ls='--', lw=2.2, alpha=0.75,
-                         label=f'H₂O slope model ({slope_model:.2f} mol%/min)')
+# t_fit_meas  = np.linspace(twin_meas[0], twin_meas[1], 80)
+# t_fit_model = np.linspace(twin_model[0], twin_model[1], 80)
+# h_slope_m,   = ax1.plot(t_fit_meas,  np.polyval(poly_meas, t_fit_meas),
+#                          color='olive', ls='--', lw=2.2, alpha=0.75,
+#                          label=f'H₂O slope meas. ({slope_meas:.2f} mol%/min)')
+# h_slope_mod, = ax1.plot(t_fit_model, np.polyval(poly_model, t_fit_model),
+#                          color='darkgreen', ls='--', lw=2.2, alpha=0.75,
+#                          label=f'H₂O slope model ({slope_model:.2f} mol%/min)')
 
 # --- Combined legend ---
 all_handles = [h_CH4, h_CH4_m, h_Xeq, h_X, h_X_m,
-               h_H2, h_H2_m, h_CO2, h_CO2_m, h_H2O, h_H2O_m,
-               h_slope_m, h_slope_mod]
+               h_H2, h_H2_m, h_CO2, h_CO2_m, h_H2O, h_H2O_m]
 ax2.legend(handles=all_handles, loc='center left', bbox_to_anchor=(0.02, 0.5),
            fontsize=8.5, framealpha=0.9, ncol=2)
 

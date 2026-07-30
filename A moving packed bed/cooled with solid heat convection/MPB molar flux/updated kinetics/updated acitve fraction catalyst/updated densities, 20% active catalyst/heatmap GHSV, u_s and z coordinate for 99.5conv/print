@@ -1,0 +1,180 @@
+> C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+Loaded: C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling\A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\heatmap GHSV, u_s and z coordinate for 99.5conv\sweep_results_active_frac_20%.pkl
+Sweep grid: 10 x 10 = 100 cells
+  u_s  in [3.00, 10.00] mm/s
+  GHSV in [0.50, 3.00] m3_STP/(kg_ads.h)
+  T = 280 C, L_trial = 2.0 m
+  q_star_max = 1.256 mol/kg  @ p_H2O_full = 87.0 mbar
+  survive Lambda_thermo >= 2.5: 47/100
+  attempted: 47, converged: 47, reach X_CO2=99.5%: 43
+
+ u_s[mm/s]   GHSV  Lambda  conv  iter  z995/L  z974/L  Tmax[C]  H2O err%
+      3.00   0.50    3.85  True   503   0.264   0.180    288.1       n/a
+      3.78   0.50    4.85  True    30   0.266   0.183    286.5       n/a
+      3.78   0.78    3.12  True    36   0.408   0.276    289.9       n/a
+      4.56   0.50    5.85  True    27   0.267   0.184    285.4       n/a
+      4.56   0.78    3.76  True    32   0.410   0.280    288.3       n/a
+      4.56   1.06    2.77  True    56   0.550   0.370    291.1       n/a
+      5.33   0.50    6.85  True    25   0.268   0.186    284.6       n/a
+      5.33   0.78    4.40  True    40   0.412   0.282    287.1       n/a
+      5.33   1.06    3.24  True    41   0.553   0.375    289.5       n/a
+      5.33   1.33    2.57  True    62   0.691   0.465    291.9       n/a
+      6.11   0.50    7.85  True    24   0.269   0.187    284.1       n/a
+      6.11   0.78    5.04  True    26   0.414   0.285    286.2       n/a
+      6.11   1.06    3.72  True    41   0.556   0.379    288.4       n/a
+      6.11   1.33    2.94  True    42   0.694   0.470    290.5       n/a
+      6.89   0.50    8.85  True    22   0.269   0.187    283.6       n/a
+      6.89   0.78    5.69  True    25   0.415   0.286    285.6       n/a
+      6.89   1.06    4.19  True    34   0.558   0.382    287.5       n/a
+      6.89   1.33    3.32  True    39   0.698   0.475    289.3       n/a
+      6.89   1.61    2.75  True    55   0.834   0.565    291.2       n/a
+      7.67   0.50    9.84  True    22   0.270   0.188    283.2       n/a
+      7.67   0.78    6.33  True    23   0.416   0.288    285.0       n/a
+      7.67   1.06    4.66  True    30   0.560   0.385    286.7       n/a
+      7.67   1.33    3.69  True    34   0.700   0.479    288.4       n/a
+      7.67   1.61    3.06  True    47   0.838   0.570    290.1       n/a
+      7.67   1.89    2.61  True    64   0.970   0.660    291.7       n/a
+      8.44   0.50   10.84  True    21   0.270   0.189    283.0       n/a
+      8.44   0.78    6.97  True    22   0.417   0.289    284.6       n/a
+      8.44   1.06    5.14  True    28   0.561   0.387    286.1       n/a
+      8.44   1.33    4.07  True    31   0.703   0.482    287.7       n/a
+      8.44   1.61    3.37  True    41   0.841   0.574    289.2       n/a
+      8.44   1.89    2.87  True    44   0.975   0.665    290.7       n/a
+      8.44   2.17    2.50  True    72     nan   0.754    292.2       n/a
+      9.22   0.50   11.84  True    20   0.271   0.189    282.7       n/a
+      9.22   0.78    7.61  True    21   0.418   0.290    284.2       n/a
+      9.22   1.06    5.61  True    27   0.562   0.388    285.6       n/a
+      9.22   1.33    4.44  True    28   0.705   0.484    287.1       n/a
+      9.22   1.61    3.67  True    36   0.844   0.578    288.5       n/a
+      9.22   1.89    3.13  True    41   0.979   0.670    289.8       n/a
+      9.22   2.17    2.73  True    54     nan   0.760    291.2       n/a
+     10.00   0.50   12.84  True    20   0.271   0.189    282.5       n/a
+     10.00   0.78    8.25  True    24   0.418   0.291    283.9       n/a
+     10.00   1.06    6.08  True    26   0.564   0.390    285.2       n/a
+     10.00   1.33    4.82  True    28   0.707   0.487    286.5       n/a
+     10.00   1.61    3.98  True    34   0.847   0.581    287.8       n/a
+     10.00   1.89    3.40  True    34   0.983   0.674    289.1       n/a
+     10.00   2.17    2.96  True    46     nan   0.766    290.4       n/a
+     10.00   2.44    2.63  True    58     nan   0.856    291.6       n/a
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/heatmap GHSV, u_s and z coordinate for 99.5conv/MPB_flux_form active frac heatmap.py"
+MPB flux form (feasibility/sizing sweep): d=5 cm, L_trial=2.0 m, rho_bed_tot=840 kg/m3
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+  sweep grid: u_s in [3.0, 10.0] mm/s (10 pts), GHSV in [0.50, 3.00] m3_STP/(kg_ads.h) (10 pts), T=280 C
+
+Step 1: Lambda_thermo pre-filter  (q*_max=1.256 mol/kg @ p_H2O_full=87.0 mbar, T=280 C)
+  grid: 10 x 10 = 100 cells, 47 survive Lambda_thermo >= 2.5
+
+Step 2: solving surviving cells (snake traversal, warm-started)...
+  [1/47] u_s=3.00 mm/s  GHSV=0.50  [solid-dom, ok, 503 iter, err=7.20e-06]  (866.5s, ETA 664m 20s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.752  err=-0.3%
+  [2/47] u_s=3.78 mm/s  GHSV=0.50  [solid-dom, ok, 30 iter, err=9.70e-06]  (50.7s, ETA 343m 57s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.813  err=-0.3%
+  [3/47] u_s=4.56 mm/s  GHSV=0.50  [solid-dom, ok, 27 iter, err=8.07e-06]  (45.3s, ETA 235m 18s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.889  err=-0.3%
+  [4/47] u_s=5.33 mm/s  GHSV=0.50  [solid-dom, ok, 25 iter, err=9.63e-06]  (41.5s, ETA 179m 53s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.844  err=-0.3%
+  [5/47] u_s=6.11 mm/s  GHSV=0.50  [solid-dom, ok, 24 iter, err=7.51e-06]  (35.3s, ETA 145m 30s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.858  err=-0.3%
+  [6/47] u_s=6.89 mm/s  GHSV=0.50  [solid-dom, ok, 22 iter, err=9.50e-06]  (30.5s, ETA 121m 50s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.856  err=-0.3%
+  [7/47] u_s=7.67 mm/s  GHSV=0.50  [solid-dom, ok, 22 iter, err=9.02e-06]  (30.5s, ETA 104m 47s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.830  err=-0.3%
+  [8/47] u_s=8.44 mm/s  GHSV=0.50  [solid-dom, ok, 21 iter, err=6.15e-06]  (29.0s, ETA 91m 45s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.859  err=-0.3%
+  [9/47] u_s=9.22 mm/s  GHSV=0.50  [solid-dom, ok, 20 iter, err=9.06e-06]  (27.7s, ETA 81m 25s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.867  err=-0.3%
+  [10/47] u_s=10.00 mm/s  GHSV=0.50  [solid-dom, ok, 20 iter, err=9.38e-06]  (27.6s, ETA 73m 03s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.878  err=-0.3%
+  [11/47] u_s=10.00 mm/s  GHSV=0.78  [solid-dom, ok, 24 iter, err=7.16e-06]  (33.4s, ETA 66m 26s)
+    H2O balance [mmol/(m²·s)]:  produced=286.778  gas_out=0.000  solid_out=286.386  err=-0.1%
+  [12/47] u_s=9.22 mm/s  GHSV=0.78  [solid-dom, ok, 21 iter, err=9.09e-06]  (29.0s, ETA 60m 37s)
+    H2O balance [mmol/(m²·s)]:  produced=286.776  gas_out=0.000  solid_out=286.414  err=-0.1%
+  [13/47] u_s=8.44 mm/s  GHSV=0.78  [solid-dom, ok, 22 iter, err=7.65e-06]  (30.7s, ETA 55m 41s)
+    H2O balance [mmol/(m²·s)]:  produced=286.774  gas_out=0.000  solid_out=286.345  err=-0.1%
+  [14/47] u_s=7.67 mm/s  GHSV=0.78  [solid-dom, ok, 23 iter, err=8.35e-06]  (31.8s, ETA 51m 26s)
+    H2O balance [mmol/(m²·s)]:  produced=286.772  gas_out=0.000  solid_out=286.362  err=-0.1%
+  [15/47] u_s=6.89 mm/s  GHSV=0.78  [solid-dom, ok, 25 iter, err=7.65e-06]  (37.0s, ETA 47m 52s)
+    H2O balance [mmol/(m²·s)]:  produced=286.768  gas_out=0.000  solid_out=286.360  err=-0.1%
+  [16/47] u_s=6.11 mm/s  GHSV=0.78  [solid-dom, ok, 26 iter, err=8.68e-06]  (38.5s, ETA 44m 43s)
+    H2O balance [mmol/(m²·s)]:  produced=286.765  gas_out=0.000  solid_out=286.340  err=-0.1%
+  [17/47] u_s=5.33 mm/s  GHSV=0.78  [solid-dom, ok, 40 iter, err=5.84e-06]  (57.3s, ETA 42m 25s)
+    H2O balance [mmol/(m²·s)]:  produced=286.760  gas_out=0.000  solid_out=286.286  err=-0.2%
+  [18/47] u_s=4.56 mm/s  GHSV=0.78  [solid-dom, ok, 32 iter, err=8.58e-06]  (45.3s, ETA 39m 56s)
+    H2O balance [mmol/(m²·s)]:  produced=286.753  gas_out=0.000  solid_out=286.208  err=-0.2%
+  [19/47] u_s=3.78 mm/s  GHSV=0.78  [solid-dom, ok, 36 iter, err=7.50e-06]  (51.5s, ETA 37m 48s)
+    H2O balance [mmol/(m²·s)]:  produced=286.745  gas_out=0.000  solid_out=285.992  err=-0.3%
+  [20/47] u_s=4.56 mm/s  GHSV=1.06  [solid-dom, ok, 56 iter, err=9.41e-06]  (78.5s, ETA 36m 23s)
+    H2O balance [mmol/(m²·s)]:  produced=388.950  gas_out=0.001  solid_out=388.054  err=-0.2%
+  [21/47] u_s=5.33 mm/s  GHSV=1.06  [solid-dom, ok, 41 iter, err=1.00e-05]  (56.5s, ETA 34m 32s)
+    H2O balance [mmol/(m²·s)]:  produced=388.957  gas_out=0.001  solid_out=388.378  err=-0.1%
+  [22/47] u_s=6.11 mm/s  GHSV=1.06  [solid-dom, ok, 41 iter, err=7.94e-06]  (56.5s, ETA 32m 46s)
+    H2O balance [mmol/(m²·s)]:  produced=388.961  gas_out=0.001  solid_out=388.506  err=-0.1%
+  [23/47] u_s=6.89 mm/s  GHSV=1.06  [solid-dom, ok, 34 iter, err=7.49e-06]  (54.8s, ETA 31m 03s)
+    H2O balance [mmol/(m²·s)]:  produced=388.965  gas_out=0.001  solid_out=388.576  err=-0.1%
+  [24/47] u_s=7.67 mm/s  GHSV=1.06  [solid-dom, ok, 30 iter, err=9.88e-06]  (54.2s, ETA 29m 23s)
+    H2O balance [mmol/(m²·s)]:  produced=388.967  gas_out=0.001  solid_out=388.687  err=-0.1%
+  [25/47] u_s=8.44 mm/s  GHSV=1.06  [solid-dom, ok, 28 iter, err=9.43e-06]  (49.7s, ETA 27m 42s)
+    H2O balance [mmol/(m²·s)]:  produced=388.969  gas_out=0.001  solid_out=388.718  err=-0.1%
+  [26/47] u_s=9.22 mm/s  GHSV=1.06  [solid-dom, ok, 27 iter, err=8.84e-06]  (45.7s, ETA 26m 02s)
+    H2O balance [mmol/(m²·s)]:  produced=388.971  gas_out=0.001  solid_out=388.681  err=-0.1%
+  [27/47] u_s=10.00 mm/s  GHSV=1.06  [solid-dom, ok, 26 iter, err=7.40e-06]  (44.2s, ETA 24m 26s)
+    H2O balance [mmol/(m²·s)]:  produced=388.972  gas_out=0.001  solid_out=388.701  err=-0.1%
+  [28/47] u_s=10.00 mm/s  GHSV=1.33  [solid-dom, ok, 28 iter, err=9.49e-06]  (49.1s, ETA 22m 56s)
+    H2O balance [mmol/(m²·s)]:  produced=490.892  gas_out=0.005  solid_out=490.584  err=-0.1%
+  [29/47] u_s=9.22 mm/s  GHSV=1.33  [solid-dom, ok, 28 iter, err=5.16e-06]  (47.8s, ETA 21m 28s)
+    H2O balance [mmol/(m²·s)]:  produced=490.893  gas_out=0.005  solid_out=490.610  err=-0.1%
+  [30/47] u_s=8.44 mm/s  GHSV=1.33  [solid-dom, ok, 31 iter, err=9.58e-06]  (49.2s, ETA 20m 04s)
+    H2O balance [mmol/(m²·s)]:  produced=490.895  gas_out=0.005  solid_out=490.537  err=-0.1%
+  [31/47] u_s=7.67 mm/s  GHSV=1.33  [solid-dom, ok, 34 iter, err=9.33e-06]  (53.8s, ETA 18m 44s)
+    H2O balance [mmol/(m²·s)]:  produced=490.896  gas_out=0.005  solid_out=490.501  err=-0.1%
+  [32/47] u_s=6.89 mm/s  GHSV=1.33  [solid-dom, ok, 39 iter, err=7.03e-06]  (58.1s, ETA 17m 28s)
+    H2O balance [mmol/(m²·s)]:  produced=490.897  gas_out=0.005  solid_out=490.343  err=-0.1%
+  [33/47] u_s=6.11 mm/s  GHSV=1.33  [solid-dom, ok, 42 iter, err=8.13e-06]  (61.2s, ETA 16m 15s)
+    H2O balance [mmol/(m²·s)]:  produced=490.898  gas_out=0.005  solid_out=490.218  err=-0.1%
+  [34/47] u_s=5.33 mm/s  GHSV=1.33  [solid-dom, ok, 62 iter, err=9.46e-06]  (89.8s, ETA 15m 13s)
+    H2O balance [mmol/(m²·s)]:  produced=490.898  gas_out=0.005  solid_out=489.847  err=-0.2%
+  [35/47] u_s=6.89 mm/s  GHSV=1.61  [solid-dom, ok, 55 iter, err=8.68e-06]  (79.1s, ETA 14m 05s)
+    H2O balance [mmol/(m²·s)]:  produced=592.432  gas_out=0.021  solid_out=591.657  err=-0.1%
+  [36/47] u_s=7.67 mm/s  GHSV=1.61  [solid-dom, ok, 47 iter, err=8.24e-06]  (68.5s, ETA 12m 54s)
+    H2O balance [mmol/(m²·s)]:  produced=592.415  gas_out=0.022  solid_out=591.859  err=-0.1%
+  [37/47] u_s=8.44 mm/s  GHSV=1.61  [solid-dom, ok, 41 iter, err=8.29e-06]  (60.9s, ETA 11m 41s)
+    H2O balance [mmol/(m²·s)]:  produced=592.400  gas_out=0.022  solid_out=591.849  err=-0.1%
+  [38/47] u_s=9.22 mm/s  GHSV=1.61  [solid-dom, ok, 36 iter, err=6.67e-06]  (58.0s, ETA 10m 28s)
+    H2O balance [mmol/(m²·s)]:  produced=592.386  gas_out=0.023  solid_out=591.998  err=-0.1%
+  [39/47] u_s=10.00 mm/s  GHSV=1.61  [solid-dom, ok, 34 iter, err=8.92e-06]  (73.2s, ETA 9m 19s)
+    H2O balance [mmol/(m²·s)]:  produced=592.374  gas_out=0.023  solid_out=592.036  err=-0.1%
+  [40/47] u_s=10.00 mm/s  GHSV=1.89  [solid-dom, ok, 34 iter, err=6.58e-06]  (61.1s, ETA 8m 08s)
+    H2O balance [mmol/(m²·s)]:  produced=693.311  gas_out=0.080  solid_out=692.792  err=-0.1%
+  [41/47] u_s=9.22 mm/s  GHSV=1.89  [solid-dom, ok, 41 iter, err=9.87e-06]  (67.3s, ETA 6m 57s)
+    H2O balance [mmol/(m²·s)]:  produced=693.348  gas_out=0.078  solid_out=692.766  err=-0.1%
+  [42/47] u_s=8.44 mm/s  GHSV=1.89  [solid-dom, ok, 44 iter, err=9.05e-06]  (61.9s, ETA 5m 47s)
+    H2O balance [mmol/(m²·s)]:  produced=693.388  gas_out=0.076  solid_out=692.776  err=-0.1%
+  [43/47] u_s=7.67 mm/s  GHSV=1.89  [solid-dom, ok, 64 iter, err=7.98e-06]  (88.0s, ETA 4m 39s)
+    H2O balance [mmol/(m²·s)]:  produced=693.433  gas_out=0.074  solid_out=692.555  err=-0.1%
+  [44/47] u_s=8.44 mm/s  GHSV=2.17  [solid-dom, ok, 72 iter, err=8.64e-06]  (97.5s, ETA 3m 31s)
+    H2O balance [mmol/(m²·s)]:  produced=793.215  gas_out=0.195  solid_out=792.058  err=-0.1%
+  [45/47] u_s=9.22 mm/s  GHSV=2.17  [solid-dom, ok, 54 iter, err=7.39e-06]  (79.2s, ETA 2m 21s)
+    H2O balance [mmol/(m²·s)]:  produced=793.072  gas_out=0.203  solid_out=792.165  err=-0.1%
+  [46/47] u_s=10.00 mm/s  GHSV=2.17  [solid-dom, ok, 46 iter, err=9.79e-06]  (64.3s, ETA 1m 10s)
+    H2O balance [mmol/(m²·s)]:  produced=792.941  gas_out=0.209  solid_out=792.209  err=-0.1%
+  [47/47] u_s=10.00 mm/s  GHSV=2.44  [solid-dom, ok, 58 iter, err=9.10e-06]  (80.9s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=889.899  gas_out=0.468  solid_out=888.646  err=-0.1%
+Step 2 done. 47 cell(s) solved in 55m 27s
+
+Retry pass for non-converged/failed surviving cells...
+Retry pass done. 0 cell(s) re-run.
+
+Step 3: 43/47 solved cells reach X_CO2=99.5% within L_trial=2.0 m
+
+Step 5: raw sweep results saved to c:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling\A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\heatmap GHSV, u_s and z coordinate for 99.5conv\sweep_results_active_frac_20%.pkl
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+

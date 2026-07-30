@@ -451,7 +451,7 @@ wpd_path = os.path.join(os.path.dirname(__file__), '..', 'wpd_datasets.csv')
 wpd = pd.read_csv(wpd_path, header=1)
 wpd.columns = ['X_nonSE', 'Y_nonSE', 'X_SE', 'Y_SE']
 
-fig, ax = plt.subplots(figsize=(10, 7.5))
+fig, ax = plt.subplots(figsize=(8, 5.5))
 
 ax.plot(T_fine, X_eq, 'k--', lw=1.5, label='Equilibrium', zorder=1)
 
@@ -471,12 +471,12 @@ for i, af in enumerate(ACTIVE_FRACTIONS):
     ax.plot(T_arr, data['X_off_ss'], color=color, marker='o', ls='--', lw=1.5, ms=7,
              label=f'Non-SE, active fraction={af:.0%}', zorder=2)
 
-ax.set_xlabel('Temperature [°C]', fontsize=12)
-ax.set_ylabel('CO₂ conversion [%]', fontsize=12)
-ax.set_title('SEM column — CO₂ conversion vs temperature, multiple active fractions')
+ax.set_xlabel('Temperature [°C]', fontsize=16)
+ax.set_ylabel('CO₂ conversion [%]', fontsize=16)
 ax.set_xlim(170, 370)
 ax.set_ylim(0, 105)
-ax.legend(fontsize=8, loc='upper left', bbox_to_anchor=(1.02, 1.0), borderaxespad=0)
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=14, loc='lower right')
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig(os.path.join(os.path.dirname(__file__), 'Figure_1_multi_active_fraction.png'),

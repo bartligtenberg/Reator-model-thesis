@@ -1,0 +1,122 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\length determination based on GHSV(U_s, lambda)\MPB_flux_form active frac length determ.py"
+MPB flux form (length-determination sweep): d=5 cm, L_trial=2.0 m, rho_bed_tot=840 kg/m3
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+  LAMBDA_TARGET = 2.50  |  GHSV_LIST = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]  |  X_TARGET = 99.5%  |  T = 280 C  |  L_trial = 2.00 m
+
+============================================================
+  Length-determination sweep  |  T = 280 C  |  LAMBDA_TARGET = 2.50  |  L_trial = 2.00 m
+============================================================
+  GHSV=0.50  u_s=1.9470 mm/s  Lambda=2.500  X=100.0%  q(0)=0.694  T_max=294.3 C  z_cross=0.812 m  [solid-dom, not-conv, 1000 iter, err=2.19e-02]  (2297.6s, ETA 191m 28s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=184.387  gas_out=0.000  solid_out=254.668  err=+38.1%
+  GHSV=1.00  u_s=3.8940 mm/s  Lambda=2.500  X=99.9%  q(0)=0.500  T_max=292.2 C  z_cross=1.038 m  [solid-dom, ok, 402 iter, err=7.25e-06]  (818.4s, ETA 103m 52s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=368.518  gas_out=0.001  solid_out=367.185  err=-0.4%
+  GHSV=1.50  u_s=5.8410 mm/s  Lambda=2.500  X=99.8%  q(0)=0.500  T_max=292.2 C  z_cross=1.549 m  [solid-dom, ok, 74 iter, err=6.34e-06]  (134.8s, ETA 54m 11s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.680  err=-0.2%
+  GHSV=2.00  u_s=7.7880 mm/s  Lambda=2.500  X=99.5%  q(0)=0.499  T_max=292.2 C  z_cross=n/a  [solid-dom, ok, 73 iter, err=9.04e-06]  (120.6s, ETA 28m 05s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=733.600  gas_out=0.107  solid_out=732.551  err=-0.1%
+  GHSV=2.50  u_s=9.7349 mm/s  Lambda=2.500  X=98.6%  q(0)=0.495  T_max=292.1 C  z_cross=n/a  [solid-dom, ok, 72 iter, err=8.80e-06]  (123.2s, ETA 11m 38s)
+    non-SE fixed-bed conversion: 84.5%
+    H2O balance [mmol/(m²·s)]:  produced=909.017  gas_out=0.528  solid_out=907.536  err=-0.1%
+  GHSV=3.00  u_s=11.6819 mm/s  Lambda=2.500  X=96.8%  q(0)=0.486  T_max=291.9 C  z_cross=n/a  [solid-dom, ok, 72 iter, err=6.42e-06]  (117.7s, ETA 0s)
+    non-SE fixed-bed conversion: 84.2%
+    H2O balance [mmol/(m²·s)]:  produced=1071.030  gas_out=1.405  solid_out=1068.848  err=-0.1%
+
+All done.  Total: 60m 12s
+
+Retry pass (backwards) for non-converged solutions...
+  RETRY GHSV=0.50  u_s=1.95 mm/s  [ok, 98 iter, err=9.95e-06]  (kept)  (177.3s)
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=182.504  err=-1.0%
+Retry pass done. 1 solution(s) re-run.
+
+Length-determination table  (T=280 C, LAMBDA_TARGET=2.50, X_TARGET=99.5%)
+    GHSV  u_s [mm/s]    Lambda   z_cross [m]  iterations  converged
+    0.50      1.9470     2.500         0.521          98          y
+    1.00      3.8940     2.500         1.038         402          y
+    1.50      5.8410     2.500         1.549          74          y
+    2.00      7.7880     2.500   not reached          73          y
+    2.50      9.7349     2.500   not reached          72          y
+    3.00     11.6819     2.500   not reached          72          y
+
+Required reactor length (before margin): 1.549 m  (worst case at GHSV = 1.50 m3_STP/(kg_ads·h))
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+
+
+
+
+
+ 
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/length determination based on GHSV(U_s, lambda)/MPB_flux_form active frac length determ.py"
+MPB flux form (length-determination sweep): d=5 cm, L_trial=2.0 m, rho_bed_tot=840 kg/m3
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+  LAMBDA_TARGET = 2.50  |  GHSV_LIST = [np.float64(0.5), np.float64(1.0), np.float64(1.5), np.float64(2.0), np.float64(2.5), np.float64(3.0)]  |  X_TARGET = 99.0%  |  T = 280 C  |  L_trial = 2.00 m
+
+============================================================
+  Length-determination sweep  |  T = 280 C  |  LAMBDA_TARGET = 2.50  |  L_trial = 2.00 m
+============================================================
+  GHSV=0.50  u_s=3.0000 mm/s  Lambda=3.852  X=100.0%  q(0)=0.325  T_max=288.1 C  z_cross=0.442 m  [solid-dom, ok, 503 iter, err=7.20e-06]  (769.5s, ETA 64m 07s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=184.395  gas_out=0.000  solid_out=183.752  err=-0.3%
+  GHSV=1.00  u_s=3.8940 mm/s  Lambda=2.500  X=99.9%  q(0)=0.500  T_max=292.2 C  z_cross=0.861 m  [solid-dom, ok, 76 iter, err=9.66e-06]  (294.8s, ETA 35m 28s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=368.518  gas_out=0.001  solid_out=367.147  err=-0.4%
+  GHSV=1.50  u_s=5.8410 mm/s  Lambda=2.500  X=99.8%  q(0)=0.500  T_max=292.2 C  z_cross=1.291 m  [solid-dom, ok, 75 iter, err=5.73e-06]  (263.3s, ETA 22m 07s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.682  err=-0.2%
+  GHSV=2.00  u_s=7.7880 mm/s  Lambda=2.500  X=99.5%  q(0)=0.499  T_max=292.2 C  z_cross=1.720 m  [solid-dom, ok, 79 iter, err=9.51e-06]  (104.8s, ETA 11m 56s)
+    non-SE fixed-bed conversion: 84.6%
+    H2O balance [mmol/(m²·s)]:  produced=733.600  gas_out=0.107  solid_out=732.571  err=-0.1%
+  GHSV=2.50  u_s=9.7349 mm/s  Lambda=2.500  X=98.6%  q(0)=0.495  T_max=292.1 C  z_cross=n/a  [solid-dom, ok, 72 iter, err=8.70e-06]  (96.4s, ETA 5m 05s)
+    non-SE fixed-bed conversion: 84.5%
+    H2O balance [mmol/(m²·s)]:  produced=909.017  gas_out=0.528  solid_out=907.533  err=-0.1%
+  GHSV=3.00  u_s=11.6819 mm/s  Lambda=2.500  X=96.8%  q(0)=0.486  T_max=291.9 C  z_cross=n/a  [solid-dom, ok, 71 iter, err=9.84e-06]  (97.0s, ETA 0s)
+    non-SE fixed-bed conversion: 84.2%
+    H2O balance [mmol/(m²·s)]:  produced=1071.030  gas_out=1.405  solid_out=1068.835  err=-0.1%
+
+All done.  Total: 27m 06s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.
+
+Length-determination table  (T=280 C, LAMBDA_TARGET=2.50, X_TARGET=99.0%)
+    GHSV  u_s [mm/s]    Lambda   z_cross [m]  iterations  converged
+    0.50      3.0000     3.852         0.442         503          y
+    1.00      3.8940     2.500         0.861          76          y
+    1.50      5.8410     2.500         1.291          75          y
+    2.00      7.7880     2.500         1.720          79          y
+    2.50      9.7349     2.500   not reached          72          y
+    3.00     11.6819     2.500   not reached          71          y
+
+Required reactor length (before margin): 1.720 m  (worst case at GHSV = 2.00 m3_STP/(kg_ads·h))
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

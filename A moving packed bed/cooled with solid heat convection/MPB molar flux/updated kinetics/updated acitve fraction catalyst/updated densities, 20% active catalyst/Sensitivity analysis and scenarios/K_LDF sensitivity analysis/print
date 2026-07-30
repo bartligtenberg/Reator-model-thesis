@@ -1,0 +1,247 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/Sensitivity analysis and scenarios/K_LDF sensitivity analysis/MPB_flux_form active frac KLDF sensitivity.py"
+MPB flux form — K_LDF sensitivity analysis: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  K_LDF multipliers swept: [1.0, 0.2, 0.1, 0.04, 0.02]
+
+======================================================================
+  K_LDF sensitivity: u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C
+======================================================================
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 1x $K_{LDF}$ (baseline)  (multiplier = 1x)
+----------------------------------------------------------------------
+  Solved in 1403.0s  [solid-dominated, converged, 767 outer iterations, err=9.97e-06]
+  X_CO2(outlet) = 99.77%   T_max = 292.2 C
+c:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling\A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\K_LDF sensitivity analysis\MPB_flux_form active frac KLDF sensitivity.py:712: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  tau_gas = float(np.trapz(1.0/u_g_z, z))
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.790  err=-0.2%
+    Energy closure @ z=L:  Q_gen=138.496 W  Q_wall=15.843 W  Q_sens=122.225 W  mismatch=+0.31%
+    tau_gas=7.25s  tau_solid=342.47s  1/K_LDF_peak=6.37s  tau_rxn=1.50s
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.2x $K_{LDF}$  (multiplier = 0.2x)
+----------------------------------------------------------------------
+  Solved in 265.7s  [solid-dominated, converged, 116 outer iterations, err=8.69e-06]
+  X_CO2(outlet) = 99.37%   T_max = 292.1 C
+    H2O balance [mmol/(m²·s)]:  produced=549.718  gas_out=0.156  solid_out=549.401  err=-0.0%
+    Energy closure @ z=L:  Q_gen=137.661 W  Q_wall=16.740 W  Q_sens=120.857 W  mismatch=+0.05%
+    tau_gas=7.22s  tau_solid=342.47s  1/K_LDF_peak=30.92s  tau_rxn=1.50s
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.1x $K_{LDF}$  (multiplier = 0.1x)
+----------------------------------------------------------------------
+  Solved in 139.1s  [solid-dominated, converged, 70 outer iterations, err=8.73e-06]
+  X_CO2(outlet) = 99.00%   T_max = 291.9 C
+    H2O balance [mmol/(m²·s)]:  produced=547.663  gas_out=0.501  solid_out=547.096  err=-0.0%
+    Energy closure @ z=L:  Q_gen=137.089 W  Q_wall=17.777 W  Q_sens=119.286 W  mismatch=+0.02%
+    tau_gas=7.19s  tau_solid=342.47s  1/K_LDF_peak=56.68s  tau_rxn=1.50s
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.04x $K_{LDF}$  (multiplier = 0.04x)
+----------------------------------------------------------------------
+  Solved in 93.5s  [solid-dominated, converged, 46 outer iterations, err=8.48e-06]
+  X_CO2(outlet) = 97.68%   T_max = 291.4 C
+    H2O balance [mmol/(m²·s)]:  produced=540.373  gas_out=4.049  solid_out=536.319  err=-0.0%
+    Energy closure @ z=L:  Q_gen=134.935 W  Q_wall=20.168 W  Q_sens=114.756 W  mismatch=+0.01%
+    tau_gas=7.12s  tau_solid=342.47s  1/K_LDF_peak=122.64s  tau_rxn=1.50s
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.02x $K_{LDF}$  (multiplier = 0.02x)
+----------------------------------------------------------------------
+  Solved in 66.4s  [solid-dominated, converged, 34 outer iterations, err=9.71e-06]
+  X_CO2(outlet) = 95.27%   T_max = 290.8 C
+    H2O balance [mmol/(m²·s)]:  produced=526.992  gas_out=24.188  solid_out=502.812  err=+0.0%
+    Energy closure @ z=L:  Q_gen=129.800 W  Q_wall=21.529 W  Q_sens=108.264 W  mismatch=+0.01%
+    tau_gas=7.02s  tau_solid=342.47s  1/K_LDF_peak=222.42s  tau_rxn=1.50s
+
+All 5 K_LDF cases solved.
+
+==========================================================================================
+  K_LDF sensitivity — comparison table
+==========================================================================================
+  case                        X_out[%]  T_max[C]    q_out  H2O err[%]  E closure[%]  tau_gas[s]  1/K_LDF_pk[s]
+  1x $K_{LDF}$ (baseline)        99.77     292.2    0.500        -0.2          0.31        7.25          6.366
+  0.2x $K_{LDF}$                 99.37     292.1    0.499        -0.0          0.05        7.22         30.921
+  0.1x $K_{LDF}$                 99.00     291.9    0.497        -0.0          0.02        7.19         56.677
+  0.04x $K_{LDF}$                97.68     291.4    0.487        -0.0          0.01        7.12        122.644
+  0.02x $K_{LDF}$                95.27     290.8    0.457         0.0          0.01        7.02        222.420
+
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+ 
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\K_LDF sensitivity analysis\MPB_flux_form active frac KLDF sensitivity.py"
+MPB flux form — K_LDF sensitivity analysis: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  K_LDF multipliers swept: [1.0, 0.2, 0.1, 0.04, 0.02]
+
+======================================================================
+  K_LDF sensitivity: u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C
+======================================================================
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 1x $K_{LDF}$ (baseline)  (multiplier = 1x)
+----------------------------------------------------------------------
+  Solved in 1841.6s  [solid-dominated, converged, 767 outer iterations, err=8.54e-06]
+  X_CO2(outlet) = 99.77%   T_max = 292.2 C
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.785  err=-0.2%
+    Energy closure @ z=L:  Q_gen=138.497 W  Q_wall=15.843 W  Q_sens=122.225 W  mismatch=+0.31%
+    tau_gas=7.25s  tau_solid=342.47s  1/K_LDF_peak=6.37s  tau_rxn=1.50s
+    p_H2O max = 22.61 mbar (at z=0.067 m)   q_outlet (solid, z=0) = 0.500 mol/kg_ads
+    max local desorption (regeneration) rate = 15.4360 mmol/(kg_ads.s)  (z=0.007 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.2x $K_{LDF}$  (multiplier = 0.2x)
+----------------------------------------------------------------------
+  Solved in 577.6s  [solid-dominated, converged, 116 outer iterations, err=8.67e-06]
+  X_CO2(outlet) = 99.37%   T_max = 292.1 C
+    H2O balance [mmol/(m²·s)]:  produced=549.718  gas_out=0.156  solid_out=549.401  err=-0.0%
+    Energy closure @ z=L:  Q_gen=137.661 W  Q_wall=16.740 W  Q_sens=120.857 W  mismatch=+0.05%
+    tau_gas=7.22s  tau_solid=342.47s  1/K_LDF_peak=30.92s  tau_rxn=1.50s
+    p_H2O max = 24.78 mbar (at z=0.147 m)   q_outlet (solid, z=0) = 0.499 mol/kg_ads
+    max local desorption (regeneration) rate = 2.9422 mmol/(kg_ads.s)  (z=0.013 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.1x $K_{LDF}$  (multiplier = 0.1x)
+----------------------------------------------------------------------
+  Solved in 343.8s  [solid-dominated, converged, 70 outer iterations, err=8.76e-06]
+  X_CO2(outlet) = 99.00%   T_max = 291.9 C
+    H2O balance [mmol/(m²·s)]:  produced=547.663  gas_out=0.501  solid_out=547.096  err=-0.0%
+    Energy closure @ z=L:  Q_gen=137.089 W  Q_wall=17.777 W  Q_sens=119.286 W  mismatch=+0.02%
+    tau_gas=7.19s  tau_solid=342.47s  1/K_LDF_peak=56.68s  tau_rxn=1.50s
+    p_H2O max = 29.28 mbar (at z=0.214 m)   q_outlet (solid, z=0) = 0.497 mol/kg_ads
+    max local desorption (regeneration) rate = 1.4299 mmol/(kg_ads.s)  (z=0.013 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.04x $K_{LDF}$  (multiplier = 0.04x)
+----------------------------------------------------------------------
+  Solved in 222.5s  [solid-dominated, converged, 46 outer iterations, err=8.49e-06]
+  X_CO2(outlet) = 97.68%   T_max = 291.4 C
+    H2O balance [mmol/(m²·s)]:  produced=540.373  gas_out=4.049  solid_out=536.319  err=-0.0%
+    Energy closure @ z=L:  Q_gen=134.935 W  Q_wall=20.168 W  Q_sens=114.756 W  mismatch=+0.01%
+    tau_gas=7.12s  tau_solid=342.47s  1/K_LDF_peak=122.64s  tau_rxn=1.50s
+    p_H2O max = 38.08 mbar (at z=0.334 m)   q_outlet (solid, z=0) = 0.487 mol/kg_ads
+    max local desorption (regeneration) rate = 0.5363 mmol/(kg_ads.s)  (z=0.013 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.02x $K_{LDF}$  (multiplier = 0.02x)
+----------------------------------------------------------------------
+  Solved in 165.7s  [solid-dominated, converged, 34 outer iterations, err=9.71e-06]
+  X_CO2(outlet) = 95.27%   T_max = 290.8 C
+    H2O balance [mmol/(m²·s)]:  produced=526.992  gas_out=24.188  solid_out=502.812  err=+0.0%
+    Energy closure @ z=L:  Q_gen=129.800 W  Q_wall=21.529 W  Q_sens=108.264 W  mismatch=+0.01%
+    tau_gas=7.02s  tau_solid=342.47s  1/K_LDF_peak=222.42s  tau_rxn=1.50s
+    p_H2O max = 45.47 mbar (at z=0.448 m)   q_outlet (solid, z=0) = 0.457 mol/kg_ads
+    max local desorption (regeneration) rate = 0.2302 mmol/(kg_ads.s)  (z=0.013 m)
+
+All 5 K_LDF cases solved.
+
+==========================================================================================
+  K_LDF sensitivity — comparison table
+==========================================================================================
+  case                        X_out[%]  T_max[C]    q_out  p_H2O_max[mbar]  regen[mmol/kg.s]  H2O err[%]  E closure[%]  tau_gas[s]  1/K_LDF_pk[s]
+  1x $K_{LDF}$ (baseline)        99.77     292.2    0.500            22.61           15.4360        -0.2          0.31        7.25          6.366
+  0.2x $K_{LDF}$                 99.37     292.1    0.499            24.78            2.9422        -0.0          0.05        7.22         30.921
+  0.1x $K_{LDF}$                 99.00     291.9    0.497            29.28            1.4299        -0.0          0.02        7.19         56.677
+  0.04x $K_{LDF}$                97.68     291.4    0.487            38.08            0.5363        -0.0          0.01        7.12        122.644
+  0.02x $K_{LDF}$                95.27     290.8    0.457            45.47            0.2302         0.0          0.01        7.02        222.420
+
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\K_LDF sensitivity analysis\MPB_flux_form active frac KLDF sensitivity.py"
+MPB flux form — K_LDF sensitivity analysis: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  K_LDF multipliers swept: [1.0, 0.2, 0.1, 0.04, 0.02]
+
+======================================================================
+  K_LDF sensitivity: u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C
+======================================================================
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 1x $K_{LDF}$ (baseline)  (multiplier = 1x)
+----------------------------------------------------------------------
+  Solved in 1583.9s  [solid-dominated, converged, 767 outer iterations, err=8.54e-06]
+  X_CO2(outlet) = 99.77%   T_max = 292.2 C
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.785  err=-0.2%
+    Energy closure @ z=L:  Q_gen=138.497 W  Q_wall=15.843 W  Q_sens=122.225 W  mismatch=+0.31%
+    tau_gas=7.25s  tau_solid=342.47s  1/K_LDF_peak=6.37s  tau_rxn=1.50s
+    p_H2O max = 22.61 mbar (at z=0.067 m)   q_outlet (solid, z=0) = 0.500 mol/kg_ads
+    max local desorption (regeneration) rate = 15.4360 mmol/(kg_ads.s)  (z=0.007 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.2x $K_{LDF}$  (multiplier = 0.2x)
+----------------------------------------------------------------------
+  Solved in 244.4s  [solid-dominated, converged, 116 outer iterations, err=8.67e-06]
+  X_CO2(outlet) = 99.37%   T_max = 292.1 C
+    H2O balance [mmol/(m²·s)]:  produced=549.718  gas_out=0.156  solid_out=549.401  err=-0.0%
+    Energy closure @ z=L:  Q_gen=137.661 W  Q_wall=16.740 W  Q_sens=120.857 W  mismatch=+0.05%
+    tau_gas=7.22s  tau_solid=342.47s  1/K_LDF_peak=30.92s  tau_rxn=1.50s
+    p_H2O max = 24.78 mbar (at z=0.147 m)   q_outlet (solid, z=0) = 0.499 mol/kg_ads
+    max local desorption (regeneration) rate = 2.9422 mmol/(kg_ads.s)  (z=0.013 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.1x $K_{LDF}$  (multiplier = 0.1x)
+----------------------------------------------------------------------
+  Solved in 145.6s  [solid-dominated, converged, 70 outer iterations, err=8.76e-06]
+  X_CO2(outlet) = 99.00%   T_max = 291.9 C
+    H2O balance [mmol/(m²·s)]:  produced=547.663  gas_out=0.501  solid_out=547.096  err=-0.0%
+    Energy closure @ z=L:  Q_gen=137.089 W  Q_wall=17.777 W  Q_sens=119.286 W  mismatch=+0.02%
+    tau_gas=7.19s  tau_solid=342.47s  1/K_LDF_peak=56.68s  tau_rxn=1.50s
+    p_H2O max = 29.28 mbar (at z=0.214 m)   q_outlet (solid, z=0) = 0.497 mol/kg_ads
+    max local desorption (regeneration) rate = 1.4299 mmol/(kg_ads.s)  (z=0.013 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.04x $K_{LDF}$  (multiplier = 0.04x)
+----------------------------------------------------------------------
+  Solved in 90.0s  [solid-dominated, converged, 46 outer iterations, err=8.49e-06]
+  X_CO2(outlet) = 97.68%   T_max = 291.4 C
+    H2O balance [mmol/(m²·s)]:  produced=540.373  gas_out=4.049  solid_out=536.319  err=-0.0%
+    Energy closure @ z=L:  Q_gen=134.935 W  Q_wall=20.168 W  Q_sens=114.756 W  mismatch=+0.01%
+    tau_gas=7.12s  tau_solid=342.47s  1/K_LDF_peak=122.64s  tau_rxn=1.50s
+    p_H2O max = 38.08 mbar (at z=0.334 m)   q_outlet (solid, z=0) = 0.487 mol/kg_ads
+    max local desorption (regeneration) rate = 0.5363 mmol/(kg_ads.s)  (z=0.013 m)
+
+----------------------------------------------------------------------
+  Solving K_LDF case: 0.02x $K_{LDF}$  (multiplier = 0.02x)
+----------------------------------------------------------------------
+  Solved in 65.7s  [solid-dominated, converged, 34 outer iterations, err=9.71e-06]
+  X_CO2(outlet) = 95.27%   T_max = 290.8 C
+    H2O balance [mmol/(m²·s)]:  produced=526.992  gas_out=24.188  solid_out=502.812  err=+0.0%
+    Energy closure @ z=L:  Q_gen=129.800 W  Q_wall=21.529 W  Q_sens=108.264 W  mismatch=+0.01%
+    tau_gas=7.02s  tau_solid=342.47s  1/K_LDF_peak=222.42s  tau_rxn=1.50s
+    p_H2O max = 45.47 mbar (at z=0.448 m)   q_outlet (solid, z=0) = 0.457 mol/kg_ads
+    max local desorption (regeneration) rate = 0.2302 mmol/(kg_ads.s)  (z=0.013 m)
+
+All 5 K_LDF cases solved.
+
+==========================================================================================
+  K_LDF sensitivity — comparison table
+==========================================================================================
+  case                        X_out[%]  z_X95[m]  T_max[C]    q_out  p_H2O_max[mbar]  regen[mmol/kg.s]  H2O err[%]  E closure[%]  tau_gas[s]  1/K_LDF_pk[s]
+  1x $K_{LDF}$ (baseline)        99.77     0.878     292.2    0.500            22.61           15.4360        -0.2          0.31        7.25          6.366
+  0.2x $K_{LDF}$                 99.37     0.898     292.1    0.499            24.78            2.9422        -0.0          0.05        7.22         30.921
+  0.1x $K_{LDF}$                 99.00     0.939     291.9    0.497            29.28            1.4299        -0.0          0.02        7.19         56.677
+  0.04x $K_{LDF}$                97.68     1.262     291.4    0.487            38.08            0.5363        -0.0          0.01        7.12        122.644
+  0.02x $K_{LDF}$                95.27     1.924     290.8    0.457            45.47            0.2302         0.0          0.01        7.02        222.420
+
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

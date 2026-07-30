@@ -53,7 +53,7 @@ from scipy.interpolate import interp1d
 
 # --- Bed geometry (Bareschino lab setup) ---
 d_b   = 0.050                # [m]   reactor inner (tube) diameter — Bareschino et al. (2023)
-L_b   = 1.000                # [m]   bed length — Bareschino et al. (2023)
+L_b   = 2.000                # [m]   bed length — Bareschino et al. (2023)
 A_b   = np.pi / 4 * d_b**2   # [m²]  bed cross-sectional area
 V_bed = A_b * L_b            # [m³]  total bed volume
 eps_b = 0.4                  # [-]   inter-particle (bed) void fraction — typical packed-bed value (not from Bareschino table)
@@ -65,7 +65,7 @@ tau_p = 4.0      # [-]      pore tortuosity factor — Mette et al. (2015)
 rho_p = 1400     # [kg/m³]  particle (skeletal) density of sorbent — Bareschino et al. (2023)
 
 # --- Catalyst and sorbent loading ---
-bifuctional_mass = 0.4   # [kg]  mass of bifunctional 5%Ni-2.5%Ce/13X material
+bifuctional_mass = 0.8   # [kg]  mass of bifunctional 5%Ni-2.5%Ce/13X material
 M_zeolite_added  = 0   # [kg]  additional pure 13X zeolite mixed in — 100% sorbent-active, 0% catalytically active (no Ni)
 
 M_ads = bifuctional_mass * 0.925 + M_zeolite_added   # [kg]  sorbent mass: 92.5% of the bifunctional material acts as sorbent, plus all of the added pure zeolite
@@ -123,7 +123,7 @@ y_CH4_in = 0.80             # [-]    CH4 inlet mole fraction (background/diluent
 
 # --- Inlet molar fluxes [mol/(m²·s)] — temperature-independent ---
 T_STP   = 273.15                  # [K]                   standard temperature (0 °C)
-GHSV    = 1.5                     # [m³_STP/(kg_ads·h)]   gas hourly space velocity — Bareschino et al. (2023)
+GHSV    = 1                    # [m³_STP/(kg_ads·h)]   gas hourly space velocity — Bareschino et al. (2023)
 Q_STP   = GHSV * M_ads / 3600.0   # [m³_STP/s]  volumetric feed flow at STP
 u_g_STP = Q_STP / A_b             # [m/s]       superficial gas velocity at STP
 F_total_in = u_g_STP * P_Pa / (R_gas * T_STP)  # [mol/(m²·s)]  total molar flux at inlet (ideal gas law)
@@ -132,7 +132,7 @@ F_in_H2    = y_H2_in  * F_total_in   # [mol/(m²·s)]  H2 inlet molar flux
 F_in_CH4   = y_CH4_in * F_total_in   # [mol/(m²·s)]  CH4 inlet molar flux
 
 # --- MPB scan parameters ---
-U_S_LIST  = np.array([8.0, 6.0, 5.0, 4.0, 3.0, 2.75, 2.5]) * 1e-3
+U_S_LIST  = np.array([8.0, 6.0, 5.0, 4.0, 3.5, 3.4]) * 1e-3
 T_IN_LIST = [280]
 
 print(f"MPB flux form: d={d_b*100:.0f} cm, L={L_b:.1f} m, "
@@ -193,7 +193,8 @@ def K_LDF_vec(T_K, p_arr, W0, E, n):
             - q_star_vec(T_K, np.maximum(p-dp, 1e-15), W0, E, n)) / 2.0      # central finite difference: dq*/dp [mol/(kg·Pa)]; np.maximum prevents zero/negative pressure in DA log
     dqsp = np.maximum(dqsp, 1e-30)                                             # guard against division by zero when isotherm slope is numerically flat
     r_p = 0.5 * d_p                                                            # particle radius [m]
-    return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * R_gas * T_K * dqsp)  # Glueckauf LDF coefficient from pore diffusion [1/s]: large dq*/dp → slow K_LDF
+    return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * R_gas * T_K * dqsp)  # Glueckauf LDF coefficient from pore diffusion [1/s]: large dq*/dp → slow K_LDF. does not use Rw but R_gas since it return mol per kg and not kg/kg
+
 
 def K_eq_sabatier(T_K):
     return 137.0*T_K**(-3.994)*np.exp(158700.0/(R_gas*T_K))  # equilibrium constant of the Sabatier reaction (CO2 + 4H2 <-> CH4 + 2H2O). Koschany et al. (2016)
@@ -694,7 +695,7 @@ for T_C in T_IN_LIST:                                               # outer swee
     u_s_star   = gas_cap_in / (rho_bed_tot * Cp_cat)                  # regime-switch velocity for this T_C, printed below so you can see where each u_s in the scan falls relative to it
 
     print(f"\n{'='*60}")
-    print(f"  T_in = {T_C} C  |  u_g_STP = {u_g_STP*1e3:.1f} mm/s  |  U_a = {U_a:.0f} W/(m3·K)")
+    print(f"  T_in = {T_C} C  |  u_g_STP = {u_g_STP*1e3:.1f} mm/s  |  U_a = {U_a:.0f} W/(m3·K)  |  GHSV = {GHSV:.2f} m3_STP/(kg·h)")
     print(f"  u_s* = {u_s_star*1e3:.3f} mm/s  (regime switch at this velocity)")
     print(f"{'='*60}")
 
@@ -717,10 +718,13 @@ for T_C in T_IN_LIST:                                               # outer swee
             X_out  = float(res['X_CO2'][-1])*100
             q_out  = float(res['q'][0])
             T_max  = float(np.max(res['T'])) - 273.15
+            p_H2O_prof = res['C_H2O'] * R_gas * res['T'] / 1e5   # [bar]  local H2O partial pressure, recovered from concentration via ideal gas law (p = C*R*T)
+            p_H2O_max  = float(np.max(p_H2O_prof))
             regime = "gas" if res['gas_dominates'] else "solid"
             tag    = "ok" if res['converged'] else "not-conv"
             print(f"  u_s={u_s*1e3:.4f} mm/s  X={X_out:.1f}%  "
                   f"q(0)={q_out:.3f}  T_max={T_max:.1f} C  "
+                  f"p_H2O_max={p_H2O_max*1e3:.2f} mbar  "
                   f"[{regime}-dom, {tag}, {res['n_iter']} iter, err={res['conv_err']:.2e}]"
                   f"  ({dt:.1f}s, ETA {_fmt_seconds(eta)})")
             print(_h2o_balance_line(u_s, res))
@@ -800,7 +804,7 @@ SAVE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def _savefig(filename):
     stem, ext = os.path.splitext(filename)
-    filename  = f'{stem}_active_frac_{active_fraction:.0%}{ext}'
+    filename  = f'{stem}_active_frac_{active_fraction:.0%}_GHSV_{GHSV:.2f}{ext}'
     plt.savefig(os.path.join(SAVE_DIR, filename), dpi=150, bbox_inches='tight')
 
 markers = ['o', 's', '^', 'D']
@@ -808,13 +812,7 @@ cmap    = plt.cm.viridis
 
 T_C_PROF = T_IN_LIST[0]
 
-# Below u_s = 2.5 mm/s, only plot every other line (keep the slowest point for range).
-_us_mm        = U_S_LIST * 1e3
-_i_thin_start = int(np.argmax(_us_mm <= 2.5))
-_i_thin       = np.arange(_i_thin_start, len(U_S_LIST), 2)
-if _i_thin[-1] != len(U_S_LIST) - 1:
-    _i_thin = np.append(_i_thin, len(U_S_LIST) - 1)
-i_plot   = np.concatenate([np.arange(_i_thin_start), _i_thin])
+i_plot   = np.arange(len(U_S_LIST))
 pal      = plt.cm.plasma(np.linspace(0.1, 0.85, len(i_plot)))
 pal2     = cmap(np.linspace(0.1, 0.85, len(T_IN_LIST)))
 
@@ -822,31 +820,26 @@ _p0 = noSE_results.get(T_C_PROF, {}).get('profile')
 
 # ── Plot 1: Axial profiles ───────────────────────────────────────────────────
 fig, axes = plt.subplots(2, 2, figsize=(13, 9))
-fig.suptitle(f'MPB flux form  |  T_in = {T_C_PROF} C  |  '
-             f'U_a = {U_a:.0f} W/(m³·K), counter-current', fontsize=11)
 for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
-    if e is None or e['res'] is None:
+    if e is None or e['res'] is None or not e['res']['converged']:
         continue
     r   = e['res']
-    ls  = '-' if r['converged'] else '--'
-    lbl = f"u_s = {e['u_s']*1e3:.2f} mm/s" + ("" if r['converged'] else " (nc)")
-    axes[0,0].plot(r['z'], r['C_CO2']*1e3, color=pal[k], lw=2, ls=ls, label=lbl)
-    axes[0,1].plot(r['z'], r['q'],          color=pal[k], lw=2, ls=ls, label=lbl)
-    axes[1,0].plot(r['z'], r['X_CO2']*100,  color=pal[k], lw=2, ls=ls, label=lbl)
-    axes[1,1].plot(r['z'], r['r']*1e3,      color=pal[k], lw=2, ls=ls, label=lbl)
+    lbl = f"u_s = {e['u_s']*1e3:.2f} mm/s"
+    axes[0,0].plot(r['z'], r['C_CO2']*1e3, color=pal[k], lw=2, label=lbl)
+    axes[0,1].plot(r['z'], r['q'],          color=pal[k], lw=2, label=lbl)
+    axes[1,0].plot(r['z'], r['X_CO2']*100,  color=pal[k], lw=2, label=lbl)
+    axes[1,1].plot(r['z'], r['r']*1e3,      color=pal[k], lw=2, label=lbl)
 if _p0 is not None:
     axes[0,0].plot(_p0['z'], _p0['C_CO2']*1e3, color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
     axes[0,1].plot(_p0['z'], _p0['q'],          color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
     axes[1,0].plot(_p0['z'], _p0['X_CO2']*100,  color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
     axes[1,1].plot(_p0['z'], _p0['r']*1e3,      color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
-labels_units = [('C_CO2 [mmol/m3]', 'CO2 concentration'),
-                ('q [mol/kg]',       'Solid H2O loading'),
-                ('CO2 conversion [%]', 'CO2 conversion along bed'),
-                ('r [mmol/(kg_cat.s)]', 'Reaction rate')]
-for ax, (ylabel, title) in zip(axes.flat, labels_units):
-    ax.set_xlabel('z [m]', fontsize=10);  ax.set_ylabel(ylabel, fontsize=10)
-    ax.set_title(title, fontsize=10);     ax.legend(fontsize=7);  ax.grid(True, alpha=0.3)
+labels_units = ['C_CO2 [mmol/m3]', 'q [mol/kg]', 'CO2 conversion [%]', 'r [mmol/(kg_cat.s)]']
+for ax, ylabel in zip(axes.flat, labels_units):
+    ax.set_xlabel('z [m]', fontsize=16);  ax.set_ylabel(ylabel, fontsize=16)
+    ax.tick_params(labelsize=13)
+    ax.legend(fontsize=14);  ax.grid(True, alpha=0.3)
     ax.axvline(0,   color='tab:blue',   lw=1, ls=':', alpha=0.5)
     ax.axvline(L_b, color='tab:orange', lw=1, ls=':', alpha=0.5)
 plt.tight_layout()
@@ -855,152 +848,125 @@ _savefig(f'flux_plot1_axial_profiles_T{T_C_PROF}C.png');  plt.show()
 # ── Plot 2: CO2 conversion vs u_s ────────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
-    us_conv, X_conv, us_nc, X_nc = [], [], [], []
+    us_conv, X_conv = [], []
     for i_us in range(len(U_S_LIST)):
         e = all_results.get((T_C, i_us))
-        if e and e['res']:
+        if e and e['res'] and e['res']['converged']:
             m = get_metrics(e)
             if m:
-                if e['res']['converged']:
-                    us_conv.append(e['u_s']*1e3);  X_conv.append(m['X_CO2']*100)
-                else:
-                    us_nc.append(e['u_s']*1e3);    X_nc.append(m['X_CO2']*100)
+                us_conv.append(e['u_s']*1e3);  X_conv.append(m['X_CO2']*100)
     if us_conv:
         ax.semilogx(us_conv, X_conv, marker=markers[j], color=pal2[j],
                     lw=2, ms=6, label=f'{T_C} C (MPB)')
-    if us_nc:
-        ax.semilogx(us_nc, X_nc, marker=markers[j], color=pal2[j],
-                    lw=2, ms=6, ls='--', mfc='none', mew=1.5, label=f'{T_C} C (not conv)')
-    if us_conv or us_nc:
+    if us_conv:
         ax.axhline(equilibrium_conversion(T_C+273.15), color=pal2[j],
                    lw=1, ls=':', alpha=0.5, label=f'{T_C} C thermo. eq.')
         if T_C in noSE_results:
             ax.axhline(noSE_results[T_C]['X_CO2_noSE']*100, color=pal2[j],
                        lw=1.5, ls='--', alpha=0.8, label=f'{T_C} C u_s=0 (fixed bed)')
-ax.set_xlabel('u_s [mm/s]', fontsize=11);  ax.set_ylabel('CO2 conversion [%]', fontsize=11)
-ax.set_title(f'MPB flux form  |  U_a = {U_a:.0f} W/(m³·K)  — CO2 conversion vs solid velocity',
-             fontsize=10)
-ax.legend(fontsize=9);  ax.grid(True, alpha=0.3);  ax.set_ylim(0, 105)
+ax.set_xlabel('u_s [mm/s]', fontsize=16);  ax.set_ylabel('CO2 conversion [%]', fontsize=16)
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=14);  ax.grid(True, alpha=0.3);  ax.set_ylim(0, 105)
 plt.tight_layout()
 _savefig('flux_plot2_conversion_vs_us.png');  plt.show()
 
 # ── Plot 3: Sorbent utilisation vs u_s ───────────────────────────────────────
 fig, ax = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
-    us_conv, util_conv, us_nc, util_nc = [], [], [], []
+    us_conv, util_conv = [], []
     for i_us in range(len(U_S_LIST)):
         e = all_results.get((T_C, i_us))
-        if e and e['res']:
+        if e and e['res'] and e['res']['converged']:
             m = get_metrics(e)
             if m:
-                if e['res']['converged']:
-                    us_conv.append(e['u_s']*1e3);  util_conv.append(m['sorbent_util']*100)
-                else:
-                    us_nc.append(e['u_s']*1e3);    util_nc.append(m['sorbent_util']*100)
+                us_conv.append(e['u_s']*1e3);  util_conv.append(m['sorbent_util']*100)
     if us_conv:
         ax.semilogx(us_conv, util_conv, marker=markers[j], color=pal2[j],
                     lw=2, ms=6, label=f'{T_C} C')
-    if us_nc:
-        ax.semilogx(us_nc, util_nc, marker=markers[j], color=pal2[j],
-                    lw=2, ms=6, ls='--', mfc='none', mew=1.5, label=f'{T_C} C (not conv)')
 ax.axhline(100, color='grey', lw=1.5, ls='--', label='q = q* (fully saturated)')
-ax.set_xlabel('u_s [mm/s]', fontsize=11)
-ax.set_ylabel('Sorbent utilisation  q(z=0) / q*(p_H2O_max)  [%]', fontsize=11)
-ax.set_title(f'MPB flux form  |  U_a = {U_a:.0f} W/(m³·K)  — Sorbent utilisation', fontsize=10)
-ax.legend(fontsize=9);  ax.grid(True, alpha=0.3)
+ax.set_xlabel('u_s [mm/s]', fontsize=16)
+ax.set_ylabel('Sorbent utilisation  q(z=0) / q*(p_H2O_max)  [%]', fontsize=16)
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=14);  ax.grid(True, alpha=0.3)
 plt.tight_layout()
 _savefig('flux_plot3_sorbent_utilisation.png');  plt.show()
 
 # ── Plot 4: H2O profiles ─────────────────────────────────────────────────────
 T_K_prof = T_C_PROF + 273.15
 fig, (ax_q, ax_h) = plt.subplots(1, 2, figsize=(13, 5))
-fig.suptitle(f'H2O profiles  |  T_in = {T_C_PROF} C  |  U_a = {U_a:.0f} W/(m³·K)', fontsize=11)
 for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
-    if e is None or e['res'] is None:
+    if e is None or e['res'] is None or not e['res']['converged']:
         continue
     r   = e['res']
-    ls  = '-' if r['converged'] else '--'
-    lbl = f"u_s = {e['u_s']*1e3:.2f} mm/s" + ("" if r['converged'] else " (nc)")
-    ax_q.plot(r['z'], r['q'],                          color=pal[k], lw=2, ls=ls, label=lbl)
-    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_K_prof/1e2,  color=pal[k], lw=2, ls=ls, label=lbl)
+    lbl = f"u_s = {e['u_s']*1e3:.2f} mm/s"
+    ax_q.plot(r['z'], r['q'],                          color=pal[k], lw=2, label=lbl)
+    ax_h.plot(r['z'], r['C_H2O']*R_gas*T_K_prof/1e2,  color=pal[k], lw=2, label=lbl)
 if _p0 is not None:
     ax_q.plot(_p0['z'], _p0['q'],                          color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
     ax_h.plot(_p0['z'], _p0['C_H2O']*R_gas*T_K_prof/1e2,  color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
-ax_q.set_xlabel('z [m]');  ax_q.set_ylabel('q [mol/kg]')
-ax_q.set_title('Solid H2O loading');  ax_q.legend(fontsize=7);  ax_q.grid(True, alpha=0.3)
-ax_h.set_xlabel('z [m]');  ax_h.set_ylabel('p_H2O [mbar]')
-ax_h.set_title('Gas-phase H2O partial pressure');  ax_h.legend(fontsize=7);  ax_h.grid(True, alpha=0.3)
+ax_q.set_xlabel('z [m]', fontsize=16);  ax_q.set_ylabel('q [mol/kg]', fontsize=16)
+ax_q.tick_params(labelsize=13);  ax_q.legend(fontsize=14);  ax_q.grid(True, alpha=0.3)
+ax_h.set_xlabel('z [m]', fontsize=16);  ax_h.set_ylabel('p_H2O [mbar]', fontsize=16)
+ax_h.tick_params(labelsize=13);  ax_h.legend(fontsize=14);  ax_h.grid(True, alpha=0.3)
 plt.tight_layout()
 _savefig(f'flux_plot4_H2O_profiles_T{T_C_PROF}C.png');  plt.show()
 
 # ── Plot 5: Temperature profiles ─────────────────────────────────────────────
 fig, ax_T = plt.subplots(figsize=(9, 5))
-fig.suptitle(f'Temperature profile  |  T_in = {T_C_PROF} C  |  U_a = {U_a:.0f} W/(m³·K)',
-             fontsize=11)
 for k, i_us in enumerate(i_plot):
     e = all_results.get((T_C_PROF, i_us))
-    if e is None or e['res'] is None:
+    if e is None or e['res'] is None or not e['res']['converged']:
         continue
     r      = e['res']
     regime = 'g' if r['gas_dominates'] else 's'
-    ls     = '-' if r['converged'] else '--'
-    lbl    = f"u_s = {e['u_s']*1e3:.2f} mm/s ({regime})" + ("" if r['converged'] else " (nc)")
-    ax_T.plot(r['z'], r['T'] - 273.15, color=pal[k], lw=2, ls=ls, label=lbl)
+    lbl    = f"u_s = {e['u_s']*1e3:.2f} mm/s ({regime})"
+    ax_T.plot(r['z'], r['T'] - 273.15, color=pal[k], lw=2, label=lbl)
 if _p0 is not None:
     ax_T.plot(_p0['z'], _p0['T'] - 273.15, color='k', lw=2, ls='--', label='u_s=0 (fixed bed)')
 ax_T.axhline(T_C_PROF, color='grey', lw=1.5, ls='--', alpha=0.8, label=f'T_in = T_wall = {T_C_PROF} °C')
-ax_T.set_xlabel('z [m]', fontsize=10);  ax_T.set_ylabel('T [°C]', fontsize=10)
-ax_T.set_title('(g) = gas-dominated  |  (s) = solid-dominated (T from solid IVP)', fontsize=9)
-ax_T.legend(fontsize=7);  ax_T.grid(True, alpha=0.3)
+ax_T.set_xlabel('z [m]', fontsize=16);  ax_T.set_ylabel('T [°C]', fontsize=16)
+ax_T.tick_params(labelsize=13)
+ax_T.legend(fontsize=14);  ax_T.grid(True, alpha=0.3)
 plt.tight_layout()
 _savefig(f'flux_plot5_temperature_T{T_C_PROF}C.png');  plt.show()
 
 # ── Plot 6: Peak temperature rise vs u_s ─────────────────────────────────────
 fig, ax6 = plt.subplots(figsize=(9, 5))
 for j, T_C in enumerate(T_IN_LIST):
-    us_conv, dT_conv, us_nc, dT_nc = [], [], [], []
+    us_conv, dT_conv = [], []
     for i_us in range(len(U_S_LIST)):
         e = all_results.get((T_C, i_us))
-        if e and e['res']:
+        if e and e['res'] and e['res']['converged']:
             m = get_metrics(e)
             if m:
-                if e['res']['converged']:
-                    us_conv.append(e['u_s']*1e3);  dT_conv.append(m['T_max'] - (T_C + 273.15))
-                else:
-                    us_nc.append(e['u_s']*1e3);    dT_nc.append(m['T_max'] - (T_C + 273.15))
+                us_conv.append(e['u_s']*1e3);  dT_conv.append(m['T_max'] - (T_C + 273.15))
     if us_conv:
         ax6.semilogx(us_conv, dT_conv, marker=markers[j], color=pal2[j],
                      lw=2, ms=6, label=f'{T_C} C (MPB)')
-    if us_nc:
-        ax6.semilogx(us_nc, dT_nc, marker=markers[j], color=pal2[j],
-                     lw=2, ms=6, ls='--', mfc='none', mew=1.5, label=f'{T_C} C (not conv)')
     if T_C in noSE_results and noSE_results[T_C].get('profile') is not None:
         dT_noSE = float(np.max(noSE_results[T_C]['profile']['T'])) - (T_C + 273.15)
         ax6.axhline(dT_noSE, color=pal2[j], lw=1.5, ls='--', alpha=0.8,
                     label=f'{T_C} C u_s=0 (fixed bed)')
-ax6.set_xlabel('u_s [mm/s]', fontsize=11)
-ax6.set_ylabel('ΔT_max = T_peak − T_in  [K]', fontsize=11)
-ax6.set_title(f'MPB flux form  |  U_a = {U_a:.0f} W/(m³·K)  — peak temperature rise',
-              fontsize=10)
-ax6.legend(fontsize=9);  ax6.grid(True, alpha=0.3)
+ax6.set_xlabel('u_s [mm/s]', fontsize=16)
+ax6.set_ylabel('ΔT_max = T_peak − T_in  [K]', fontsize=16)
+ax6.tick_params(labelsize=13)
+ax6.legend(fontsize=14);  ax6.grid(True, alpha=0.3)
 plt.tight_layout()
 _savefig('flux_plot6_Tmax_vs_us.png');  plt.show()
 
 # ── Plot 7: H2O budget decomposition ─────────────────────────────────────────
 fig, (ax_rate, ax_cumul) = plt.subplots(1, 2, figsize=(13, 5))
-fig.suptitle(f'H2O budget  |  T_in = {T_C_PROF} C  |  U_a = {U_a:.0f} W/(m³·K)', fontsize=11)
 
-i_plot_7 = i_plot[::2]  # extra thinning on top of the already-halved i_plot
+i_plot_7 = i_plot
 pal_7    = plt.cm.plasma(np.linspace(0.1, 0.85, len(i_plot_7)))
 
 for k, i_us in enumerate(i_plot_7):
     e = all_results.get((T_C_PROF, i_us))
-    if e is None or e['res'] is None:
+    if e is None or e['res'] is None or not e['res']['converged']:
         continue
     r   = e['res']
-    ls  = '-' if r['converged'] else '--'
-    lbl = f"u_s = {e['u_s']*1e3:.2f} mm/s" + ("" if r['converged'] else " (nc)")
+    lbl = f"u_s = {e['u_s']*1e3:.2f} mm/s"
 
     p_H2O_f = r['C_H2O'] * R_gas * r['T'] / 1e5   # [bar]
     qs_f    = q_star(r['T'], p_H2O_f)
@@ -1014,22 +980,22 @@ for k, i_us in enumerate(i_plot_7):
     F_ads = cumulative_trapezoid(S_ads, r['z'], initial=0)
     F_net = F_rxn + F_ads
 
-    ax_rate.plot(r['z'], S_rxn*1e3, color=pal_7[k], lw=2,   ls=ls,            label=lbl)
-    ax_rate.plot(r['z'], S_ads*1e3, color=pal_7[k], lw=1.5, ls=ls, alpha=0.5)
+    ax_rate.plot(r['z'], S_rxn*1e3, color=pal_7[k], lw=2,               label=f"{lbl} rxn")
+    ax_rate.plot(r['z'], S_ads*1e3, color=pal_7[k], lw=1.5, alpha=0.5, label=f"{lbl} sorbent")
 
-    ax_cumul.plot(r['z'], F_rxn*1e3, color=pal_7[k], lw=2,   ls=ls,            label=f"{lbl} rxn")
-    ax_cumul.plot(r['z'], F_ads*1e3, color=pal_7[k], lw=1.5, ls=ls, alpha=0.5, label=f"{lbl} ads")
-    ax_cumul.plot(r['z'], F_net*1e3, color=pal_7[k], lw=1,   ls=ls, alpha=0.3)
+    ax_cumul.plot(r['z'], F_rxn*1e3, color=pal_7[k], lw=2,               label=f"{lbl} rxn")
+    ax_cumul.plot(r['z'], F_ads*1e3, color=pal_7[k], lw=1.5, alpha=0.5, label=f"{lbl} ads")
+    ax_cumul.plot(r['z'], F_net*1e3, color=pal_7[k], lw=1,   alpha=0.3, label=f"{lbl} net")
 
 ax_rate.axhline(0, color='k', lw=0.8, ls=':')
-ax_rate.set_xlabel('z [m]');  ax_rate.set_ylabel('S_H2O [mmol/(m³_bed·s)]')
-ax_rate.set_title('Local H2O source (+) / sink (−) rates\nsolid line = rxn,  faint = sorbent', fontsize=9)
-ax_rate.legend(fontsize=7);  ax_rate.grid(True, alpha=0.3)
+ax_rate.set_xlabel('z [m]', fontsize=16);  ax_rate.set_ylabel('S_H2O [mmol/(m³_bed·s)]', fontsize=16)
+ax_rate.tick_params(labelsize=13)
+ax_rate.legend(fontsize=14);  ax_rate.grid(True, alpha=0.3)
 
 ax_cumul.axhline(0, color='k', lw=0.8, ls=':')
-ax_cumul.set_xlabel('z [m]');  ax_cumul.set_ylabel('Cumulative H2O flux [mmol/(m²·s)]')
-ax_cumul.set_title('Cumulative H2O budget\nbright = rxn,  faint = sorbent capture,  faintest = net gas', fontsize=9)
-ax_cumul.legend(fontsize=6);  ax_cumul.grid(True, alpha=0.3)
+ax_cumul.set_xlabel('z [m]', fontsize=16);  ax_cumul.set_ylabel('Cumulative H2O flux [mmol/(m²·s)]', fontsize=16)
+ax_cumul.tick_params(labelsize=13)
+ax_cumul.legend(fontsize=14);  ax_cumul.grid(True, alpha=0.3)
 
 plt.tight_layout()
 _savefig(f'flux_plot7_H2O_budget_T{T_C_PROF}C.png');  plt.show()

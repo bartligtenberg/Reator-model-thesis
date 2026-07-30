@@ -55,6 +55,7 @@ m_cat       = m_cat_total * active_fraction   # active catalyst mass   [kg]  (re
 rho_bed_cat = m_cat       / V_bed             # catalyst bulk density  [kg_cat/m³_bed]  (reaction terms)
 rho_bed_ads = m_cat_total / V_bed             # sorbent bulk density   [kg_sorb/m³_bed] (adsorption terms — always 100% of mass)
 eps_b   = 0.40              # void fraction between particles      [-]
+rho_p   = 1.40e3             # particle skeletal density            [kg/m³]  (5%Ni2.5%Ce/13X, Wei thesis)
 
 # --------------- Particle properties  (identical to adsorption_simulation.py)
 d_p   = 0.75e-3             # particle diameter                   [m]
@@ -131,7 +132,7 @@ dH_mix  = -10.0e3           # K_mix van 't Hoff parameter        [J/mol]
 P_FLOOR = 1e-4              # [bar]
 
 # --------------- Spatial discretisation --------------------------------------
-N  = 50                    # number of axial nodes
+N  = 100                    # number of axial nodes
 dz = L_b / (N - 1)          # node spacing                         [m]
 z_cm = np.linspace(0, L_b, N) * 100   # node positions for plots   [cm]
 
@@ -195,20 +196,29 @@ def K_LDF_vec(T_K, p_arr, W0, E, n):
     extra bit of pressure drives a lot of adsorption, making diffusion the
     bottleneck  →  smaller K_LDF.
     """
+    # D_M = 3.36e-9 * T_K**1.75                                                  # molecular diffusivity [m²/s], power-law T-dependence (Chapman-Enskog) from supplementary material of Bareschino et al. (2023)
+    # p      = np.asarray(p_arr, dtype=float)
+    # dp_bar = 1.0 / 1e5          # 1 Pa expressed in bar (central-difference step)
+
+    # p_lo = np.maximum(p - dp_bar, 1e-15)
+    # p_hi = p + dp_bar
+
+    # # Central-difference derivative of the isotherm (matches adsorption_simulation.py).
+    # dqstar_dp = (q_star_vec(T_K, p_hi, W0, E, n)
+    #              - q_star_vec(T_K, p_lo, W0, E, n)) / 2.0
+    # dqstar_dp = np.maximum(dqstar_dp, 1e-30)   # prevent division by zero on flat isotherm
+
+    # return  (15.0 * D_M * MW_H2O * eps_p
+    #         / (0.5 * d_p**2 * tau_p * rho_ads * R_gas * T_K * dqstar_dp))
+
     D_M = 3.36e-9 * T_K**1.75                                                  # molecular diffusivity [m²/s], power-law T-dependence (Chapman-Enskog) from supplementary material of Bareschino et al. (2023)
-    p      = np.asarray(p_arr, dtype=float)
-    dp_bar = 1.0 / 1e5          # 1 Pa expressed in bar (central-difference step)
-
-    p_lo = np.maximum(p - dp_bar, 1e-15)
-    p_hi = p + dp_bar
-
-    # Central-difference derivative of the isotherm (matches adsorption_simulation.py).
-    dqstar_dp = (q_star_vec(T_K, p_hi, W0, E, n)
-                 - q_star_vec(T_K, p_lo, W0, E, n)) / 2.0
-    dqstar_dp = np.maximum(dqstar_dp, 1e-30)   # prevent division by zero on flat isotherm
-
-    return  (15.0 * D_M * MW_H2O * eps_p
-            / (0.5 * d_p**2 * tau_p * rho_ads * R_gas * T_K * dqstar_dp))
+    p    = np.asarray(p_arr, dtype=float)                                      # ensure p (water pressure)is a numpy float array for vectorised operations
+    dp   = 1.0/1e5                                                             # pressure step = 1 Pa expressed in bar; chosen so dividing by 2.0 [Pa] gives dq*/dp in mol/(kg·Pa)
+    dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
+            - q_star_vec(T_K, np.maximum(p-dp, 1e-15), W0, E, n)) / 2.0      # central finite difference: dq*/dp [mol/(kg·Pa)]; np.maximum prevents zero/negative pressure in DA log
+    dqsp = np.maximum(dqsp, 1e-30)                                             # guard against division by zero when isotherm slope is numerically flat
+    r_p = 0.5 * d_p                                                            # particle radius [m]
+    return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * (R_gas/MW_H2O) * T_K * dqsp)  # Glueckauf LDF coefficient from pore diffusion [1/s]: large dq*/dp → slow K_LDF
 
 
 def K_eq_sabatier(T_K):
@@ -589,7 +599,7 @@ wpd_path = os.path.join(os.path.dirname(__file__), 'wpd_datasets.csv')
 wpd = pd.read_csv(wpd_path, header=1)
 wpd.columns = ['X_nonSE', 'Y_nonSE', 'X_SE', 'Y_SE']
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots(figsize=(8, 5.5))
 ax.plot(T_fine,  X_eq,     'k--',  lw=1.5, label='Equilibrium')
 ax.plot(T_arr,   X_off_ss, 'ko--', lw=2.0, ms=7, label='Non-SE (steady state)')
 ax.plot(T_arr,   X_on_ini, 'r^-',  lw=2.0, ms=7, label='SE (fresh sorbent)')
@@ -599,11 +609,12 @@ ax.scatter(wpd['X_nonSE'], wpd['Y_nonSE'], marker='o', s=50,
 ax.scatter(wpd['X_SE'], wpd['Y_SE'], marker='^', s=50,
            facecolors='none', edgecolors='red', linewidths=1.5,
            label='SE (Wei, measured)')
-ax.set_xlabel('Temperature [°C]', fontsize=12)
-ax.set_ylabel('CO₂ conversion [%]', fontsize=12)
+ax.set_xlabel('Temperature [°C]', fontsize=16)
+ax.set_ylabel('CO₂ conversion [%]', fontsize=16)
 ax.set_xlim(170, 370)
 ax.set_ylim(0, 105)
-ax.legend(fontsize=10)
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=14)
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig(os.path.join(os.path.dirname(__file__),

@@ -214,7 +214,7 @@ def K_LDF_vec(T_K, p_arr, W0, E, n):
     dqstar_dp = np.maximum(dqstar_dp, 1e-30)
 
     return (15.0 * D_M * eps_p
-            / (0.5 * d_p**2 * tau_p * rho_p * R_gas * T_K * dqstar_dp))
+            / ((0.5 * d_p)**2 * tau_p * rho_p * R_gas * T_K * dqstar_dp))
 
 
 # =============================================================================
@@ -360,7 +360,7 @@ for label, params in PARAM_SETS.items():
 # 5. PLOT — reproduce Bareschino et al. (2023) Fig. 1(a)
 # =============================================================================
 
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plt.subplots(figsize=(8, 5.5))
 
 styles = {
     'Mette (2014)':       {'color': 'tab:blue',   'marker': 's', 'ms': 8},
@@ -380,11 +380,12 @@ ax.scatter(wei_exp_T, wei_exp_cap,
            color='k', marker='o', s=60, zorder=5,
            label='exp. (Wei et al. 2021a)')
 
-ax.set_xlabel('Temperature [°C]')
-ax.set_ylabel('H₂O breakthrough capacity [mmol$_{H_2O}$/g$_{ads}$]')
+ax.set_xlabel('Temperature [°C]', fontsize=16)
+ax.set_ylabel('H₂O breakthrough capacity [mmol$_{H_2O}$/g$_{ads}$]', fontsize=16)
 ax.set_xlim(250, 330)
 ax.set_ylim(0, 4)
-ax.legend(fontsize=9)
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=14)
 ax.grid(True, alpha=0.3)
 
 plt.tight_layout()

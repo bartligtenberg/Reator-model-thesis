@@ -1,0 +1,116 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\adsorption Wo analysis\MPB_flux_form active frac W0_DA sensitivity.py"                                                                                                                                                                      
+MPB flux form — W0_DA sensitivity analysis: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3                                                                                         
+  GHSV = 1.0 m3_STP/(kg_ads.h)  ->  u_g_STP = 104.689 mm/s, F_in_total = 4.6099 mol/(m2.s)                                                                                 
+  u_s = 5.8 mm/s,  T_in = 280 C                                                                                                                                            
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)                         
+  W0_DA = 190.0 cm3/kg baseline,  multipliers swept: [1.0, 0.9, 1.1]
+
+======================================================================
+  W0_DA sensitivity: u_s = 5.84 mm/s, GHSV = 1.0, T_in = T_wall = 280 C
+======================================================================
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+
+----------------------------------------------------------------------
+  Solving W0_DA case: 1x $W_0$ (baseline)  (multiplier = 1x, W0 = 190.0 cm3/kg)
+----------------------------------------------------------------------
+  Solved in 490.7s  [solid-dominated, converged, 288 outer iterations, err=7.38e-06]
+  X_CO2(outlet) = 99.93%   T_max = 288.3 C
+    H2O balance [mmol/(m²·s)]:  produced=368.535  gas_out=0.001  solid_out=368.060  err=-0.1%
+    Energy closure @ z=L:  Q_gen=92.453 W  Q_wall=7.402 W  Q_sens=84.822 W  mismatch=+0.25%
+    tau_gas=10.99s  tau_solid=342.47s  1/K_LDF_peak=11.60s  tau_rxn=1.50s
+    p_H2O max = 8.87 mbar (at z=0.033 m)   q_outlet (solid, z=0) = 0.334 mol/kg_ads
+
+----------------------------------------------------------------------
+  Solving W0_DA case: 0.9x $W_0$  (multiplier = 0.9x, W0 = 171.0 cm3/kg)
+----------------------------------------------------------------------
+  Solved in 548.2s  [solid-dominated, converged, 327 outer iterations, err=8.64e-06]
+  X_CO2(outlet) = 99.92%   T_max = 288.3 C
+    H2O balance [mmol/(m²·s)]:  produced=368.489  gas_out=0.001  solid_out=368.010  err=-0.1%
+    Energy closure @ z=L:  Q_gen=92.453 W  Q_wall=7.456 W  Q_sens=84.755 W  mismatch=+0.26%
+    tau_gas=10.99s  tau_solid=342.47s  1/K_LDF_peak=10.45s  tau_rxn=1.50s
+    p_H2O max = 10.66 mbar (at z=0.040 m)   q_outlet (solid, z=0) = 0.334 mol/kg_ads
+
+---------------
+----------------------------------------------------------------------
+  Solving W0_DA case: 1.1x $W_0$  (multiplier = 1.1x, W0 = 209.0 cm3/kg)
+----------------------------------------------------------------------
+  Solved in 481.1s  [solid-dominated, converged, 262 outer iterations, err=9.02e-06]
+  X_CO2(outlet) = 99.94%   T_max = 288.3 C
+    H2O balance [mmol/(m²·s)]:  produced=368.572  gas_out=0.001  solid_out=368.102  err=-0.1%
+    Energy closure @ z=L:  Q_gen=92.452 W  Q_wall=7.363 W  Q_sens=84.871 W  mismatch=+0.24%
+    tau_gas=10.99s  tau_solid=342.47s  1/K_LDF_peak=12.71s  tau_rxn=1.50s
+    p_H2O max = 7.57 mbar (at z=0.033 m)   q_outlet (solid, z=0) = 0.334 mol/kg_ads
+
+All 3 W0_DA cases solved.
+
+====================================================================================================
+  W0_DA sensitivity — comparison table
+====================================================================================================
+  case                  X_out[%]  T_max[C]  p_H2O_max[mbar]  q_outlet  H2O err[%]  E closure[%]  tau_gas[s]  1/K_LDF_pk[s]
+  1x $W_0$ (baseline)      99.93     288.3             8.87     0.334        -0.1          0.25       10.99         11.602
+  0.9x $W_0$               99.92     288.3            10.66     0.334        -0.1          0.26       10.99         10.448
+  1.1x $W_0$               99.94     288.3             7.57     0.334        -0.1          0.24       10.99         12.714
+
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/Sensitivity analysis and scenarios/adsorption Wo analysis/MPB_flux_form active frac W0_DA sensitivity.py"
+MPB flux form — W0_DA sensitivity analysis: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  u_s = 11.7 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  W0_DA = 190.0 cm3/kg baseline,  multipliers swept: [1.0, 0.5, 2.0]
+
+======================================================================
+  W0_DA sensitivity: u_s = 11.68 mm/s, GHSV = 1.5, T_in = T_wall = 280 C
+======================================================================
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+
+----------------------------------------------------------------------
+  Solving W0_DA case: 1x $W_0$ (baseline)  (multiplier = 1x, W0 = 190.0 cm3/kg)
+----------------------------------------------------------------------
+  Solved in 223.5s  [solid-dominated, converged, 111 outer iterations, err=9.89e-06]
+  X_CO2(outlet) = 99.76%   T_max = 286.3 C
+c:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling\A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\adsorption Wo analysis\MPB_flux_form active frac W0_DA sensitivity.py:722: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  tau_gas = float(np.trapz(1.0/u_g_z, z))
+    H2O balance [mmol/(m²·s)]:  produced=551.833  gas_out=0.013  solid_out=551.515  err=-0.1%
+    Energy closure @ z=L:  Q_gen=138.237 W  Q_wall=8.509 W  Q_sens=129.615 W  mismatch=+0.08%
+    tau_gas=7.25s  tau_solid=171.23s  1/K_LDF_peak=15.20s  tau_rxn=1.50s
+    p_H2O max = 5.78 mbar (at z=0.047 m)   q_outlet (solid, z=0) = 0.251 mol/kg_ads
+
+----------------------------------------------------------------------
+  Solving W0_DA case: 0.5x $W_0$  (multiplier = 0.5x, W0 = 95.0 cm3/kg)
+----------------------------------------------------------------------
+  Solved in 476.4s  [solid-dominated, converged, 250 outer iterations, err=8.76e-06]
+  X_CO2(outlet) = 99.60%   T_max = 286.3 C
+    H2O balance [mmol/(m²·s)]:  produced=550.974  gas_out=0.050  solid_out=550.620  err=-0.1%
+    Energy closure @ z=L:  Q_gen=138.046 W  Q_wall=8.986 W  Q_sens=128.921 W  mismatch=+0.10%
+    tau_gas=7.23s  tau_solid=171.23s  1/K_LDF_peak=7.74s  tau_rxn=1.50s
+    p_H2O max = 18.48 mbar (at z=0.100 m)   q_outlet (solid, z=0) = 0.250 mol/kg_ads
+
+----------------------------------------------------------------------
+  Solving W0_DA case: 2x $W_0$  (multiplier = 2x, W0 = 380.0 cm3/kg)
+----------------------------------------------------------------------
+  Solved in 286.3s  [solid-dominated, converged, 90 outer iterations, err=6.74e-06]
+  X_CO2(outlet) = 99.87%   T_max = 286.3 C
+    H2O balance [mmol/(m²·s)]:  produced=552.474  gas_out=0.003  solid_out=551.951  err=-0.1%
+    Energy closure @ z=L:  Q_gen=138.341 W  Q_wall=8.398 W  Q_sens=129.861 W  mismatch=+0.06%
+    tau_gas=7.25s  tau_solid=171.23s  1/K_LDF_peak=25.36s  tau_rxn=1.50s
+    p_H2O max = 2.25 mbar (at z=0.027 m)   q_outlet (solid, z=0) = 0.251 mol/kg_ads
+
+All 3 W0_DA cases solved.
+
+====================================================================================================
+  W0_DA sensitivity — comparison table
+====================================================================================================
+  case                  X_out[%]  T_max[C]  p_H2O_max[mbar]  q_outlet  H2O err[%]  E closure[%]  tau_gas[s]  1/K_LDF_pk[s]
+  1x $W_0$ (baseline)      99.76     286.3             5.78     0.251        -0.1          0.08        7.25         15.201
+  0.5x $W_0$               99.60     286.3            18.48     0.250        -0.1          0.10        7.23          7.745
+  2x $W_0$                 99.87     286.3             2.25     0.251        -0.1          0.06        7.25         25.359
+
+  Non-SE fixed-bed reference conversion: 84.62%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

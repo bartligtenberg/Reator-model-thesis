@@ -1,3 +1,4 @@
+"""
 PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/GHSV analysis/MPB_flux_form active frac GHSV.py"
 MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
   GHSV sweep = [0.5, 1.0, 1.5, 2.0] m3_STP/(kg_ads.h)
@@ -86,3 +87,5 @@ All done.  Total: 71m 48s
 Retry pass (backwards) for non-converged solutions...
 Retry pass done. 0 solution(s) re-run.
 PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+"""

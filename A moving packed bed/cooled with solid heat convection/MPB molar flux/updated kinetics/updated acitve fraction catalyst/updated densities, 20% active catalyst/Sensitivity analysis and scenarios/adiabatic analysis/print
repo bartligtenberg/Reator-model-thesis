@@ -1,0 +1,113 @@
+MPB flux form — Sec. 7.1 reference case: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)  (same derivation as GHSV=1.5 case, only GHSV changed)
+  Dilution (background/diluent) confirmed at script default: y_CH4_in = 80%  (not changed)
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 0 W/(m3.K)
+
+======================================================================
+  Solving reference case: u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C
+======================================================================
+  Solved in 2262.5s  [solid-dominated, converged, 930 outer iterations, err=8.84e-06]
+  X_CO2(outlet) = 99.77%   T_max = 293.8 C
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 293.8 C
+  Non-SE fixed-bed reference conversion: 59.78%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+  Fig.1: SE outlet conversion = 99.77%, non-SE fixed-bed outlet = 59.78%, dry-feed equilibrium @ T_in = 84.62%
+
+  Energy closure @ z=L:  Q_gen(rxn+ads)=138.523 W   Q_wall_removed=0.000 W   Q_sensible_out(gas+solid)=138.081 W   mismatch=+0.32%
+
+======================================================================
+  Reactor heat balance -- Q produced vs. Q removed [W]
+======================================================================
+  Q produced:  reaction heat            =   89.407 W
+               adsorption heat          =   49.116 W
+               total                    =  138.523 W
+  Q removed:   wall cooling             =    0.000 W
+               sensible heat (gas+solid)=  138.081 W
+               total                    =  138.081 W
+  mismatch (Q_prod vs Q_removed) = +0.32%
+  (for reference only, not separately plotted -- see the entrance-region discussion: gas sensible =   -7.822 W, solid sensible =  145.903 W)
+
+======================================================================
+  H2O mass balance check
+======================================================================
+    H2O balance [mmol/(m²·s)]:  produced=551.911  gas_out=0.011  solid_out=550.885  err=-0.2%
+
+======================================================================
+  Species / water balance table  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00064         0.6361
+  F_H2               1.10637   0.00254         2.5446
+  F_CH4              5.53184   5.80779      5807.7924
+  F_H2O (gas)        0.00000   0.00001         0.0112
+  F_H2O (ads)        0.00000   0.55088       550.8847
+  X_CO2 (outlet)                               99.77%
+
+======================================================================
+  Characteristic quantities
+======================================================================
+  gas residence time     tau_gas   =   7.25 s   (= integral of dz/u_g(z), u_g = local actual superficial gas velocity)
+  solid residence time    tau_solid = 342.47 s   (= L_b / u_s, u_s constant)
+  1/K_LDF @ peak p_H2O    =   6.06 s   (z=0.067 m, p_H2O=23.92 mbar, T=292.6 C)
+  characteristic reaction time  tau_rxn =   1.50 s   (= C_CO2,in / (rho_bed_cat * r_in); r_in at fresh dry feed, T_in)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\adiabatic analysis\MPB_flux_form_wal cooling.py"
+MPB flux form — Sec. 7.1 reference case: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)  (same derivation as GHSV=1.5 case, only GHSV changed)
+  Dilution (background/diluent) confirmed at script default: y_CH4_in = 80%  (not changed)
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 0 W/(m3.K)
+
+======================================================================
+  Solving reference case: u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C
+======================================================================
+  Solved in 2124.8s  [solid-dominated, converged, 930 outer iterations, err=8.84e-06]
+  X_CO2(outlet) = 99.77%   T_max = 293.8 C
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 293.8 C
+  Non-SE fixed-bed reference conversion: 59.78%
+  Thermodynamic equilibrium conversion @ T_in: 84.62%
+  Fig.1: SE outlet conversion = 99.77%, non-SE fixed-bed outlet = 59.78%, dry-feed equilibrium @ T_in = 84.62%
+
+  Energy closure @ z=L:  Q_gen(rxn+ads)=138.523 W   Q_wall_removed=0.000 W   Q_sensible_out(gas+solid)=138.081 W   mismatch=+0.32%
+
+======================================================================
+  Reactor heat balance -- Q produced vs. Q removed [W]
+======================================================================
+  Q produced:  reaction heat            =   89.407 W
+               adsorption heat          =   49.116 W
+               total                    =  138.523 W
+  Q removed:   wall cooling             =    0.000 W
+               sensible heat (gas+solid)=  138.081 W
+               total                    =  138.081 W
+  mismatch (Q_prod vs Q_removed) = +0.32%
+  (for reference only, not separately plotted -- see the entrance-region discussion: gas sensible =   -7.822 W, solid sensible =  145.903 W)
+
+======================================================================
+  H2O mass balance check
+======================================================================
+    H2O balance [mmol/(m²·s)]:  produced=551.911  gas_out=0.011  solid_out=550.885  err=-0.2%
+
+======================================================================
+  Species / water balance table  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00064         0.6361
+  F_H2               1.10637   0.00254         2.5446
+  F_CH4              5.53184   5.80779      5807.7924
+  F_H2O (gas)        0.00000   0.00001         0.0112
+  F_H2O (ads)        0.00000   0.55088       550.8847
+  X_CO2 (outlet)                               99.77%
+
+======================================================================
+  Characteristic quantities
+======================================================================
+  gas residence time     tau_gas   =   7.25 s   (= integral of dz/u_g(z), u_g = local actual superficial gas velocity)
+  solid residence time    tau_solid = 342.47 s   (= L_b / u_s, u_s constant)
+  1/K_LDF @ peak p_H2O    =   6.06 s   (z=0.067 m, p_H2O=23.92 mbar, T=292.6 C)
+  characteristic reaction time  tau_rxn =   1.50 s   (= C_CO2,in / (rho_bed_cat * r_in); r_in at fresh dry feed, T_in)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+

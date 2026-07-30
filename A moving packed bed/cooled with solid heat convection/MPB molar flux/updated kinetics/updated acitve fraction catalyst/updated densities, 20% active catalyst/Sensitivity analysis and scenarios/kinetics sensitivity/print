@@ -1,0 +1,421 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\kinetics sensitivity\MPB_flux_form_sensitivity kinetics.py"
+MPB flux form — kinetics sensitivity sweep: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  Dilution (background/diluent): y_CH4_in = 80%
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  Kinetics multipliers swept: KIN_MULT = [0.5, 1.0, 2.0]
+
+======================================================================
+  Solving case: KIN_MULT = 0.50x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 1472.9s  [solid-dominated, converged, 835 outer iterations, err=9.52e-06]
+  X_CO2(outlet) = 96.72%   T_max = 291.1 C   r_max = 10.0008 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 290.7 C
+  Non-SE fixed-bed reference conversion: 84.56%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=535.028  gas_out=0.365  solid_out=533.683  err=-0.2%
+
+======================================================================
+  Solving case: KIN_MULT = 1.00x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 164.4s  [solid-dominated, converged, 94 outer iterations, err=8.67e-06]
+  X_CO2(outlet) = 99.77%   T_max = 292.2 C   r_max = 20.9301 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 292.2 C
+  Non-SE fixed-bed reference conversion: 84.62%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.787  err=-0.2%
+
+======================================================================
+  Solving case: KIN_MULT = 2.00x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 123.0s  [solid-dominated, converged, 69 outer iterations, err=8.82e-06]
+  X_CO2(outlet) = 99.91%   T_max = 292.9 C   r_max = 42.8356 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 292.9 C
+  Non-SE fixed-bed reference conversion: 84.62%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=552.669  gas_out=0.002  solid_out=551.665  err=-0.2%
+
+======================================================================
+  Max local reaction rate observed across the sweep: r_max = 42.8356 mmol/(kg_cat.s)  (at KIN_MULT = 2.00x)
+======================================================================
+  Fig.1 [KIN_MULT = 0.5x]: SE outlet conversion = 96.72%, non-SE fixed-bed outlet = 84.56%
+  Fig.1 [KIN_MULT = 1x]: SE outlet conversion = 99.77%, non-SE fixed-bed outlet = 84.62%
+  Fig.1 [KIN_MULT = 2x]: SE outlet conversion = 99.91%, non-SE fixed-bed outlet = 84.62%
+
+======================================================================
+  Energy closure @ z=L (per case)
+======================================================================
+  [KIN_MULT = 0.5x]  Q_gen(rxn+ads)=134.139 W   Q_wall_removed=26.374 W   Q_sensible_out(gas+solid)=107.450 W   mismatch=+0.24%
+  [KIN_MULT = 1x]  Q_gen(rxn+ads)=138.496 W   Q_wall_removed=15.843 W   Q_sensible_out(gas+solid)=122.225 W   mismatch=+0.31%
+  [KIN_MULT = 2x]  Q_gen(rxn+ads)=138.816 W   Q_wall_removed=8.530 W   Q_sensible_out(gas+solid)=129.748 W   mismatch=+0.39%
+
+======================================================================
+  Reactor heat balance -- Q produced vs. Q removed [W]  (per case)
+======================================================================
+  [KIN_MULT = 0.5x]
+    Q produced:  reaction =   86.669 W   adsorption =   47.470 W   total =  134.139 W
+    Q removed:   wall =   26.374 W   sensible(gas+solid) =  107.450 W   total =  133.824 W
+    mismatch = +0.24%   (gas sensible =   -6.079 W, solid sensible =  113.529 W)
+  [KIN_MULT = 1x]
+    Q produced:  reaction =   89.403 W   adsorption =   49.094 W   total =  138.496 W
+    Q removed:   wall =   15.843 W   sensible(gas+solid) =  122.225 W   total =  138.068 W
+    mismatch = +0.31%   (gas sensible =   -6.916 W, solid sensible =  129.141 W)
+  [KIN_MULT = 2x]
+    Q produced:  reaction =   89.540 W   adsorption =   49.276 W   total =  138.816 W
+    Q removed:   wall =    8.530 W   sensible(gas+solid) =  129.748 W   total =  138.278 W
+    mismatch = +0.39%   (gas sensible =   -7.349 W, solid sensible =  137.097 W)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 0.5x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00908         9.0781
+  F_H2               1.10637   0.03631        36.3123
+  F_CH4              5.53184   5.79935      5799.3504
+  F_H2O (gas)        0.00000   0.00036         0.3646
+  F_H2O (ads)        0.00000   0.53368       533.6825
+  X_CO2 (outlet)                               96.72%
+
+  Characteristic quantities [KIN_MULT = 0.5x]
+  gas residence time      tau_gas   =   7.03 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.72 s
+  characteristic reaction time  tau_rxn =   2.99 s   (r_in=7.1360 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 1x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00065         0.6480
+  F_H2               1.10637   0.00259         2.5918
+  F_CH4              5.53184   5.80778      5807.7806
+  F_H2O (gas)        0.00000   0.00001         0.0117
+  F_H2O (ads)        0.00000   0.55079       550.7870
+  X_CO2 (outlet)                               99.77%
+
+  Characteristic quantities [KIN_MULT = 1x]
+  gas residence time      tau_gas   =   7.25 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.37 s
+  characteristic reaction time  tau_rxn =   1.50 s   (r_in=14.2720 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 2x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00026         0.2575
+  F_H2               1.10637   0.00103         1.0300
+  F_CH4              5.53184   5.80817      5808.1710
+  F_H2O (gas)        0.00000   0.00000         0.0021
+  F_H2O (ads)        0.00000   0.55166       551.6649
+  X_CO2 (outlet)                               99.91%
+
+  Characteristic quantities [KIN_MULT = 2x]
+  gas residence time      tau_gas   =   7.36 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.35 s
+  characteristic reaction time  tau_rxn =   0.75 s   (r_in=28.5441 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Kinetics sensitivity summary
+======================================================================
+    KIN_MULT   X_CO2 out [%]   T_max [C]   r_max [mmol/kg.s]   tau_rxn [s]
+        0.50           96.72       291.1             10.0008          2.99
+        1.00           99.77       292.2             20.9301          1.50
+        2.00           99.91       292.9             42.8356          0.75
+
+  Max local reaction rate observed across the sweep: r_max = 42.8356 mmol/(kg_cat.s)  (at KIN_MULT = 2.00x)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+
+
+
+
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\kinetics sensitivity\MPB_flux_form_sensitivity kinetics.py"
+MPB flux form — kinetics sensitivity sweep: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  Dilution (background/diluent): y_CH4_in = 80%
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  Kinetics multipliers swept: KIN_MULT = [0.5, 1.0, 2.0]
+
+======================================================================
+  Solving case: KIN_MULT = 0.50x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 1879.1s  [solid-dominated, converged, 835 outer iterations, err=9.52e-06]
+  X_CO2(outlet) = 96.72%   T_max = 291.1 C   r_max = 10.0008 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 290.7 C
+  Non-SE fixed-bed reference conversion: 84.56%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=535.028  gas_out=0.365  solid_out=533.683  err=-0.2%
+
+======================================================================
+  Solving case: KIN_MULT = 1.00x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 153.9s  [solid-dominated, converged, 94 outer iterations, err=8.67e-06]
+  X_CO2(outlet) = 99.77%   T_max = 292.2 C   r_max = 20.9301 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 292.2 C
+  Non-SE fixed-bed reference conversion: 84.62%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.787  err=-0.2%
+
+======================================================================
+  Solving case: KIN_MULT = 2.00x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 119.3s  [solid-dominated, converged, 69 outer iterations, err=8.82e-06]
+  X_CO2(outlet) = 99.91%   T_max = 292.9 C   r_max = 42.8356 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 292.9 C
+  Non-SE fixed-bed reference conversion: 84.62%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=552.669  gas_out=0.002  solid_out=551.665  err=-0.2%
+
+======================================================================
+  Max local reaction rate observed across the sweep: r_max = 42.8356 mmol/(kg_cat.s)  (at KIN_MULT = 2.00x)
+======================================================================
+  Fig.1 [KIN_MULT = 0.5x]: SE outlet conversion = 96.72%, non-SE fixed-bed outlet = 84.56%
+  Fig.1 [KIN_MULT = 1x]: SE outlet conversion = 99.77%, non-SE fixed-bed outlet = 84.62%
+  Fig.1 [KIN_MULT = 2x]: SE outlet conversion = 99.91%, non-SE fixed-bed outlet = 84.62%
+
+======================================================================
+  Energy closure @ z=L (per case)
+======================================================================
+  [KIN_MULT = 0.5x]  Q_gen(rxn+ads)=134.139 W   Q_wall_removed=26.374 W   Q_sensible_out(gas+solid)=107.450 W   mismatch=+0.24%
+  [KIN_MULT = 1x]  Q_gen(rxn+ads)=138.496 W   Q_wall_removed=15.843 W   Q_sensible_out(gas+solid)=122.225 W   mismatch=+0.31%
+  [KIN_MULT = 2x]  Q_gen(rxn+ads)=138.816 W   Q_wall_removed=8.530 W   Q_sensible_out(gas+solid)=129.748 W   mismatch=+0.39%
+
+======================================================================
+  Reactor heat balance -- Q produced vs. Q removed [W]  (per case)
+======================================================================
+  [KIN_MULT = 0.5x]
+    Q produced:  reaction =   86.669 W   adsorption =   47.470 W   total =  134.139 W
+    Q removed:   wall =   26.374 W   sensible(gas+solid) =  107.450 W   total =  133.824 W
+    mismatch = +0.24%   (gas sensible =   -6.079 W, solid sensible =  113.529 W)
+  [KIN_MULT = 1x]
+    Q produced:  reaction =   89.403 W   adsorption =   49.094 W   total =  138.496 W
+    Q removed:   wall =   15.843 W   sensible(gas+solid) =  122.225 W   total =  138.068 W
+    mismatch = +0.31%   (gas sensible =   -6.916 W, solid sensible =  129.141 W)
+  [KIN_MULT = 2x]
+    Q produced:  reaction =   89.540 W   adsorption =   49.276 W   total =  138.816 W
+    Q removed:   wall =    8.530 W   sensible(gas+solid) =  129.748 W   total =  138.278 W
+    mismatch = +0.39%   (gas sensible =   -7.349 W, solid sensible =  137.097 W)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 0.5x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00908         9.0781
+  F_H2               1.10637   0.03631        36.3123
+  F_CH4              5.53184   5.79935      5799.3504
+  F_H2O (gas)        0.00000   0.00036         0.3646
+  F_H2O (ads)        0.00000   0.53368       533.6825
+  X_CO2 (outlet)                               96.72%
+
+  Characteristic quantities [KIN_MULT = 0.5x]
+  gas residence time      tau_gas   =   7.03 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.72 s
+  characteristic reaction time  tau_rxn =   2.99 s   (r_in=7.1360 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 1x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00065         0.6480
+  F_H2               1.10637   0.00259         2.5918
+  F_CH4              5.53184   5.80778      5807.7806
+  F_H2O (gas)        0.00000   0.00001         0.0117
+  F_H2O (ads)        0.00000   0.55079       550.7870
+  X_CO2 (outlet)                               99.77%
+
+  Characteristic quantities [KIN_MULT = 1x]
+  gas residence time      tau_gas   =   7.25 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.37 s
+  characteristic reaction time  tau_rxn =   1.50 s   (r_in=14.2720 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 2x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00026         0.2575
+  F_H2               1.10637   0.00103         1.0300
+  F_CH4              5.53184   5.80817      5808.1710
+  F_H2O (gas)        0.00000   0.00000         0.0021
+  F_H2O (ads)        0.00000   0.55166       551.6649
+  X_CO2 (outlet)                               99.91%
+
+  Characteristic quantities [KIN_MULT = 2x]
+  gas residence time      tau_gas   =   7.36 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.35 s
+  characteristic reaction time  tau_rxn =   0.75 s   (r_in=28.5441 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Kinetics sensitivity summary
+======================================================================
+    KIN_MULT   X_CO2 out [%]   T_max [C]   r_max [mmol/kg.s]   tau_rxn [s]
+        0.50           96.72       291.1             10.0008          2.99
+        1.00           99.77       292.2             20.9301          1.50
+        2.00           99.91       292.9             42.8356          0.75
+
+  Max local reaction rate observed across the sweep: r_max = 42.8356 mmol/(kg_cat.s)  (at KIN_MULT = 2.00x)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+
+
+
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\kinetics sensitivity\MPB_flux_form_sensitivity kinetics.py"
+MPB flux form — kinetics sensitivity sweep: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3
+  GHSV = 1.5 m3_STP/(kg_ads.h)  ->  u_g_STP = 157.033 mm/s, F_in_total = 6.9148 mol/(m2.s)
+  Dilution (background/diluent): y_CH4_in = 80%
+  u_s = 5.8 mm/s,  T_in = 280 C
+  M_cat(active) = 160.0 g,  M_ads = 740.0 g,  U_a = 2000 W/(m3.K)
+  Kinetics multipliers swept: KIN_MULT = [0.5, 1.0, 2.0]
+
+======================================================================
+  Solving case: KIN_MULT = 0.50x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 1993.1s  [solid-dominated, converged, 835 outer iterations, err=9.52e-06]
+  X_CO2(outlet) = 96.72%   T_max = 291.1 C   r_max = 10.0008 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 290.7 C
+  z(95% conversion) = 1.786 m  (89.3% of bed length)
+  Non-SE fixed-bed reference conversion: 84.56%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=535.028  gas_out=0.365  solid_out=533.683  err=-0.2%
+
+======================================================================
+  Solving case: KIN_MULT = 1.00x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 221.4s  [solid-dominated, converged, 94 outer iterations, err=8.67e-06]
+  X_CO2(outlet) = 99.77%   T_max = 292.2 C   r_max = 20.9301 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 292.2 C
+  z(95% conversion) = 0.878 m  (43.9% of bed length)
+  Non-SE fixed-bed reference conversion: 84.62%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=551.888  gas_out=0.012  solid_out=550.787  err=-0.2%
+
+======================================================================
+  Solving case: KIN_MULT = 2.00x   (u_s = 5.84 mm/s, GHSV = 1.5, T_in = T_wall = 280 C)
+======================================================================
+  Solved in 188.8s  [solid-dominated, converged, 69 outer iterations, err=8.82e-06]
+  X_CO2(outlet) = 99.91%   T_max = 292.9 C   r_max = 42.8356 mmol/(kg_cat.s)
+  T_out (gas, z=L) = 280.0 C   T(solid outlet, z=0) = 292.9 C
+  z(95% conversion) = 0.438 m  (21.9% of bed length)
+  Non-SE fixed-bed reference conversion: 84.62%   (thermodynamic equilibrium @ T_in: 84.62%, kinetics-independent)
+    H2O balance [mmol/(m²·s)]:  produced=552.669  gas_out=0.002  solid_out=551.665  err=-0.2%
+
+======================================================================
+  Max local reaction rate observed across the sweep: r_max = 42.8356 mmol/(kg_cat.s)  (at KIN_MULT = 2.00x)
+======================================================================
+  Fig.1 [KIN_MULT = 0.5x]: SE outlet conversion = 96.72%, non-SE fixed-bed outlet = 84.56%
+  Fig.1 [KIN_MULT = 1x]: SE outlet conversion = 99.77%, non-SE fixed-bed outlet = 84.62%
+  Fig.1 [KIN_MULT = 2x]: SE outlet conversion = 99.91%, non-SE fixed-bed outlet = 84.62%
+
+======================================================================
+  Energy closure @ z=L (per case)
+======================================================================
+  [KIN_MULT = 0.5x]  Q_gen(rxn+ads)=134.139 W   Q_wall_removed=26.374 W   Q_sensible_out(gas+solid)=107.450 W   mismatch=+0.24%
+  [KIN_MULT = 1x]  Q_gen(rxn+ads)=138.496 W   Q_wall_removed=15.843 W   Q_sensible_out(gas+solid)=122.225 W   mismatch=+0.31%
+  [KIN_MULT = 2x]  Q_gen(rxn+ads)=138.816 W   Q_wall_removed=8.530 W   Q_sensible_out(gas+solid)=129.748 W   mismatch=+0.39%
+
+======================================================================
+  Reactor heat balance -- Q produced vs. Q removed [W]  (per case)
+======================================================================
+  [KIN_MULT = 0.5x]
+    Q produced:  reaction =   86.669 W   adsorption =   47.470 W   total =  134.139 W
+    Q removed:   wall =   26.374 W   sensible(gas+solid) =  107.450 W   total =  133.824 W
+    mismatch = +0.24%   (gas sensible =   -6.079 W, solid sensible =  113.529 W)
+  [KIN_MULT = 1x]
+    Q produced:  reaction =   89.403 W   adsorption =   49.094 W   total =  138.496 W
+    Q removed:   wall =   15.843 W   sensible(gas+solid) =  122.225 W   total =  138.068 W
+    mismatch = +0.31%   (gas sensible =   -6.916 W, solid sensible =  129.141 W)
+  [KIN_MULT = 2x]
+    Q produced:  reaction =   89.540 W   adsorption =   49.276 W   total =  138.816 W
+    Q removed:   wall =    8.530 W   sensible(gas+solid) =  129.748 W   total =  138.278 W
+    mismatch = +0.39%   (gas sensible =   -7.349 W, solid sensible =  137.097 W)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 0.5x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00908         9.0781
+  F_H2               1.10637   0.03631        36.3123
+  F_CH4              5.53184   5.79935      5799.3504
+  F_H2O (gas)        0.00000   0.00036         0.3646
+  F_H2O (ads)        0.00000   0.53368       533.6825
+  X_CO2 (outlet)                               96.72%
+
+  Characteristic quantities [KIN_MULT = 0.5x]
+  gas residence time      tau_gas   =   7.03 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.72 s
+  characteristic reaction time  tau_rxn =   2.99 s   (r_in=7.1360 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 1x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00065         0.6480
+  F_H2               1.10637   0.00259         2.5918
+  F_CH4              5.53184   5.80778      5807.7806
+  F_H2O (gas)        0.00000   0.00001         0.0117
+  F_H2O (ads)        0.00000   0.55079       550.7870
+  X_CO2 (outlet)                               99.77%
+
+  Characteristic quantities [KIN_MULT = 1x]
+  gas residence time      tau_gas   =   7.25 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.37 s
+  characteristic reaction time  tau_rxn =   1.50 s   (r_in=14.2720 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Species / water balance table  [KIN_MULT = 2x]  [mol/(m2.s)]  (outlet in brackets: mmol/(m2.s))
+======================================================================
+  species                 in       out     out [mmol]
+  F_CO2              0.27659   0.00026         0.2575
+  F_H2               1.10637   0.00103         1.0300
+  F_CH4              5.53184   5.80817      5808.1710
+  F_H2O (gas)        0.00000   0.00000         0.0021
+  F_H2O (ads)        0.00000   0.55166       551.6649
+  X_CO2 (outlet)                               99.91%
+
+  Characteristic quantities [KIN_MULT = 2x]
+  gas residence time      tau_gas   =   7.36 s
+  solid residence time     tau_solid = 342.47 s
+  1/K_LDF @ peak p_H2O     =   6.35 s
+  characteristic reaction time  tau_rxn =   0.75 s   (r_in=28.5441 mmol/(kg_cat.s) at fresh dry feed, T_in)
+
+======================================================================
+  Kinetics sensitivity summary
+======================================================================
+    KIN_MULT   X_CO2 out [%]   T_max [C]   r_max [mmol/kg.s]   tau_rxn [s]   z(95% X) [m]
+        0.50           96.72       291.1             10.0008          2.99          1.786
+        1.00           99.77       292.2             20.9301          1.50          0.878
+        2.00           99.91       292.9             42.8356          0.75          0.438
+
+  Max local reaction rate observed across the sweep: r_max = 42.8356 mmol/(kg_cat.s)  (at KIN_MULT = 2.00x)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
