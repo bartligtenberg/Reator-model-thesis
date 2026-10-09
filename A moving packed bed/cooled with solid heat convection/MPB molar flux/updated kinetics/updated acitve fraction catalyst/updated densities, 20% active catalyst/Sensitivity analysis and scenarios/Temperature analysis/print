@@ -1,0 +1,207 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\Temperature analysis\MPB_temp.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3, u_g_STP=104.7 mm/s
+  F_in_total = 4.6099 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+
+============================================================
+  T_in = 240 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 89.4%
+  u_s=5.8400 mm/s  X=90.9%  q(0)=0.304  T_max=246.4 C  p_H2O_max=1.86 mbar  [solid-dom, ok, 100 iter, err=9.20e-06]  (216.9s, ETA 14m 27s)
+    H2O balance [mmol/(m²·s)]:  produced=335.213  gas_out=0.290  solid_out=334.810  err=-0.0%
+
+============================================================
+  T_in = 260 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 88.3%
+  u_s=5.8400 mm/s  X=99.7%  q(0)=0.334  T_max=267.7 C  p_H2O_max=4.50 mbar  [solid-dom, ok, 37 iter, err=6.45e-06]  (89.2s, ETA 7m 39s)
+    H2O balance [mmol/(m²·s)]:  produced=367.500  gas_out=0.023  solid_out=367.233  err=-0.1%
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.8400 mm/s  X=99.9%  q(0)=0.334  T_max=288.3 C  p_H2O_max=8.87 mbar  [solid-dom, ok, 41 iter, err=9.70e-06]  (102.1s, ETA 4m 32s)
+    H2O balance [mmol/(m²·s)]:  produced=368.535  gas_out=0.001  solid_out=368.075  err=-0.1%
+
+============================================================
+  T_in = 300 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 80.3%
+  u_s=5.8400 mm/s  X=99.9%  q(0)=0.334  T_max=308.6 C  p_H2O_max=16.68 mbar  [solid-dom, ok, 52 iter, err=8.58e-06]  (115.4s, ETA 2m 10s)
+    H2O balance [mmol/(m²·s)]:  produced=368.371  gas_out=0.001  solid_out=367.595  err=-0.2%
+
+============================================================
+  T_in = 320 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 75.2%
+  u_s=5.8400 mm/s  X=99.8%  q(0)=0.333  T_max=328.7 C  p_H2O_max=31.30 mbar  [solid-dom, ok, 75 iter, err=9.34e-06]  (140.4s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=367.871  gas_out=0.003  solid_out=365.996  err=-0.5%
+
+All done.  Total: 11m 04s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/Sensitivity analysis and scenarios/Temperature analysis/MPB_temp.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3, u_g_STP=104.7 mm/s
+  F_in_total = 4.6099 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+
+============================================================
+  T_in = 240 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 89.4%
+  u_s=5.8400 mm/s  X=90.9%  q(0)=0.304  T_max=246.4 C  p_H2O_max=1.86 mbar  [solid-dom, ok, 100 iter, err=9.07e-06]  (203.2s, ETA 13m 32s)
+    H2O balance [mmol/(m²·s)]:  produced=335.213  gas_out=0.290  solid_out=334.810  err=-0.0%
+
+============================================================
+  T_in = 260 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 88.3%
+  u_s=5.8400 mm/s  X=99.7%  q(0)=0.334  T_max=267.7 C  p_H2O_max=4.50 mbar  [solid-dom, ok, 37 iter, err=6.41e-06]  (72.5s, ETA 6m 53s)
+    H2O balance [mmol/(m²·s)]:  produced=367.500  gas_out=0.023  solid_out=367.233  err=-0.1%
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.8400 mm/s  X=99.9%  q(0)=0.334  T_max=288.3 C  p_H2O_max=8.87 mbar  [solid-dom, ok, 43 iter, err=7.61e-06]  (84.9s, ETA 4m 00s)
+    H2O balance [mmol/(m²·s)]:  produced=368.535  gas_out=0.001  solid_out=368.072  err=-0.1%
+
+============================================================
+  T_in = 300 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 80.3%
+  u_s=5.8400 mm/s  X=99.9%  q(0)=0.334  T_max=308.6 C  p_H2O_max=16.68 mbar  [solid-dom, ok, 52 iter, err=8.47e-06]  (84.5s, ETA 1m 51s)
+    H2O balance [mmol/(m²·s)]:  produced=368.371  gas_out=0.001  solid_out=367.595  err=-0.2%
+
+============================================================
+  T_in = 320 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 75.2%
+  u_s=5.8400 mm/s  X=99.8%  q(0)=0.333  T_max=328.7 C  p_H2O_max=31.30 mbar  [solid-dom, ok, 76 iter, err=5.94e-06]  (149.7s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=367.871  gas_out=0.003  solid_out=365.994  err=-0.5%
+
+All done.  Total: 9m 54s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.
+
+============================================================
+  Max GHSV at u_s = 5.84 mm/s for Lambda >= 2.50
+============================================================
+  T_in = 240 C:  q_star_max = 2.0087 mol/kg  Lambda(GHSV=1.00) = 5.994  ->  GHSV_max = 2.398 m3_STP/(kg_ads.h)
+  T_in = 260 C:  q_star_max = 1.5961 mol/kg  Lambda(GHSV=1.00) = 4.763  ->  GHSV_max = 1.905 m3_STP/(kg_ads.h)
+  T_in = 280 C:  q_star_max = 1.2565 mol/kg  Lambda(GHSV=1.00) = 3.749  ->  GHSV_max = 1.500 m3_STP/(kg_ads.h)
+  T_in = 300 C:  q_star_max = 0.9800 mol/kg  Lambda(GHSV=1.00) = 2.924  ->  GHSV_max = 1.170 m3_STP/(kg_ads.h)
+  T_in = 320 C:  q_star_max = 0.7572 mol/kg  Lambda(GHSV=1.00) = 2.260  ->  GHSV_max = 0.904 m3_STP/(kg_ads.h)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> python "A moving packed bed\cooled with solid heat convection\MPB molar flux\updated kinetics\updated acitve fraction catalyst\updated densities, 20% active catalyst\Sensitivity analysis and scenarios\Temperature analysis\MPB_temp.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3, u_g_STP=104.7 mm/s
+  F_in_total = 4.6099 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+
+============================================================
+  T_in = 240 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 89.4%
+  u_s=5.8400 mm/s  X=90.9%  q(0)=0.304  T_max=246.4 C  p_H2O_max=1.86 mbar  [solid-dom, ok, 100 iter, err=9.20e-06]  (188.0s, ETA 18m 47s)
+    H2O balance [mmol/(m²·s)]:  produced=335.213  gas_out=0.290  solid_out=334.810  err=-0.0%
+
+============================================================
+  T_in = 260 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 88.3%
+  u_s=5.8400 mm/s  X=99.7%  q(0)=0.334  T_max=267.7 C  p_H2O_max=4.50 mbar  [solid-dom, ok, 37 iter, err=6.45e-06]  (68.2s, ETA 10m 40s)
+    H2O balance [mmol/(m²·s)]:  produced=367.500  gas_out=0.023  solid_out=367.233  err=-0.1%
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 84.6%
+  u_s=5.8400 mm/s  X=99.9%  q(0)=0.334  T_max=288.3 C  p_H2O_max=8.87 mbar  [solid-dom, ok, 41 iter, err=9.70e-06]  (150.4s, ETA 9m 02s)
+    H2O balance [mmol/(m²·s)]:  produced=368.535  gas_out=0.001  solid_out=368.075  err=-0.1%
+
+============================================================
+  T_in = 300 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 80.3%
+  u_s=5.8400 mm/s  X=99.9%  q(0)=0.334  T_max=308.6 C  p_H2O_max=16.68 mbar  [solid-dom, ok, 52 iter, err=8.58e-06]  (269.6s, ETA 8m 27s)
+    H2O balance [mmol/(m²·s)]:  produced=368.371  gas_out=0.001  solid_out=367.595  err=-0.2%
+
+============================================================
+  T_in = 310 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 77.8%
+  u_s=5.8400 mm/s  X=99.8%  q(0)=0.333  T_max=318.7 C  p_H2O_max=22.70 mbar  [solid-dom, ok, 56 iter, err=9.95e-06]  (294.7s, ETA 6m 28s)
+    H2O balance [mmol/(m²·s)]:  produced=368.173  gas_out=0.002  solid_out=366.812  err=-0.4%
+
+============================================================
+  T_in = 320 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 75.2%
+  u_s=5.8400 mm/s  X=99.8%  q(0)=0.333  T_max=328.7 C  p_H2O_max=31.30 mbar  [solid-dom, ok, 63 iter, err=9.55e-06]  (322.4s, ETA 3m 35s)
+    H2O balance [mmol/(m²·s)]:  produced=367.871  gas_out=0.003  solid_out=365.996  err=-0.5%
+
+============================================================
+  T_in = 330 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.220 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 72.5%
+  u_s=5.8400 mm/s  X=99.6%  q(0)=0.331  T_max=338.7 C  p_H2O_max=44.86 mbar  [solid-dom, ok, 123 iter, err=9.28e-06]  (603.3s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=367.391  gas_out=0.006  solid_out=364.420  err=-0.8%
+
+All done.  Total: 31m 37s
+
+Retry pass (backwards) for non-converged solutions...
+Retry pass done. 0 solution(s) re-run.
+
+============================================================
+  Max GHSV at u_s = 5.84 mm/s for Lambda >= 2.50
+============================================================
+  T_in = 240 C:  q_star_max = 2.0087 mol/kg  Lambda(GHSV=1.00) = 5.994  ->  GHSV_max = 2.398 m3_STP/(kg_ads.h)
+  T_in = 260 C:  q_star_max = 1.5961 mol/kg  Lambda(GHSV=1.00) = 4.763  ->  GHSV_max = 1.905 m3_STP/(kg_ads.h)
+  T_in = 280 C:  q_star_max = 1.2565 mol/kg  Lambda(GHSV=1.00) = 3.749  ->  GHSV_max = 1.500 m3_STP/(kg_ads.h)
+  T_in = 300 C:  q_star_max = 0.9800 mol/kg  Lambda(GHSV=1.00) = 2.924  ->  GHSV_max = 1.170 m3_STP/(kg_ads.h)
+  T_in = 310 C:  q_star_max = 0.8624 mol/kg  Lambda(GHSV=1.00) = 2.574  ->  GHSV_max = 1.029 m3_STP/(kg_ads.h)
+  T_in = 320 C:  q_star_max = 0.7572 mol/kg  Lambda(GHSV=1.00) = 2.260  ->  GHSV_max = 0.904 m3_STP/(kg_ads.h)
+  T_in = 330 C:  q_star_max = 0.6633 mol/kg  Lambda(GHSV=1.00) = 1.979  ->  GHSV_max = 0.792 m3_STP/(kg_ads.h)
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 
+
+

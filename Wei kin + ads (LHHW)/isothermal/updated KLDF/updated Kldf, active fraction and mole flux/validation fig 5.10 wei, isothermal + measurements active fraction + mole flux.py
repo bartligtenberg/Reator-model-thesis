@@ -71,7 +71,7 @@ E_DA    = 1190e3                # characteristic energy       [J/kg]
 n_DA    = 1.55                     # heterogeneity exponent      [-]
 
 # Operating conditions
-T_C     = 260
+T_C     = 240
 T_K     = T_C + 273.15
 P_bar   = 1.0
 P_Pa    = P_bar * 1e5
@@ -466,7 +466,7 @@ print(f"  Ratio (model / meas): {slope_model / slope_meas:.2f}")
 # 8. PLOT — model lines + measured scatter, dual-axis
 # =============================================================================
 
-fig, ax1 = plt.subplots(figsize=(10, 6))
+fig, ax1 = plt.subplots(figsize=(12, 7))
 
 # --- Left y-axis: model lines ---
 h_H2,  = ax1.plot(t_min, pct_H2,  'k-',  lw=1.8, label='H₂ (model)')
@@ -484,8 +484,8 @@ h_H2O_m = ax1.scatter(t_H2O_meas, H2O_meas, color='olive',
                        marker='^', s=55, zorder=5,
                        label='H₂O (meas.)')
 
-ax1.set_xlabel('Time (min)', fontsize=12)
-ax1.set_ylabel('H₂, CO₂, H₂O concentration (mol%)', fontsize=11)
+ax1.set_xlabel('Time (min)', fontsize=15)
+ax1.set_ylabel('H₂, CO₂, H₂O concentration (mol%)', fontsize=14)
 ax1.set_xlim(0, 60)
 ax1.set_ylim(-0.5, 10.5)
 ax1.set_yticks([0, 2, 4, 6, 8, 10])
@@ -509,7 +509,7 @@ h_X_m   = ax2.scatter(t_X_meas,   X_meas,
                        color='m', marker='s', s=65, zorder=5,
                        label='CO₂ conversion (meas.)')
 
-ax2.set_ylabel('CH₄ concentration (mol%)  /  CO₂ conversion (%)', fontsize=11)
+ax2.set_ylabel('CH₄ concentration (mol%)  /  CO₂ conversion (%)', fontsize=14)
 ax2.set_ylim(-10, 110)
 ax2.set_yticks([0, 20, 40, 60, 80, 100])
 
@@ -527,8 +527,10 @@ ax2.set_yticks([0, 20, 40, 60, 80, 100])
 all_handles = [h_CH4, h_CH4_m, h_Xeq, h_X, h_X_m,
                h_H2, h_H2_m, h_CO2, h_CO2_m, h_H2O, h_H2O_m]
 ax2.legend(handles=all_handles, loc='center left', bbox_to_anchor=(0.02, 0.5),
-           fontsize=8.5, framealpha=0.9, ncol=2)
+           fontsize=11, framealpha=0.9, ncol=2)
 
+ax1.tick_params(labelsize=13)
+ax2.tick_params(labelsize=13)
 ax1.grid(True, alpha=0.3)
 
 plt.tight_layout()

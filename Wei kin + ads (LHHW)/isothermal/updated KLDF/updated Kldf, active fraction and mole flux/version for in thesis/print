@@ -1,0 +1,35 @@
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/Wei kin + ads (LHHW)/isothermal/updated KLDF/updated Kldf, active fraction and mole flux/version for in thesis/validation fig 5.10 wei, isothermal + measurements active fraction + mole flux + EA difference.py"
+
+===== Case: Ea = 1.0 x Ea_base = 77.5 kJ/mol =====
+Validating Wei Fig. 5.10 (molar-flux form):  T = 240 °C,  P = 1.0 bar,  GHSV = 923 mL/(g·h)
+Bed (sorbent) density: 827.6 kg/m³  |  Catalyst density: 165.5 kg/m³  (active_fraction = 20% of 6.5 g)
+Inlet velocity: 39.866 mm/s  |  Inlet total molar flux F_total_in = 0.9344 mol/(m²·s)
+Solving sorption-enhanced case for 120 min ...
+Done.
+
+N2 concentration diagnostic: max rise above inlet = 9.90% (expected: carrier gas shrinks as reaction+adsorption remove moles, so N2 gets concentrated -- this is NOT an error)
+Velocity floor never engaged on the accepted solution (exact mass conservation holds).
+Outlet/inlet velocity ratio at t_end: 0.9572
+CO2 equilibrium conversion at 240 °C: 88.5 %
+CH4 mol% at full CO2 conversion (N2 dilution): 86.2 %  (Wei caption: 94 %)
+
+===== Case: Ea = 0.6 x Ea_base = 46.5 kJ/mol =====
+Validating Wei Fig. 5.10 (molar-flux form):  T = 240 °C,  P = 1.0 bar,  GHSV = 923 mL/(g·h)
+Bed (sorbent) density: 827.6 kg/m³  |  Catalyst density: 165.5 kg/m³  (active_fraction = 20% of 6.5 g)
+Inlet velocity: 39.866 mm/s  |  Inlet total molar flux F_total_in = 0.9344 mol/(m²·s)
+Solving sorption-enhanced case for 120 min ...
+Done.
+
+N2 concentration diagnostic: max rise above inlet = 10.97% (expected: carrier gas shrinks as reaction+adsorption remove moles, so N2 gets concentrated -- this is NOT an error)
+Velocity floor never engaged on the accepted solution (exact mass conservation holds).
+Outlet/inlet velocity ratio at t_end: 0.9558
+CO2 equilibrium conversion at 240 °C: 88.5 %
+CH4 mol% at full CO2 conversion (N2 dilution): 86.2 %  (Wei caption: 94 %)
+
+Max CO2 conversion — model: 98.9 %  |  measurements: 100.0 %
+
+--- H₂O breakthrough slope (K_LDF validation) ---
+  Measured : 0.760 mol%/min  (fitted over t = 43.4–46.9 min)
+  Model    : 2.134 mol%/min  (fitted over t = 49.3–50.5 min)
+  Ratio (model / meas): 2.81
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> 

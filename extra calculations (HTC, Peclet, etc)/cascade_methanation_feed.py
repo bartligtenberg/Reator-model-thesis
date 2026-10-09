@@ -1,6 +1,6 @@
 """
 Cascade methanation feed calculation
-Two conventional reactors with flash separators (25C, 25 bar).
+Two conventional reactors with flash separators (conditions set by FLASH_T_C / FLASH_P_BAR below).
 
 Reaction (Sabatier):  CO2 + 4H2 -> CH4 + 2H2O   (dH = -165 kJ/mol, strongly exothermic)
 
@@ -10,13 +10,22 @@ equilibrium back towards methane, allowing higher overall CO2 conversion.
 
 Assumptions:
 - 80% CO2 conversion per reactor pass (kinetically limited; equilibrium is >99% below ~400C)
-- Flash separators operate at 25C and 25 bar
-- Only water condenses in the flash; H2, CO2, CH4 are supercritical at 25C and stay in gas phase
+- Flash separators operate at FLASH_T_C / FLASH_P_BAR (see constants below, and the
+  "Flash separators:" line in the printed output for the actual values used in this run)
+- Only water condenses in the flash; H2, CO2, CH4 are treated as non-condensable and stay
+  in the gas phase (valid as long as FLASH_T_C stays well above their critical temperatures)
 - Basis: 1 mol total feed
 """
 
 # ── Feed ─────────────────────────────────────────────────────────────────────
 X_per_pass = 0.80   # CO2 conversion per reactor pass
+
+# Flash operating conditions -- single source of truth, used by both flash() calls below
+# and echoed in the printed output, so the docstring/comments can never drift out of sync
+# with what was actually run (as happened before: both calls silently used flash()'s
+# 1 bar/20C defaults while the docstring claimed 25C/25bar).
+FLASH_T_C   = 20.0   # [C]    flash drum temperature
+FLASH_P_BAR = 1.0    # [bar]  flash drum pressure
 
 # Stoichiometric H2/CO2 ratio for CO2 methanation is 4:1, so 80% H2 + 20% CO2
 feed = {"H2": 0.80, "CO2": 0.20, "CH4": 0.00, "H2O": 0.00}  # moles (basis: 1 mol total)
@@ -39,9 +48,11 @@ def react(stream, conversion):
     }
 
 
-def flash(stream, P_bar=25.0, T_C=25.0):
+def flash(stream, P_bar=FLASH_P_BAR, T_C=FLASH_T_C):
     """
     Model a flash drum: cool and hold at pressure, drain condensed water.
+    Defaults to the module-level FLASH_P_BAR / FLASH_T_C, so both call sites below stay
+    in sync with the module docstring/printed banner unless a call explicitly overrides them.
 
     Physics: at temperature T, water has a saturation pressure P_sat below which
     it exists as liquid. In a gas mixture at total pressure P_total, the maximum
@@ -53,8 +64,9 @@ def flash(stream, P_bar=25.0, T_C=25.0):
     High operating pressure is therefore beneficial: it forces more water out
     (lower y_H2O_sat), which also shifts the methanation equilibrium towards CH4.
 
-    H2, CO2, and CH4 are well above their critical temperatures at 25C, so they
-    have no meaningful vapour pressure and pass through the flash unchanged.
+    H2, CO2, and CH4 are treated as non-condensable and pass through the flash unchanged
+    -- valid as long as T_C stays well above their critical temperatures (H2: -240C,
+    CH4: -82C; CO2 at 31C is closer, so this assumption weakens near/below that point).
 
     P_sat is calculated from the Antoine equation (valid 1-100C):
         log10(P_sat / mmHg) = A - B / (C + T)
@@ -98,6 +110,7 @@ def print_stream(label, stream):
 print("=" * 50)
 print("  CASCADE METHANATION — FEED CALCULATION")
 print("=" * 50)
+print(f"  Flash separators: {FLASH_T_C:.0f} C, {FLASH_P_BAR:.0f} bar")
 
 print_stream("Feed", feed)
 
@@ -108,7 +121,7 @@ print_stream("After Reactor 1 (80% conv.)", after_r1)
 # This allows Reactor 2 to start with a lower water content, shifting
 # the equilibrium and enabling further CO2 conversion.
 after_f1, w1, Psat1 = flash(after_r1)
-print(f"\n  Flash 1 — P_sat(25C) = {Psat1*1000:.2f} mbar | water removed: {w1:.4f} mol")
+print(f"\n  Flash 1 — P_sat({FLASH_T_C:.0f}C) = {Psat1*1000:.2f} mbar | water removed: {w1:.4f} mol")
 print_stream("After Flash 1", after_f1)
 
 # ── Stage 2 ───────────────────────────────────────────────────────────────────
@@ -116,11 +129,11 @@ after_r2 = react(after_f1, X_per_pass)
 print_stream("After Reactor 2 (80% conv.)", after_r2)
 
 # Flash 2: final water removal before the gas enters the MPB reactor.
-# Residual water vapour is set by VLE at 25C/25bar (~0.13 mol%).
+# Residual water vapour is set by VLE at FLASH_T_C/FLASH_P_BAR (see printed value below).
 # Even this small amount matters for the MPB: water adsorbs preferentially
 # on 13X zeolite over CO2, so it competes for sorbent active sites.
 after_f2, w2, Psat2 = flash(after_r2)
-print(f"\n  Flash 2 — P_sat(25C) = {Psat2*1000:.2f} mbar | water removed: {w2:.4f} mol")
+print(f"\n  Flash 2 — P_sat({FLASH_T_C:.0f}C) = {Psat2*1000:.2f} mbar | water removed: {w2:.4f} mol")
 print_stream("After Flash 2 (MPB feed)", after_f2)
 
 # ── Overall summary ───────────────────────────────────────────────────────────

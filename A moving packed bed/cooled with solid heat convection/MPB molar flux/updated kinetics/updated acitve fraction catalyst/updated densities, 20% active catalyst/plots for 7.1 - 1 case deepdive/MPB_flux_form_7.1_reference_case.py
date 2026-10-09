@@ -139,14 +139,18 @@ def q_star_vec(T_K, p_arr, W0, E, n):
     qs = rho_water(T_K)/MW_H2O*W
     return np.where(p <= 0, 0.0, qs)
 
-def K_LDF_vec(T_K, p_arr, W0, E, n):
-    D_M = 3.36e-9 * T_K**1.75
+def dqstar_dp_vec(T_K, p_arr, W0, E, n):
+    """Local slope of the DA isotherm, dq*/dp_H2O, central-difference (same stencil as K_LDF_vec)."""
     p    = np.asarray(p_arr, dtype=float)
     dp   = 1.0/1e5
     dqsp = (q_star_vec(T_K, p+dp, W0, E, n)
             - q_star_vec(T_K, np.maximum(p-dp, 1e-15), W0, E, n)) / 2.0
-    dqsp = np.maximum(dqsp, 1e-30)
-    r_p = 0.5 * d_p
+    return np.maximum(dqsp, 1e-30)
+
+def K_LDF_vec(T_K, p_arr, W0, E, n):
+    D_M  = 3.36e-9 * T_K**1.75
+    dqsp = dqstar_dp_vec(T_K, p_arr, W0, E, n)
+    r_p  = 0.5 * d_p
     return 15.0 * eps_p * D_M / (r_p**2 * tau_p * rho_p * R_gas * T_K * dqsp)
 
 def K_eq_sabatier(T_K):
@@ -169,6 +173,9 @@ def q_star(T_K, p_H2O):
 
 def K_LDF(T_K, p_H2O):
     return K_LDF_vec(T_K, p_H2O, W0_DA, E_DA, n_DA)
+
+def dqstar_dp(T_K, p_H2O):
+    return dqstar_dp_vec(T_K, p_H2O, W0_DA, E_DA, n_DA)
 
 def equilibrium_conversion(T_K_val):
     K = K_eq_sabatier(T_K_val)
@@ -915,6 +922,19 @@ ax.tick_params(labelsize=13)
 ax.legend(fontsize=14);  ax.grid(True, which='both', alpha=0.3)
 plt.tight_layout()
 _savefig('sec7_1_fig9_K_LDF_vs_z.png');  plt.show()
+
+# ── Figure 10: dq*/dp_H2O (local DA-isotherm slope) vs z ────────────────────
+dqsp_f = dqstar_dp(res['T'], p_H2O_z)
+fig, ax = plt.subplots(figsize=(8, 5.5))
+ax.plot(z, dqsp_f, color='darkviolet', lw=2.5, label='$dq^*/dp_{H2O}(z)$')
+ax.plot(z[i_pmax_fig9], dqsp_f[i_pmax_fig9], 'o', color='k', ms=6,
+        label=f'peak $p_{{H2O}}$ (z={z[i_pmax_fig9]:.3f} m)')
+ax.set_xlabel('z [m]', fontsize=16);  ax.set_ylabel('$dq^*/dp_{H2O}$ [mol/(kg_ads·bar)]', fontsize=16)
+ax.set_yscale('log')
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=14);  ax.grid(True, which='both', alpha=0.3)
+plt.tight_layout()
+_savefig('sec7_1_fig10_dqstar_dp_vs_z.png');  plt.show()
 # endregion
 
 

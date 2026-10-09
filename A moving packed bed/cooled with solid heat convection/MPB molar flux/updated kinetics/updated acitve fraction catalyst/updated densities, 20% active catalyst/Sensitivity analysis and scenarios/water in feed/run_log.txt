@@ -1,0 +1,5 @@
+Error: Current working directory has a path longer than allowed for a
+Win32 working directory.
+Can't start native Windows application from here.
+
+/usr/bin/bash: line 1: /c/Users/wsbg4/AppData/Local/Programs/Python/Python310/python: File name too long

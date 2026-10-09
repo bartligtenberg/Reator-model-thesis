@@ -123,7 +123,7 @@ y_CH4_in = 0.80             # [-]    CH4 inlet mole fraction (background/diluent
 
 # --- Inlet molar fluxes [mol/(m²·s)] — temperature-independent ---
 T_STP   = 273.15                  # [K]                   standard temperature (0 °C)
-GHSV    = 1                    # [m³_STP/(kg_ads·h)]   gas hourly space velocity — Bareschino et al. (2023)
+GHSV    = 1.5                   # [m³_STP/(kg_ads·h)]   gas hourly space velocity — Bareschino et al. (2023)
 Q_STP   = GHSV * M_ads / 3600.0   # [m³_STP/s]  volumetric feed flow at STP
 u_g_STP = Q_STP / A_b             # [m/s]       superficial gas velocity at STP
 F_total_in = u_g_STP * P_Pa / (R_gas * T_STP)  # [mol/(m²·s)]  total molar flux at inlet (ideal gas law)
@@ -132,7 +132,7 @@ F_in_H2    = y_H2_in  * F_total_in   # [mol/(m²·s)]  H2 inlet molar flux
 F_in_CH4   = y_CH4_in * F_total_in   # [mol/(m²·s)]  CH4 inlet molar flux
 
 # --- MPB scan parameters ---
-U_S_LIST  = np.array([8.0, 6.0, 5.0, 4.0, 3.5, 3.4]) * 1e-3
+U_S_LIST  = np.array([5.8]) * 1e-3
 T_IN_LIST = [280]
 
 print(f"MPB flux form: d={d_b*100:.0f} cm, L={L_b:.1f} m, "

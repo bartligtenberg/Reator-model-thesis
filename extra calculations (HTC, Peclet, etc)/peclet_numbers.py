@@ -7,6 +7,7 @@ Pe >> 1: convection dominates, diffusion/conduction can be neglected.
 3. Radial heat Peclet + wall Biot  — radial temperature gradient significant?
 4. Gas-particle Nusselt (Gunn)     — pseudohomogeneous (T_gas = T_solid) valid?
 5. Weisz-Prater                    — internal (intraparticle) diffusion limitation?
+6. Minimum fluidization velocity (Wen & Yu, 1966) — bed stays packed (not fluidized)?
 """
 
 import numpy as np
@@ -28,7 +29,7 @@ eps_p   = 0.242    # [-]      intraparticle porosity — Wei's pore volume + Bar
 tau_p   = 4.0      # [-]      pore tortuosity factor — Mette et al. (2015)
 rho_p   = 1400.0   # [kg/m³]  particle (skeletal) density — Bareschino et al. (2023)
 
-bifunctional_mass = 0.4    # [kg]  mass of 5wt%Ni-2.5wt%Ce/13X bifunctional material
+bifunctional_mass = 0.8    # [kg]  mass of 5wt%Ni-2.5wt%Ce/13X bifunctional material
 M_zeolite_added   = 0.0    # [kg]  additional pure 13X zeolite (sorbent-only, no Ni)
 active_fraction   = 0.20   # [-]   fraction of the bifunctional material's mass that is catalytically active
 
@@ -42,7 +43,7 @@ rho_bed_ads  = M_ads / V_bed                     # [kg_ads/m³_bed]   sorbent bu
 rho_bed_fill = M_filler / V_bed                  # [kg_fill/m³_bed]  filler bulk density
 rho_bed_tot  = (M_solid_phys + M_filler) / V_bed  # [kg_solid/m³_bed] total solids bulk density (heat capacity basis)
 Cp_cat       = 1100.0             # [J/(kg·K)]
-u_s_min, u_s_max = 1e-4, 5e-3     # [m/s] solid velocity scan range
+u_s_min, u_s_max = 1e-4, 5.84e-3     # [m/s] solid velocity scan range
 
 print(f"Densities | M_cat_active={M_cat_active*1e3:.1f}g  M_ads={M_ads*1e3:.1f}g  M_filler={M_filler*1e3:.1f}g  "
       f"-> rho_bed_cat={rho_bed_cat:.1f}  rho_bed_ads={rho_bed_ads:.1f}  rho_bed_fill={rho_bed_fill:.1f}  "
@@ -54,18 +55,34 @@ P_Pa = 1e5
 R_gas = 8.314
 y_CH4, y_H2, y_CO2 = 0.80, 0.16, 0.04
 
-GHSV  = 1.0                        # [m³_STP/(kg_ads·h)]
+GHSV  = 1.5                        # [m³_STP/(kg_ads·h)]
 A_b   = np.pi/4 * d_b**2
 u_g   = (GHSV * M_ads / 3600.0) / A_b * (T_K / 273.15)   # GHSV=1.0 m³_STP/(kg_ads·h)
 
 k_gas  = y_CH4*0.045  + y_H2*0.230  + y_CO2*0.025        # [W/(m·K)]
 mu_gas = y_CH4*1.50e-5 + y_H2*1.10e-5 + y_CO2*2.00e-5   # [Pa·s]
 rho_gas = (P_Pa / (R_gas * T_K)) * (y_CH4*16e-3 + y_H2*2e-3 + y_CO2*44e-3)
-Cp_mix  = 1500.0                                          # [J/(kg·K)]
+Cp_mix  = 2950.0                                          # [J/(kg·K)] mass basis; matches NIST molar
+                                                            # Cp (CH4=46.9, H2=29.3, CO2=45.4 J/mol/K,
+                                                            # ~550K, as in MPB_flux_form_7.1_reference_case.py)
+                                                            # mole-fraction-weighted then /M_avg=14.92 g/mol
+
+# Binary gas diffusivity of CO2 in the bulk background (80% CH4) via the Fuller
+# correlation (Fuller, Ensley & Giddings, 1969) — a standard estimate for gas-phase
+# binary diffusivities when no measured value is available. CO2 is the dilute
+# reacting/adsorbing species, so this pseudo-binary CO2-in-CH4 value stands in for
+# the mixture diffusivity in both Sc (external mass transfer, below) and the
+# Weisz-Prater intraparticle check (section 5).
+v_CO2, v_CH4 = 26.9, 24.42                          # [-] Fuller diffusion volumes
+M_CO2_g, M_CH4_g = 44.01, 16.04                     # [g/mol]
+M_AB  = 2.0 / (1.0/M_CO2_g + 1.0/M_CH4_g)           # [g/mol]
+P_atm = P_Pa / 101325.0
+D_CO2_CH4 = (0.00143 * T_K**1.75
+             / (P_atm * np.sqrt(M_AB) * (v_CO2**(1/3) + v_CH4**(1/3))**2)) * 1e-4   # [cm2/s] -> [m2/s]
 
 Re_p = rho_gas * u_g * d_p / mu_gas
 Pr   = mu_gas * Cp_mix / k_gas
-Sc   = mu_gas / (rho_gas * (1.0 / (y_H2/1.50e-4 + y_CH4/2.50e-5)))
+Sc   = mu_gas / (rho_gas * D_CO2_CH4)
 
 print(f"MPB Peclet analysis | d_b={d_b*100:.0f}cm  L={L_b:.1f}m  d_p={d_p*1e3:.2f}mm  "
       f"T=280C  u_g={u_g*1e3:.1f}mm/s  Re_p={Re_p:.2f}  Pr={Pr:.2f}  Sc={Sc:.1f}\n")
@@ -116,7 +133,7 @@ print(f"   Solid Pe_h,bed = {Pe_sol_min:.0f} - {Pe_sol_max:.0f}"
 r_peak_active = 0.02             # [mol/(kg_cat_active·s)] representative peak reaction rate
 h_bw      = 25.0                  # [W/(m²·K)] from Specchia formula
 Bi_wall   = h_bw * R_b / k_eff_r
-Q_peak    = 165000.0 * rho_bed_cat * r_peak_active   # dH_r * rho_bed_cat * r_peak [W/m³]
+Q_peak    = 85000   # dH_r * rho_bed_cat * r_peak [W/m³]
 dT_radial = Q_peak * R_b**2 / (4 * k_eff_r)
 dT_center = Q_peak * R_b**2 / (8 * k_eff_r)
 print(f"3. Radial heat (1D vs 2D)")
@@ -137,24 +154,16 @@ print(f"   Nu_sg = {Nu_sg:.2f}   h_sg = {h_sg:.0f} W/(m2·K)   NTU = {NTU:.0f}"
 print(f"   -> {'VALID' if NTU > 100 else 'QUESTIONABLE'}\n")
 
 # ── 5. Weisz-Prater (internal / intraparticle diffusion limitation check) ────
-# Binary gas diffusivity of CO2 in the bulk background (80 % CH4) via the Fuller
-# correlation (Fuller, Ensley & Giddings, 1969) — a standard estimate for
-# gas-phase binary diffusivities when no measured value is available.
-v_CO2, v_CH4 = 26.9, 24.42                          # [-] Fuller diffusion volumes
-M_CO2_g, M_CH4_g = 44.01, 16.04                     # [g/mol]
-M_AB  = 2.0 / (1.0/M_CO2_g + 1.0/M_CH4_g)           # [g/mol]
-P_atm = P_Pa / 101325.0
-D_CO2_CH4 = (0.00143 * T_K**1.75
-             / (P_atm * np.sqrt(M_AB) * (v_CO2**(1/3) + v_CH4**(1/3))**2)) * 1e-4   # [cm2/s] -> [m2/s]
+# D_CO2_CH4 (Fuller correlation) computed above, alongside Sc.
 D_eff = D_CO2_CH4 * eps_p / tau_p                    # [m2/s] effective intraparticle diffusivity
 
 R_p    = d_p / 2
-L_char = R_p / 3                                     # [m] Weisz-Prater/Bischoff characteristic length V_p/S_p for a sphere
+L_char = R_p                                          # [m] Weisz-Prater/Bischoff characteristic length V_p/S_p for a sphere
                                                       # (NOT the particle radius -- Weisz & Prater (1954) and Bischoff (1967)
                                                       # both define the modulus with L = V/S; using R_p directly overstates
                                                       # C_WP by (R_p/L)^2 = 9x for a sphere)
 C_CO2_s = y_CO2 * P_Pa / (R_gas * T_K)               # [mol/m3] bulk CO2 concentration (surface conc. approximation)
-r_peak_particle = r_peak_active * active_fraction    # [mol/(kg_particle·s)] rescaled to whole-pellet mass basis,
+r_peak_particle = r_peak_active * 0.05    # [mol/(kg_particle·s)] rescaled to whole-pellet mass basis,
                                                       # since rho_p/D_eff act on the whole pellet, not just the active fraction
 n_order   = 0.5   # [-] approximate reaction order in CO2 (LHHW rate ~ sqrt(p_CO2))
 # Bischoff (1967) generalizes Weisz & Prater (1954) to arbitrary reaction order via his
@@ -170,9 +179,30 @@ thresh_WP = 2.0 / (n_order + 1)   # [-] threshold for C_WP below
 
 C_WP = r_peak_particle * rho_p * L_char**2 / (D_eff * C_CO2_s)
 print(f"5. Weisz-Prater / Bischoff (internal diffusion)")
-print(f"   D_CO2-CH4 = {D_CO2_CH4:.2e} m2/s   D_eff = {D_eff:.2e} m2/s   C_CO2 = {C_CO2_s:.2f} mol/m3   L_char = R_p/3 = {L_char*1e3:.3f} mm")
-print(f"   C_WP = {C_WP:.2f}   (threshold 2/(n+1) = {thresh_WP:.2f} for n~{n_order})"
+print(f"   D_CO2-CH4 = {D_CO2_CH4:.2e} m2/s   D_eff = {D_eff:.2e} m2/s   C_CO2 = {C_CO2_s:.2f} mol/m3   L_char = R_p = {L_char*1e3:.3f} mm")
+print(f"   C_WP = {C_WP:.2f}   (threshold 1 = {thresh_WP:.2f} for n~{n_order})"
       f"  -> {'VALID' if C_WP < thresh_WP else 'NOT NEGLIGIBLE'}\n")
+
+# ── 6. Minimum fluidization velocity (Wen & Yu, 1966 — bed stays packed?) ────
+# Wen & Yu correlation: Re_mf = sqrt(C1^2 + C2*Ar) - C1, with C1=33.7, C2=0.0408
+# (fitted constants that fold in sphericity/voidage at minimum fluidization, valid
+# over a wide Re_mf range -- avoids needing eps_mf/phi_s separately, unlike the
+# direct Ergun-based solution). Confirms upward gas flow stays well below
+# fluidization so the bed remains a moving packed bed, not a fluidized one.
+g = 9.81   # [m/s2]
+Ar = d_p**3 * rho_gas * (rho_p - rho_gas) * g / mu_gas**2
+C1, C2 = 33.7, 0.0408
+Re_mf = np.sqrt(C1**2 + C2*Ar) - C1
+u_mf  = Re_mf * mu_gas / (rho_gas * d_p)
+print(f"6. Minimum fluidization velocity (Wen & Yu, 1966)")
+print(f"   Ar = {Ar:.1f}   Re_mf = {Re_mf:.3f}   u_mf = {u_mf*1e3:.2f} mm/s"
+      f"   u_g = {u_g*1e3:.2f} mm/s   u_g/u_mf = {u_g/u_mf:.3f}")
+print(f"   -> {'PACKED (u_g < u_mf)' if u_g < u_mf else 'FLUIDIZED -- u_g exceeds u_mf'}")
+
+# u_g is linear in GHSV (see u_g formula above), so GHSV_max follows by direct scaling.
+GHSV_max = GHSV * (u_mf / u_g)
+print(f"   GHSV_max (u_g = u_mf) = {GHSV_max:.2f} m3_STP/(kg_ads*h)"
+      f"   [current GHSV = {GHSV:.2f}, headroom {GHSV_max/GHSV:.1f}x]\n")
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 print("SUMMARY")

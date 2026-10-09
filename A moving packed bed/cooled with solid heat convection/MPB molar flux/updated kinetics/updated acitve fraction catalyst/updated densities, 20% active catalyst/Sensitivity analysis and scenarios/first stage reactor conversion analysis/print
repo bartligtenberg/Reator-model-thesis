@@ -1,0 +1,51 @@
+ 
+PS C:\Users\wsbg4\OneDrive\Documenten\Master EFPT\thesis\reactor modelling> & C:\Users\wsbg4\anaconda2k25\python.exe "c:/Users/wsbg4/OneDrive/Documenten/Master EFPT/thesis/reactor modelling/A moving packed bed/cooled with solid heat convection/MPB molar flux/updated kinetics/updated acitve fraction catalyst/updated densities, 20% active catalyst/Sensitivity analysis and scenarios/water in feed/MPB feed analysis v2.py"
+MPB flux form: d=5 cm, L=2.0 m, rho_bed_tot=840 kg/m3, u_g_STP=104.7 mm/s
+  F_in_total = 4.6099 mol/(m2·s)  (temperature-independent)
+  U_a = 2000 W/(m3·K)
+  bifunctional material = 800.0 g, active_fraction = 20%
+  M_cat(active)   = 160.0 g
+  zeolite added   = 0.0 g
+  M_ads           = 740.0 g  (92.5% of bifunctional material + zeolite added)
+  M_filler        = 2498.7 g  (75.7% of total solids; tops bed up to eps_b=0.40 packing at rho_p=1400 kg/m3; same rho_p/Cp_cat/d_p as catalyst/sorbent, chemically inert -> rho_bed_tot = 840 kg/m3)
+  Cascade feed sweep: X_per_pass = [0.7, 0.8, 0.9], DRY_FEED = True (flash @ 25 C / 25 bar)
+    X_per_pass=70%:  y_CO2=6.62%  y_H2=26.47%  y_CH4=66.91%  y_H2O=0.0000%
+    X_per_pass=80%:  y_CO2=3.45%  y_H2=13.79%  y_CH4=82.76%  y_H2O=0.0000%
+    X_per_pass=90%:  y_CO2=0.96%  y_H2=3.85%  y_CH4=95.19%  y_H2O=0.0000%
+
+############################################################
+  X_per_pass = 70%  (DRY_FEED=True)  ->  feed: y_CO2=6.62%  y_H2=26.47%  y_CH4=66.91%  y_H2O=0.0000%
+############################################################
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.210 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 89.0%
+  X=70%  u_s=5.8400 mm/s  X_CO2=100.0%  q(0)=0.553  T_max=293.7 C  p_H2O_max=27.82 mbar  [solid-dom, ok, 958 iter, err=8.26e-06]  (1395.0s, ETA 46m 30s)
+    H2O balance [mmol/(m²·s)]:  produced=609.944  gas_out=0.000  solid_out=608.416  err=-0.3%
+
+############################################################
+  X_per_pass = 80%  (DRY_FEED=True)  ->  feed: y_CO2=3.45%  y_H2=13.79%  y_CH4=82.76%  y_H2O=0.0000%
+############################################################
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.222 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 83.1%
+  X=80%  u_s=5.8400 mm/s  X_CO2=99.9%  q(0)=0.288  T_max=287.2 C  p_H2O_max=6.72 mbar  [solid-dom, ok, 223 iter, err=9.12e-06]  (297.5s, ETA 14m 06s)
+    H2O balance [mmol/(m²·s)]:  produced=317.657  gas_out=0.001  solid_out=317.300  err=-0.1%
+
+############################################################
+  X_per_pass = 90%  (DRY_FEED=True)  ->  feed: y_CO2=0.96%  y_H2=3.85%  y_CH4=95.19%  y_H2O=0.0000%
+############################################################
+
+============================================================
+  T_in = 280 C  |  u_g_STP = 104.7 mm/s  |  U_a = 2000 W/(m3·K)  |  GHSV = 1.00 m3_STP/(kg·h)
+  u_s* = 0.231 mm/s  (regime switch at this velocity)
+============================================================
+  non-SE fixed-bed conversion: 65.6%
+  X=90%  u_s=5.8400 mm/s  X_CO2=99.7%  q(0)=0.080  T_max=282.0 C  p_H2O_max=1.03 mbar  [solid-dom, ok, 73 iter, err=3.90e-06]  (95.3s, ETA 0s)
+    H2O balance [mmol/(m²·s)]:  produced=88.389  gas_out=0.001  solid_out=88.297  err=-0.1%
+    
